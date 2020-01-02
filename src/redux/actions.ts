@@ -53,7 +53,7 @@ function receiveArticles(articles: any) {
 const NEWS_API = 'https://www.xiaoxihome.com/api/news?query=';
 // const NEWS_API = 'http://localhost:5000/api/news?query=';
 
-export function fetchArticles(category: Categories) {
+export function fetchArticles(category: keyof typeof Categories) {
     const QUERY = `
         {
             getNews(category: ${category}) {
