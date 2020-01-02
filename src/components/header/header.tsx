@@ -14,6 +14,7 @@ import {
     Typography,
     withWidth
 } from "@material-ui/core";
+import {DispatchProp} from "react-redux";
 
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -21,25 +22,31 @@ const useStyles = makeStyles((theme: Theme) => ({
         flexShrink: 0,
         flexGrow: 1
     },
+    toolbar: {
+        textTransform: 'uppercase'
+    }
 }));
 
 interface HeaderProps {
     headers: Array<keyof typeof Categories>,
-    dispatch: any
+    dispatcher: any
 }
 
 function Header(props: HeaderProps) {
     const classes = useStyles();
     const [category, setCategory] = useState(0);
     const clickHandler = (i: number) => {
+        if (i === category) return;
         setCategory(i);
-        props.dispatch(fetchArticles((props.headers[i])));
+        props.dispatcher(fetchArticles((props.headers[i])));
     };
 
     return (
         <AppBar position="static" color="default">
             <Toolbar>
-                <Typography variant="h6" align={"center"}>News Canada</Typography>
+                <Container>
+                    <Typography variant="h5" align={"center"} className={classes.toolbar}>News Canada</Typography>
+                </Container>
             </Toolbar>
             <Tabs
                 value={category}
@@ -56,4 +63,4 @@ function Header(props: HeaderProps) {
     )
 }
 
-export default withWidth()(Header);
+export default Header;

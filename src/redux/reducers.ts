@@ -1,4 +1,4 @@
-import {ArticleActions, Categories, CategoryActions} from "./actions";
+import {ArticleType, ArticleActions, Categories, CategoryActions} from "./actions";
 import { combineReducers } from "redux";
 
 export interface InitState {
@@ -6,7 +6,7 @@ export interface InitState {
     articles: {
         isError: boolean,
         isFetching: boolean,
-        articles: Array<any>
+        articles: Array<ArticleType>
     }
 }
 

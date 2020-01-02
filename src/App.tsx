@@ -6,11 +6,14 @@ import {InitState} from "./redux/reducers";
 import {categories, Categories, fetchArticles} from "./redux/actions";
 import {Box, CssBaseline} from "@material-ui/core";
 import Header from "./components/header/header";
+import Articles from "./components/articles/articles";
 
 
 const store = configureStore();
 
-const HeaderContainer = connect()(Header);
+interface InnerAppProps extends InitState{
+    dispatch: any,
+}
 
 function InnerApp(props: any) {
     useEffect(() => {
@@ -18,7 +21,8 @@ function InnerApp(props: any) {
     }, []);
     return (
         <Box width={'100vw'} minHeight={'100vh'} maxWidth={'100%'}>
-            <HeaderContainer headers={categories}/>
+            <Header headers={categories} dispatcher={props.dispatch}/>
+            <Articles articles={props.articles}/>
         </Box>
     )
 }

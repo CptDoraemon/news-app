@@ -11,6 +11,17 @@ export const categories: Array<keyof typeof Categories> = [
     `HEADLINE`, `BUSINESS`, `ENTERTAINMENT`, `HEALTH`, `SCIENCE`, `SPORTS`, `TECHNOLOGY`
 ];
 
+export interface ArticleType {
+    source: string,
+    author: string,
+    title: string,
+    description: string,
+    url: string,
+    urlToImage: string,
+    publishedAt: string,
+    content: string
+}
+
 export enum CategoryActions {
     SET_CATEGORY = 'SET_CATEGORY'
 }
@@ -71,15 +82,13 @@ export function fetchArticles(category: keyof typeof Categories) {
 
     return (dispatch: any) => {
         dispatch(requestArticles());
-        console.log(NEWS_API + encodeURIComponent(QUERY));
         return fetch(NEWS_API + encodeURIComponent(QUERY))
             .then(res => res.json())
             .then(json => {
-                console.log(json);
                 if (json.errors) {
-                    requestArticlesFailed()
+                    dispatch(requestArticlesFailed())
                 } else {
-                    receiveArticles(json.data.getNews)
+                    dispatch(receiveArticles(json.data.getNews))
                 }
             })
     }
