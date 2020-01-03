@@ -17,18 +17,20 @@ import {ArticleType} from "../../redux/actions";
 
 const useStyles = makeStyles((theme) => createStyles({
     wrapper: {
-        width: '100vw - 40px',
+        width: 'calc(100vw - 40px)',
         margin: '20px',
-        [theme.breakpoints.down("md")]: {
-            width: '100vw',
-            margin: '0'
-        },
     },
     cardMediaPrimary: {
-        height: '100vh - 150'
+        height: '50vh',
     },
     cardMediaNormal: {
-        height: '150'
+        height: '150px'
+    },
+    [theme.breakpoints.down("md")]: {
+        wrapper: {
+            width: '100vw',
+            margin: '0'
+        }
     },
 }));
 
@@ -85,7 +87,7 @@ function Article(props: ArticleProps) {
                             image={props.urlToImage}
                             title={props.title}
                         /> :
-                        <Skeleton variant={"rect"} className={isPrimaryCard ? classes.cardMediaPrimary : classes.cardMediaNormal} />
+                        <Skeleton variant={"rect"} height={'300px'} width={'100%'} />
                 }
 
                 <CardContent>
@@ -93,8 +95,41 @@ function Article(props: ArticleProps) {
                         { props.title }
                     </Typography>
                     <Typography variant="body2" color="textSecondary" component="p">
+                        <Box component={'span'} fontWeight={700}>
+                            Source: {' '}
+                        </Box>
+                        { props.source ? props.source : 'unknown'}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary" component="p">
+                        <Box component={'span'} fontWeight={700}>
+                            Author: {' '}
+                        </Box>
+                        { props.author ? props.author : 'unknown'}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary" component="p">
+                        <Box component={'span'} fontWeight={700}>
+                            { new Date(props.publishedAt).toLocaleString('en-CA', {
+                                timeZone: 'America/Toronto',
+                                hour12: false,
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                })
+                            }
+                            { ' ' }
+                            { new Date(props.publishedAt).toLocaleString('en-CA', {
+                                timeZone: 'America/Toronto',
+                                year: 'numeric',
+                                month: 'short',
+                                day: '2-digit',
+                            })
+                            }
+                        </Box>
+                    </Typography>
+                    <Box mt={1}>
+                    <Typography variant="body2" color="textSecondary" component="p">
                         { props.content }
                     </Typography>
+                    </Box>
                 </CardContent>
                 <CardActions>
                 <Link href={props.url} target={'_blank'} rel="noopener" underline={"none"}>
