@@ -51,15 +51,23 @@ const useStyles = makeStyles((theme) => createStyles({
     cardMediaPrimary: {
         height: '550px',
     },
+    skeletonPrimary: {
+        height: '550px',
+    },
     cardContentPrimary: {
         width: '100%',
-        height: '200px'
+        height: '200px',
+        overflow: 'hidden',
+        position: 'relative'
     },
     cardWrapperNormal: {
         height: '400px'
     },
     cardMediaNormal: {
         height: '150px'
+    },
+    skeletonNormal: {
+        height: '150px',
     },
     cardContentNormal: {
         height: '200px',
@@ -71,7 +79,31 @@ const useStyles = makeStyles((theme) => createStyles({
         wrapper: {
             width: 'calc(100% - 16px)',
             margin: '8px'
-        }
+        },
+        cardWrapperPrimary: {
+            height: '400px'
+        },
+        cardMediaPrimary: {
+            height: '150px',
+        },
+        skeletonPrimary: {
+            height: '150px',
+        },
+        cardContentPrimary: {
+            height: '200px'
+        },
+        cardWrapperNormal: {
+            height: '400px'
+        },
+        cardMediaNormal: {
+            height: '150px',
+        },
+        skeletonNormal: {
+            height: '150px',
+        },
+        cardContentNormal: {
+            height: '200px'
+        },
     },
 }));
 
@@ -128,7 +160,7 @@ function Article(props: ArticleProps) {
                             image={props.urlToImage}
                             title={props.title}
                         /> :
-                        <Skeleton variant={"rect"} height={'550px'} width={'100%'} />
+                        <Skeleton variant={"rect"} className={isPrimaryCard ? classes.skeletonPrimary : classes.skeletonNormal} />
                 }
 
                 <CardContent className={isPrimaryCard ? classes.cardContentPrimary : classes.cardContentNormal}>

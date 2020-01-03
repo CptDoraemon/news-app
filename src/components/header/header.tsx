@@ -44,7 +44,7 @@ function Header(props: HeaderProps) {
             <Toolbar>
                 <Container>
                     <Typography align={"center"} className={classes.toolbar} color={'primary'}>
-                        <Box fontWeight={700} fontSize={'h4.fontSize'}>
+                        <Box fontWeight={700} fontSize={'h5.fontSize'}>
                             News Canada
                         </Box>
                     </Typography>
