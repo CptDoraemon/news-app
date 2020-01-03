@@ -15,21 +15,62 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import {InitState} from "../../redux/reducers";
 import {ArticleType} from "../../redux/actions";
 
+function getPublishTime(date: Date): string{
+    const timePast = Date.now() - date.getTime();
+    if (timePast < 0) {
+        return 'now'
+    }
+    const minutes = Math.floor(timePast / (60 * 1000));
+    if (minutes <= 59) {
+        return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`
+    }
+    const hours = Math.floor(timePast / (60 * 60 * 1000));
+    if (hours <= 23) {
+        return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`
+    }
+    const days = Math.floor(timePast / (24 * 60 * 60 * 1000));
+    if (days <= 30) {
+        return `${days} ${days === 1 ? 'day' : 'days'} ago`
+    }
+    const months = Math.floor(timePast / (30 * 24 * 60 * 60 * 1000));
+    if (months <= 12) {
+        return `${months} ${months === 1 ? 'month' : 'months'} ago`
+    }
+    const years = Math.floor(timePast / (365 * 24 * 60 * 60 * 1000));
+    return `${years} ${years === 1 ? 'year' : 'years'} ago`
+}
+
 const useStyles = makeStyles((theme) => createStyles({
     wrapper: {
-        width: 'calc(100vw - 40px)',
+        width: 'calc(100% - 40px)',
         margin: '20px',
     },
+    cardWrapperPrimary: {
+        height: '800px'
+    },
     cardMediaPrimary: {
-        height: '50vh',
+        height: '550px',
+    },
+    cardContentPrimary: {
+        width: '100%',
+        height: '200px'
+    },
+    cardWrapperNormal: {
+        height: '400px'
     },
     cardMediaNormal: {
         height: '150px'
     },
+    cardContentNormal: {
+        height: '200px',
+        width: '100%',
+        overflow: 'hidden',
+        position: 'relative'
+    },
     [theme.breakpoints.down("md")]: {
         wrapper: {
-            width: '100vw',
-            margin: '0'
+            width: 'calc(100% - 16px)',
+            margin: '8px'
         }
     },
 }));
@@ -77,9 +118,9 @@ function Article(props: ArticleProps) {
     const isPrimaryCard = props.id === 0 || props.id === 1;
     return (
         <Grid item xs={12} md={isPrimaryCard ? 6 : 3} ref={ref}>
-            <Card raised>
+            <Card raised className={isPrimaryCard ? classes.cardWrapperPrimary : classes.cardWrapperNormal}>
                 {
-                    isVisible ?
+                    isVisible && props.urlToImage?
                         <CardMedia
                             component="img"
                             alt={props.title}
@@ -87,49 +128,22 @@ function Article(props: ArticleProps) {
                             image={props.urlToImage}
                             title={props.title}
                         /> :
-                        <Skeleton variant={"rect"} height={'300px'} width={'100%'} />
+                        <Skeleton variant={"rect"} height={'550px'} width={'100%'} />
                 }
 
-                <CardContent>
+                <CardContent className={isPrimaryCard ? classes.cardContentPrimary : classes.cardContentNormal}>
                     <Typography gutterBottom variant="h5" component="h2">
                         { props.title }
                     </Typography>
                     <Typography variant="body2" color="textSecondary" component="p">
                         <Box component={'span'} fontWeight={700}>
-                            Source: {' '}
-                        </Box>
-                        { props.source ? props.source : 'unknown'}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary" component="p">
-                        <Box component={'span'} fontWeight={700}>
-                            Author: {' '}
-                        </Box>
-                        { props.author ? props.author : 'unknown'}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary" component="p">
-                        <Box component={'span'} fontWeight={700}>
-                            { new Date(props.publishedAt).toLocaleString('en-CA', {
-                                timeZone: 'America/Toronto',
-                                hour12: false,
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                })
-                            }
-                            { ' ' }
-                            { new Date(props.publishedAt).toLocaleString('en-CA', {
-                                timeZone: 'America/Toronto',
-                                year: 'numeric',
-                                month: 'short',
-                                day: '2-digit',
-                            })
-                            }
+                            { props.source ? props.source + ' - ' : props.author ? props.author + ' - ' : '' }
+                            { getPublishTime(new Date(props.publishedAt)) }
                         </Box>
                     </Typography>
-                    <Box mt={1}>
                     <Typography variant="body2" color="textSecondary" component="p">
                         { props.content }
                     </Typography>
-                    </Box>
                 </CardContent>
                 <CardActions>
                 <Link href={props.url} target={'_blank'} rel="noopener" underline={"none"}>

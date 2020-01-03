@@ -7,6 +7,7 @@ import {categories, Categories, fetchArticles} from "./redux/actions";
 import {Box, CssBaseline} from "@material-ui/core";
 import Header from "./components/header/header";
 import Articles from "./components/articles/articles";
+import Attribution from "./components/attribution";
 
 
 const store = configureStore();
@@ -23,6 +24,7 @@ function InnerApp(props: any) {
         <Box width={'100vw'} minHeight={'100vh'} maxWidth={'100%'}>
             <Header headers={categories} dispatcher={props.dispatch}/>
             <Articles articles={props.articles}/>
+            <Attribution />
         </Box>
     )
 }

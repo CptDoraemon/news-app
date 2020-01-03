@@ -1,20 +1,18 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import './header.css'
-import {Categories, fetchArticles, setCategoryIfNeeded} from "../../redux/actions";
+import {Categories, fetchArticles} from "../../redux/actions";
 import {
     AppBar,
     Box,
     Container,
-    Grid,
+
     makeStyles,
     Tab,
     Tabs,
     Theme,
     Toolbar,
     Typography,
-    withWidth
 } from "@material-ui/core";
-import {DispatchProp} from "react-redux";
 
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -42,23 +40,27 @@ function Header(props: HeaderProps) {
     };
 
     return (
-        <AppBar position="static" color="default">
+        <AppBar color="default" position={'static'}>
             <Toolbar>
                 <Container>
-                    <Typography variant="h5" align={"center"} className={classes.toolbar}>News Canada</Typography>
+                    <Typography align={"center"} className={classes.toolbar} color={'primary'}>
+                        <Box fontWeight={700} fontSize={'h4.fontSize'}>
+                            News Canada
+                        </Box>
+                    </Typography>
                 </Container>
             </Toolbar>
-            <Tabs
-                value={category}
-                indicatorColor="primary"
-                textColor="primary"
-                variant="scrollable"
-                scrollButtons="auto"
-            >
-                {
-                    props.headers.map((_, i) => <Tab label={_} key={i} className={classes.tab} onClick={() => clickHandler(i)}/>)
-                }
-            </Tabs>
+                <Tabs
+                    value={category}
+                    indicatorColor="primary"
+                    textColor="primary"
+                    variant="scrollable"
+                    scrollButtons="auto"
+                >
+                    {
+                        props.headers.map((_, i) => <Tab label={_} key={i} className={classes.tab} onClick={() => clickHandler(i)}/>)
+                    }
+                </Tabs>
         </AppBar>
     )
 }
