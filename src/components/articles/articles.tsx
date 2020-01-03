@@ -1,46 +1,28 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useRef, useState} from "react";
 import {
     Box,
     Button,
     Card,
-    CardActionArea,
     CardActions,
     CardContent,
-    CardMedia, Container, createStyles,
-    Grid, Link,
-    makeStyles,
-    Typography, useMediaQuery, useTheme,
+    CardMedia, createStyles,
+    Grid, IconButton, Link,
+    makeStyles, Snackbar, SnackbarContent,
+    Typography, useMediaQuery, useTheme, Zoom,
 } from "@material-ui/core";
+import Close from '@material-ui/icons/Close';
+import { green } from '@material-ui/core/colors';
 import Skeleton from '@material-ui/lab/Skeleton';
 import {InitState} from "../../redux/reducers";
 import {ArticleType} from "../../redux/actions";
-
-function getPublishTime(date: Date): string{
-    const timePast = Date.now() - date.getTime();
-    if (timePast < 0) {
-        return 'now'
-    }
-    const minutes = Math.floor(timePast / (60 * 1000));
-    if (minutes <= 59) {
-        return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`
-    }
-    const hours = Math.floor(timePast / (60 * 60 * 1000));
-    if (hours <= 23) {
-        return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`
-    }
-    const days = Math.floor(timePast / (24 * 60 * 60 * 1000));
-    if (days <= 30) {
-        return `${days} ${days === 1 ? 'day' : 'days'} ago`
-    }
-    const months = Math.floor(timePast / (30 * 24 * 60 * 60 * 1000));
-    if (months <= 12) {
-        return `${months} ${months === 1 ? 'month' : 'months'} ago`
-    }
-    const years = Math.floor(timePast / (365 * 24 * 60 * 60 * 1000));
-    return `${years} ${years === 1 ? 'year' : 'years'} ago`
-}
+import useLazyLoad from "../../tools/use-lazy-load";
+import getPublishTime from "../../tools/get-publish-time";
+import copyToClipboard from "../../tools/copy-to-clipboard";
 
 const useStyles = makeStyles((theme) => createStyles({
+    successSnackBar: {
+        backgroundColor: green[600]
+    },
     wrapper: {
         width: 'calc(100% - 40px)',
         margin: '20px',
@@ -107,39 +89,59 @@ const useStyles = makeStyles((theme) => createStyles({
     },
 }));
 
-function useLazyLoad(ref: any) {
-    const [isVisible, setIsVisible] = useState(false);
-    let scrollHandlerLastCalledAt = Date.now() - 1000;
+interface ButtonsProps {
+    url: string
+}
 
-    function checkIsVisible() {
-        if (!ref.current) return;
-        const calledAt = Date.now();
-        if (calledAt - scrollHandlerLastCalledAt < 20) {
-            return
-        } else {
-            scrollHandlerLastCalledAt = calledAt
-        }
 
-        const rect = ref.current.getBoundingClientRect();
-        const isBefore = rect.top + rect.height < 0;
-        const isAfter = rect.top > window.innerHeight;
-        if (!isBefore && !isAfter) setIsVisible(true);
+function Buttons(props: ButtonsProps) {
+    const classes = useStyles();
+    const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
+    function openSnackBar() {
+        copyToClipboard(props.url);
+        setIsSnackbarOpen(true);
+    }
+    function closeSnackBar() {
+        setIsSnackbarOpen(false);
     }
 
-    useEffect(() => {
-        if (isVisible) return;
-        checkIsVisible();
-        document.addEventListener('scroll', checkIsVisible);
-        return () => {
-            document.removeEventListener('scroll', checkIsVisible);
-        }
-    }, [isVisible]);
-
-    return isVisible;
+    return (
+        <CardActions>
+            <Link href={props.url} target={'_blank'} rel="noopener" underline={"none"}>
+                <Button size="small" color="primary">
+                    Learn more
+                </Button>
+            </Link>
+            <Button size="small" color="primary" onClick={openSnackBar}>Share</Button>
+            <Snackbar
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'center',
+                }}
+                open={isSnackbarOpen}
+                autoHideDuration={3000}
+                onClose={closeSnackBar}
+            >
+                    <SnackbarContent
+                        className={classes.successSnackBar}
+                        message={
+                        <span id="client-snackbar">
+                            Link copied to clipboard
+                        </span>
+                    }
+                        action={[
+                        <IconButton key="close" aria-label="close" color="inherit" onClick={closeSnackBar}>
+                            <Close/>
+                        </IconButton>,
+                        ]}
+                    />
+            </Snackbar>
+        </CardActions>
+    )
 }
 
 interface ArticleProps extends ArticleType {
-    id: number
+    id: number,
 }
 
 function Article(props: ArticleProps) {
@@ -148,8 +150,13 @@ function Article(props: ArticleProps) {
 
     const classes = useStyles();
     const isPrimaryCard = props.id === 0 || props.id === 1;
-    return (
-        <Grid item xs={12} md={isPrimaryCard ? 6 : 3} ref={ref}>
+    const content = (
+        <Grid
+            item
+            xs={12}
+            md={isPrimaryCard ? 6 : 3}
+            ref={ref}
+        >
             <Card raised className={isPrimaryCard ? classes.cardWrapperPrimary : classes.cardWrapperNormal}>
                 {
                     isVisible && props.urlToImage?
@@ -164,28 +171,30 @@ function Article(props: ArticleProps) {
                 }
 
                 <CardContent className={isPrimaryCard ? classes.cardContentPrimary : classes.cardContentNormal}>
-                    <Typography gutterBottom variant="h5" component="h2">
-                        { props.title }
+                    <Typography gutterBottom variant="body1" component="h2">
+                        <Box fontWeight={700}>
+                            { props.title }
+                        </Box>
                     </Typography>
-                    <Typography variant="body2" color="textSecondary" component="p">
+                    <Typography variant="subtitle2" color="textSecondary" component="p">
                         <Box component={'span'} fontWeight={700}>
                             { props.source ? props.source + ' - ' : props.author ? props.author + ' - ' : '' }
                             { getPublishTime(new Date(props.publishedAt)) }
                         </Box>
                     </Typography>
                     <Typography variant="body2" color="textSecondary" component="p">
-                        { props.content }
+                        { props.content && props.content.replace(/\[\+[0-9]+\schars\]/ig, '') }
                     </Typography>
                 </CardContent>
-                <CardActions>
-                <Link href={props.url} target={'_blank'} rel="noopener" underline={"none"}>
-                    <Button size="small" color="primary">
-                        Learn more
-                    </Button>
-                </Link>
-                </CardActions>
+                <Buttons url={props.url}/>
             </Card>
         </Grid>
+    );
+
+    return useMediaQuery(useTheme().breakpoints.down('md')) ? content : (
+        <Zoom in={isVisible}>
+            { content }
+        </Zoom>
     )
 }
 

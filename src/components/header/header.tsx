@@ -1,9 +1,7 @@
 import React, {useState} from "react";
-import './header.css'
 import {Categories, fetchArticles} from "../../redux/actions";
 import {
     AppBar,
-    Box,
     Container,
 
     makeStyles,
@@ -18,7 +16,8 @@ import {
 const useStyles = makeStyles((theme: Theme) => ({
     tab: {
         flexShrink: 0,
-        flexGrow: 1
+        flexGrow: 1,
+        color: theme.palette.primary.contrastText
     },
     toolbar: {
         textTransform: 'uppercase'
@@ -40,20 +39,18 @@ function Header(props: HeaderProps) {
     };
 
     return (
-        <AppBar color="default" position={'static'}>
+        <AppBar color="primary" position={'static'}>
             <Toolbar>
                 <Container>
-                    <Typography align={"center"} className={classes.toolbar} color={'primary'}>
-                        <Box fontWeight={700} fontSize={'h5.fontSize'}>
-                            News Canada
-                        </Box>
+                    <Typography align={"center"} className={classes.toolbar} variant={"h1"} component={'h1'}>
+                        News Canada
                     </Typography>
                 </Container>
             </Toolbar>
                 <Tabs
                     value={category}
-                    indicatorColor="primary"
-                    textColor="primary"
+                    indicatorColor="secondary"
+                    textColor="secondary"
                     variant="scrollable"
                     scrollButtons="auto"
                 >
