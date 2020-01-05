@@ -1,4 +1,4 @@
-import React, {useRef, useState} from "react";
+import React, {CSSProperties, useRef, useState} from "react";
 import {
     Box,
     Button,
@@ -7,8 +7,8 @@ import {
     CardContent,
     CardMedia, createStyles,
     Grid, IconButton, Link,
-    makeStyles, Snackbar, SnackbarContent,
-    Typography, useMediaQuery, useTheme, Zoom,
+    makeStyles, Snackbar, SnackbarContent, Theme,
+    Typography, TypographyClassKey, useMediaQuery, useTheme, Zoom,
 } from "@material-ui/core";
 import Close from '@material-ui/icons/Close';
 import { green } from '@material-ui/core/colors';
@@ -18,6 +18,7 @@ import {ArticleType} from "../../redux/actions";
 import useLazyLoad from "../../tools/use-lazy-load";
 import getPublishTime from "../../tools/get-publish-time";
 import copyToClipboard from "../../tools/copy-to-clipboard";
+import {ThemeStyle} from "@material-ui/core/styles/createTypography";
 
 const useStyles = makeStyles((theme) => createStyles({
     successSnackBar: {
@@ -27,70 +28,114 @@ const useStyles = makeStyles((theme) => createStyles({
         width: 'calc(100% - 40px)',
         margin: '20px',
     },
-    cardWrapperPrimary: {
-        height: '800px'
-    },
-    cardMediaPrimary: {
-        height: '550px',
-    },
-    skeletonPrimary: {
-        height: '550px',
-    },
-    cardContentPrimary: {
-        width: '100%',
-        height: '200px',
-        overflow: 'hidden',
-        position: 'relative'
-    },
-    cardWrapperNormal: {
-        height: '400px'
-    },
-    cardMediaNormal: {
-        height: '150px'
-    },
-    skeletonNormal: {
-        height: '150px',
-    },
-    cardContentNormal: {
-        height: '200px',
-        width: '100%',
-        overflow: 'hidden',
-        position: 'relative'
-    },
     [theme.breakpoints.down("md")]: {
         wrapper: {
             width: 'calc(100% - 16px)',
             margin: '8px'
         },
-        cardWrapperPrimary: {
-            height: '400px'
-        },
-        cardMediaPrimary: {
-            height: '150px',
-        },
-        skeletonPrimary: {
-            height: '150px',
-        },
-        cardContentPrimary: {
-            height: '200px'
-        },
-        cardWrapperNormal: {
-            height: '400px'
-        },
-        cardMediaNormal: {
-            height: '150px',
-        },
-        skeletonNormal: {
-            height: '150px',
-        },
-        cardContentNormal: {
-            height: '200px'
-        },
     },
 }));
 
+function calcHeight(lines: number, variant: ThemeStyle, theme: Theme): CSSProperties['height'] {
+    return `calc(${lines} * ${theme.typography[variant].fontSize} * ${theme.typography[variant].lineHeight})`;
+}
+
+function ellipsis(variant: ThemeStyle, theme: Theme) {
+    return createStyles({
+        root: {
+            position: 'relative',
+            '&:after': {
+                content: "''",
+                position: 'absolute',
+                bottom: 0,
+                right: 0,
+                width: '20%',
+                height: calcHeight(1, variant, theme),
+                backgroundImage: 'linear-gradient(to right, rgba(255, 255, 255, 0) , rgba(255, 255, 255, 1))',
+                zIndex: 10
+            },
+        }
+    })
+}
+
+const overFlowHidden: CSSProperties = {
+    width: '100%',
+    overflow: 'hidden',
+    position: 'relative'
+};
+
+const usePrimaryCardStyles = makeStyles((theme) => createStyles({
+    media: {
+        height: '550px',
+        ...overFlowHidden,
+    },
+    skeleton: {
+        height: '550px',
+        ...overFlowHidden,
+    },
+    title: {
+        height: calcHeight(2, 'body1', theme),
+        ...ellipsis('body1', theme).root,
+        ...overFlowHidden,
+    },
+    source: {
+        height: calcHeight(1, 'body2', theme),
+        ...overFlowHidden,
+    },
+    content: {
+        height: calcHeight(3, 'body2', theme),
+        ...ellipsis('body2', theme).root,
+        ...overFlowHidden,
+    },
+    buttons: {
+        ...overFlowHidden,
+    },
+    [theme.breakpoints.down("md")]: {
+        media: {
+            height: '200px',
+            ...overFlowHidden,
+        },
+        skeleton: {
+            height: '200px',
+            ...overFlowHidden,
+        },
+    }
+}));
+
+const useSecondaryCardStyles = makeStyles((theme) => createStyles({
+    media: {
+        height: '200px',
+        ...overFlowHidden,
+    },
+    skeleton: {
+        height: '200px',
+        ...overFlowHidden,
+    },
+    title: {
+        height: calcHeight(2, 'body1', theme),
+        ...ellipsis('body1', theme).root,
+        ...overFlowHidden,
+    },
+    source: {
+        height: calcHeight(1, 'body2', theme),
+        ...overFlowHidden,
+    },
+    content: {
+        height: calcHeight(3, 'body2', theme),
+        ...ellipsis('body2', theme).root,
+        ...overFlowHidden,
+    },
+    buttons: {
+        ...overFlowHidden,
+    },
+    [theme.breakpoints.down("md")]: {
+
+    }
+}));
+
 interface ButtonsProps {
-    url: string
+    url: string,
+    className: string
 }
 
 
@@ -106,7 +151,7 @@ function Buttons(props: ButtonsProps) {
     }
 
     return (
-        <CardActions>
+        <CardActions className={props.className}>
             <Link href={props.url} target={'_blank'} rel="noopener" underline={"none"}>
                 <Button size="small" color="primary">
                     Learn more
@@ -150,6 +195,10 @@ function Article(props: ArticleProps) {
 
     const classes = useStyles();
     const isPrimaryCard = props.id === 0 || props.id === 1;
+    const cardPrimaryClasses = usePrimaryCardStyles();
+    const cardSecondaryClasses = useSecondaryCardStyles();
+    const cardClasses = isPrimaryCard ? cardPrimaryClasses : cardSecondaryClasses;
+
     const content = (
         <Grid
             item
@@ -157,36 +206,36 @@ function Article(props: ArticleProps) {
             md={isPrimaryCard ? 6 : 3}
             ref={ref}
         >
-            <Card raised className={isPrimaryCard ? classes.cardWrapperPrimary : classes.cardWrapperNormal}>
+            <Card raised>
                 {
                     isVisible && props.urlToImage?
                         <CardMedia
                             component="img"
                             alt={props.title}
-                            className={isPrimaryCard ? classes.cardMediaPrimary : classes.cardMediaNormal}
+                            className={cardClasses.media}
                             image={props.urlToImage}
                             title={props.title}
                         /> :
-                        <Skeleton variant={"rect"} className={isPrimaryCard ? classes.skeletonPrimary : classes.skeletonNormal} />
+                        <Skeleton variant={"rect"} className={cardClasses.skeleton} />
                 }
 
-                <CardContent className={isPrimaryCard ? classes.cardContentPrimary : classes.cardContentNormal}>
-                    <Typography gutterBottom variant="body1" component="h2">
+                <CardContent>
+                    <Typography gutterBottom variant="body1" component="h2" className={cardClasses.title}>
                         <Box fontWeight={700}>
                             { props.title }
                         </Box>
                     </Typography>
-                    <Typography variant="subtitle2" color="textSecondary" component="p">
+                    <Typography variant="body2" color="textSecondary" component="p" className={cardClasses.source}>
                         <Box component={'span'} fontWeight={700}>
                             { props.source ? props.source + ' - ' : props.author ? props.author + ' - ' : '' }
                             { getPublishTime(new Date(props.publishedAt)) }
                         </Box>
                     </Typography>
-                    <Typography variant="body2" color="textSecondary" component="p">
+                    <Typography variant="body2" color="textSecondary" component="p" className={cardClasses.content}>
                         { props.content && props.content.replace(/\[\+[0-9]+\schars\]/ig, '') }
                     </Typography>
                 </CardContent>
-                <Buttons url={props.url}/>
+                <Buttons url={props.url} className={cardClasses.buttons}/>
             </Card>
         </Grid>
     );
