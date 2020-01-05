@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => createStyles({
         width: 'calc(100% - 40px)',
         margin: '20px',
     },
-    [theme.breakpoints.down("md")]: {
+    [theme.breakpoints.down("sm")]: {
         wrapper: {
             width: 'calc(100% - 16px)',
             margin: '8px'
@@ -74,7 +74,7 @@ const usePrimaryCardStyles = makeStyles((theme) => createStyles({
         ...overFlowHidden,
     },
     title: {
-        height: calcHeight(2, 'body1', theme),
+        height: calcHeight(1, 'body1', theme),
         ...ellipsis('body1', theme).root,
         ...overFlowHidden,
     },
@@ -82,25 +82,25 @@ const usePrimaryCardStyles = makeStyles((theme) => createStyles({
         height: calcHeight(1, 'body2', theme),
         ...overFlowHidden,
     },
-    content: {
-        height: calcHeight(3, 'body2', theme),
+    articleContent: {
+        height: calcHeight(2, 'body2', theme),
         ...ellipsis('body2', theme).root,
         ...overFlowHidden,
     },
     buttons: {
         ...overFlowHidden,
     },
-    [theme.breakpoints.down("md")]: {
+    [theme.breakpoints.down("sm")]: {
         media: {
             height: '200px',
-            ...overFlowHidden,
         },
         skeleton: {
             height: '200px',
-            ...overFlowHidden,
         },
     }
 }));
+
+
 
 const useSecondaryCardStyles = makeStyles((theme) => createStyles({
     media: {
@@ -120,7 +120,7 @@ const useSecondaryCardStyles = makeStyles((theme) => createStyles({
         height: calcHeight(1, 'body2', theme),
         ...overFlowHidden,
     },
-    content: {
+    articleContent: {
         height: calcHeight(3, 'body2', theme),
         ...ellipsis('body2', theme).root,
         ...overFlowHidden,
@@ -128,7 +128,7 @@ const useSecondaryCardStyles = makeStyles((theme) => createStyles({
     buttons: {
         ...overFlowHidden,
     },
-    [theme.breakpoints.down("md")]: {
+    [theme.breakpoints.down("sm")]: {
 
     }
 }));
@@ -193,7 +193,6 @@ function Article(props: ArticleProps) {
     const ref = useRef(null);
     const isVisible = useLazyLoad(ref);
 
-    const classes = useStyles();
     const isPrimaryCard = props.id === 0 || props.id === 1;
     const cardPrimaryClasses = usePrimaryCardStyles();
     const cardSecondaryClasses = useSecondaryCardStyles();
@@ -231,7 +230,7 @@ function Article(props: ArticleProps) {
                             { getPublishTime(new Date(props.publishedAt)) }
                         </Box>
                     </Typography>
-                    <Typography variant="body2" color="textSecondary" component="p" className={cardClasses.content}>
+                    <Typography variant="body2" color="textSecondary" component="p" className={cardClasses.articleContent}>
                         { props.content && props.content.replace(/\[\+[0-9]+\schars\]/ig, '') }
                     </Typography>
                 </CardContent>
