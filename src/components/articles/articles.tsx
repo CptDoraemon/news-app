@@ -8,7 +8,7 @@ import {
     CardMedia, createStyles,
     Grid, IconButton, Link,
     makeStyles, Snackbar, SnackbarContent, Theme,
-    Typography, TypographyClassKey, useMediaQuery, useTheme, Zoom,
+    Typography, useMediaQuery, useTheme, Grow,
 } from "@material-ui/core";
 import Close from '@material-ui/icons/Close';
 import { green } from '@material-ui/core/colors';
@@ -240,9 +240,9 @@ function Article(props: ArticleProps) {
     );
 
     return useMediaQuery(useTheme().breakpoints.down('md')) ? content : (
-        <Zoom in={isVisible}>
+        <Grow in={isVisible}>
             { content }
-        </Zoom>
+        </Grow>
     )
 }
 
