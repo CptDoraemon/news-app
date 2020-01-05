@@ -1,16 +1,6 @@
-import React, {useState} from "react";
-import {Categories, fetchArticles} from "../../redux/actions";
-import {
-    AppBar,
-    Container,
-
-    makeStyles,
-    Tab,
-    Tabs,
-    Theme,
-    Toolbar,
-    Typography,
-} from "@material-ui/core";
+import React from "react";
+import {Categories, fetchArticles, setCategoryIfNeeded} from "../../redux/actions";
+import {AppBar, Container, makeStyles, Tab, Tabs, Theme, Toolbar, Typography,} from "@material-ui/core";
 
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -26,16 +16,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface HeaderProps {
     headers: Array<keyof typeof Categories>,
-    dispatcher: any
+    dispatcher: any,
+    category: Categories
 }
 
 function Header(props: HeaderProps) {
     const classes = useStyles();
-    const [category, setCategory] = useState(0);
-    const clickHandler = (i: number) => {
-        if (i === category) return;
-        setCategory(i);
-        props.dispatcher(fetchArticles((props.headers[i])));
+    const clickHandler = (category: Categories) => {
+        props.dispatcher(setCategoryIfNeeded(category));
     };
 
     return (
@@ -48,14 +36,15 @@ function Header(props: HeaderProps) {
                 </Container>
             </Toolbar>
                 <Tabs
-                    value={category}
+                    value={props.headers.indexOf(props.category)}
+                    onChange={() => props.dispatcher(fetchArticles(props.category))}
                     indicatorColor="secondary"
                     textColor="secondary"
                     variant="scrollable"
                     scrollButtons="auto"
                 >
                     {
-                        props.headers.map((_, i) => <Tab label={_} key={i} className={classes.tab} onClick={() => clickHandler(i)}/>)
+                        props.headers.map((_, i) => <Tab label={_} key={i} className={classes.tab} onClick={() => clickHandler(Categories[_])}/>)
                     }
                 </Tabs>
         </AppBar>

@@ -26,13 +26,17 @@ export enum CategoryActions {
     SET_CATEGORY = 'SET_CATEGORY'
 }
 
+function setCategory(category: Categories) {
+    return {
+        type: CategoryActions.SET_CATEGORY,
+        category
+    }
+}
+
 export function setCategoryIfNeeded(category: Categories) {
     return (dispatch: any, getState: any) => {
-        // if (getState().category === category) return;
-        return {
-            type: CategoryActions.SET_CATEGORY,
-            category
-        }
+        if (getState().category === category) return;
+        dispatch(setCategory(category));
     };
 }
 

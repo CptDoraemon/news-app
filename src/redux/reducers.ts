@@ -22,7 +22,7 @@ export const initState = {
 function category (state = initState.category, action: {type: CategoryActions, category: Categories}) {
     switch (action.type) {
         case CategoryActions.SET_CATEGORY:
-            return action.category;
+            return Categories[action.category];
         default:
             return state
     }
