@@ -1,4 +1,4 @@
-import React, {CSSProperties, useRef, useState} from "react";
+import React, {CSSProperties, useEffect, useRef, useState} from "react";
 import {
     Box,
     Button,
@@ -8,7 +8,7 @@ import {
     CardMedia, createStyles,
     Grid, IconButton, Link,
     makeStyles, Snackbar, SnackbarContent, Theme,
-    Typography, useMediaQuery, useTheme, Grow,
+    Typography, useMediaQuery, useTheme, Zoom,
 } from "@material-ui/core";
 import Close from '@material-ui/icons/Close';
 import { green } from '@material-ui/core/colors';
@@ -192,11 +192,20 @@ interface ArticleProps extends ArticleType {
 function Article(props: ArticleProps) {
     const ref = useRef(null);
     const isVisible = useLazyLoad(ref);
+    const [isMounted, setIsMounted] = useState(false);
+    const isTransitionAnimationNeeded = !useMediaQuery(useTheme().breakpoints.down('sm'));
 
     const isPrimaryCard = props.id === 0 || props.id === 1;
     const cardPrimaryClasses = usePrimaryCardStyles();
     const cardSecondaryClasses = useSecondaryCardStyles();
     const cardClasses = isPrimaryCard ? cardPrimaryClasses : cardSecondaryClasses;
+
+    useEffect(() => {
+        if (isTransitionAnimationNeeded) {
+            setTimeout(() =>setIsMounted(true), 225)
+            // Zoom transition 225ms
+        }
+    }, []);
 
     const content = (
         <Grid
@@ -239,11 +248,11 @@ function Article(props: ArticleProps) {
         </Grid>
     );
 
-    return useMediaQuery(useTheme().breakpoints.down('md')) ? content : (
-        <Grow in={isVisible}>
+    return isTransitionAnimationNeeded ? (
+        <Zoom in={!isMounted ? true : isVisible}>
             { content }
-        </Grow>
-    )
+        </Zoom>
+    ) : content;
 }
 
 interface LoadedArticlesProps {
