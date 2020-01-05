@@ -5,13 +5,13 @@ export default function useLazyLoad(ref: React.RefObject<HTMLInputElement>): boo
     let scrollHandlerLastCalledAt = Date.now() - 1000;
 
     function checkIsVisible() {
-        if (!ref.current) return;
         const calledAt = Date.now();
         if (calledAt - scrollHandlerLastCalledAt < 20) {
             return
         } else {
             scrollHandlerLastCalledAt = calledAt
         }
+        if (!ref.current) return;
 
         const rect = ref.current.getBoundingClientRect();
         const isBefore = rect.top + rect.height < 0;
@@ -26,7 +26,7 @@ export default function useLazyLoad(ref: React.RefObject<HTMLInputElement>): boo
         return () => {
             document.removeEventListener('scroll', checkIsVisible);
         }
-    }, [isVisible]);
+    });
 
     return isVisible;
 }
