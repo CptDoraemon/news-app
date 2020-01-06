@@ -342,10 +342,10 @@ function Articles(props: ArticlesProps) {
     return (
         <div style={{
             width: '100%',
-            // transform: `translateX(${dragDistance}px)`,
+            transform: `translateX(${dragDistance}px)`,
             // it affects snackbar fixed behavior
-            left: `${dragDistance}px`,
-            position: 'relative'
+            // left: `${dragDistance}px`,
+            // position: 'relative'
         }}>
             <Box className={classes.wrapper}>
                 <Grid container direction={"row"} alignContent={"center"} justify={"center"} spacing={2} ref={containerRef}>
