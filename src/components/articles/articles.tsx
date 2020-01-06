@@ -294,7 +294,7 @@ function Articles(props: ArticlesProps) {
         direction,
         dragDistance,
         resetSwipeStatus
-    } = useSwipeable(containerRef, 5);
+    } = useSwipeable(containerRef, 20);
 
     useEffect(() => {
         if (direction === UseSwipeableDirections.RIGHT) {
@@ -310,7 +310,10 @@ function Articles(props: ArticlesProps) {
     let content;
     if (props.articles.isError) {
         content = (
-            <div>
+            <div style={{
+                width: '100%',
+                minHeight: '100vh'
+            }}>
                 error
             </div>
         )

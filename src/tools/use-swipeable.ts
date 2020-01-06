@@ -20,8 +20,11 @@ function useSwipeable(ref: RefObject<HTMLInputElement>, threshholdPx: number) {
     }
 
     function touchMoveHandler(e: TouchEvent) {
-        console.log(e.changedTouches[0].clientX - x1);
-        setDragDistance(e.changedTouches[0].clientX - x1)
+        const currentX = e.changedTouches[0].clientX;
+        const currentY = e.changedTouches[0].clientY;
+        if (Math.abs(currentX - x1) > Math.abs(currentY - y1) && Math.abs(currentX - x1) > threshholdPx) {
+            setDragDistance(e.changedTouches[0].clientX - x1)
+        }
     }
 
     function touchEndHandler(e: TouchEvent) {
