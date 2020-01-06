@@ -26,7 +26,7 @@ import useLazyLoad from "../../tools/use-lazy-load";
 import getPublishTime from "../../tools/get-publish-time";
 import copyToClipboard from "../../tools/copy-to-clipboard";
 import {ThemeStyle} from "@material-ui/core/styles/createTypography";
-import useSwipeable, {UseSwipeableDirections} from "../../tools/use-swipeable";
+import Swipeable from '../utility-components/swipeable';
 
 const useStyles = makeStyles((theme) => createStyles({
     wrapper: {
@@ -260,23 +260,6 @@ interface ArticlesProps extends Pick<InitState, 'articles'> {
 
 function Articles(props: ArticlesProps) {
     const classes = useStyles();
-    const containerRef = useRef(null);
-    const {
-        direction,
-        dragDistance,
-        resetSwipeStatus
-    } = useSwipeable(containerRef, 50);
-
-    useEffect(() => {
-        if (direction === UseSwipeableDirections.RIGHT) {
-            props.dispatcher(setPreviousCategory())
-        } else if (direction === UseSwipeableDirections.LEFT) {
-            props.dispatcher(setNextCategory())
-        }
-        return () => {
-            resetSwipeStatus();
-        }
-    }, [direction]);
 
     let content;
     if (props.articles.isError) {
@@ -311,19 +294,13 @@ function Articles(props: ArticlesProps) {
     }
 
     return (
-        <div style={{
-            width: '100%',
-            transform: `translateX(${dragDistance}px)`,
-            // it affects snackbar fixed behavior
-            // left: `${dragDistance}px`,
-            // position: 'relative'
-        }}>
+        <Swipeable>
             <Box className={classes.wrapper}>
-                <Grid container direction={"row"} alignContent={"center"} justify={"center"} spacing={2} ref={containerRef}>
+                <Grid container direction={"row"} alignContent={"center"} justify={"center"} spacing={2}>
                     { content }
                 </Grid>
             </Box>
-        </div>
+        </Swipeable>
     )
 }
 

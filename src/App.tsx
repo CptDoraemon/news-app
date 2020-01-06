@@ -38,7 +38,6 @@ function InnerApp(props: InnerAppProps) {
         props.dispatch(fetchArticles(Categories.HEADLINE))
     }, []);
 
-    console.log(props);
     return (
         <Box className={classes.root}>
             <Header headers={categories} dispatcher={props.dispatch} category={props.category}/>
@@ -52,6 +51,8 @@ function mapStateToProps(state: InitState) {
     return state
 }
 const InnerAppContainer = connect(mapStateToProps)(InnerApp);
+
+
 let theme = createMuiTheme({
     palette: {
         primary: {
