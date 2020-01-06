@@ -39,7 +39,7 @@ const setCategoryAndFetchArticles
     = (category: Category) => {
     return (dispatch: any) => {
         dispatch(setCategory(category));
-        // dispatch(fetchArticles(category));
+        dispatch(fetchArticles(category));
     };
 };
 
