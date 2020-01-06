@@ -1,7 +1,9 @@
-import React, {ReactPropTypes, useEffect, useRef} from "react";
+import React, {useEffect, useRef} from "react";
 import useSwipeable, {UseSwipeableDirections} from "../../tools/use-swipeable";
-import {setNextCategory, setPreviousCategory} from "../../redux/actions";
+
 import {connect} from "react-redux";
+import {Dispatch} from "redux";
+import {setNextCategory, setPreviousCategory} from "../../redux/actions/category";
 
 interface SwipeableProps {
     setPreviousCategory: () => void,
@@ -41,7 +43,7 @@ const Swipeable: React.FC<SwipeableProps> = (props) => {
             { props.children }
         </div>
     )
-}
+};
 
 function mapDispatchToProps(dispatch: any) {
     return {

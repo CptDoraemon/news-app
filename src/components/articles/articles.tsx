@@ -20,13 +20,14 @@ import {
     Zoom,
 } from "@material-ui/core";
 import Skeleton from '@material-ui/lab/Skeleton';
-import {InitState} from "../../redux/reducers";
-import {ArticleType, openCopyLinkSnackBar, setNextCategory, setPreviousCategory} from "../../redux/actions";
 import useLazyLoad from "../../tools/use-lazy-load";
 import getPublishTime from "../../tools/get-publish-time";
 import copyToClipboard from "../../tools/copy-to-clipboard";
 import {ThemeStyle} from "@material-ui/core/styles/createTypography";
 import Swipeable from '../utility-components/swipeable';
+import {openCopyLinkSnackBar} from "../../redux/actions/copy-link-snackbar";
+import { Article as ArticleType} from "../../redux/actions/articles";
+import {State} from "../../redux/state";
 
 const useStyles = makeStyles((theme) => createStyles({
     wrapper: {
@@ -141,7 +142,7 @@ const useSecondaryCardStyles = makeStyles((theme) => createStyles({
 interface ButtonsProps {
     url: string,
     className: string,
-    dispatcher: any
+    openCopyLinkSnackBar: () => void
 }
 
 
@@ -149,7 +150,7 @@ function Buttons(props: ButtonsProps) {
 
     function copyLinkHandler() {
         copyToClipboard(props.url);
-        props.dispatcher(openCopyLinkSnackBar())
+        props.openCopyLinkSnackBar();
     }
 
     return (
@@ -166,7 +167,7 @@ function Buttons(props: ButtonsProps) {
 
 interface ArticleProps extends ArticleType {
     id: number,
-    dispatcher: any
+    openCopyLinkSnackBar: () => void
 }
 
 function Article(props: ArticleProps) {
@@ -223,7 +224,7 @@ function Article(props: ArticleProps) {
                         { props.content && props.content.replace(/\[\+[0-9]+\schars\]/ig, '') }
                     </Typography>
                 </CardContent>
-                <Buttons url={props.url} className={cardClasses.buttons} dispatcher={props.dispatcher}/>
+                <Buttons url={props.url} className={cardClasses.buttons} openCopyLinkSnackBar={props.openCopyLinkSnackBar} />
             </Card>
         </Grid>
     );
@@ -237,7 +238,7 @@ function Article(props: ArticleProps) {
 
 interface LoadedArticlesProps {
     articles: Array<ArticleType>,
-    dispatcher: any
+    openCopyLinkSnackBar: () => void
 }
 
 function LoadedArticles(props: LoadedArticlesProps) {
@@ -246,7 +247,7 @@ function LoadedArticles(props: LoadedArticlesProps) {
             {
                 props.articles.map((article, i) => {
                     return (
-                        <Article {...article} key={i} id={i} dispatcher={props.dispatcher}/>
+                        <Article {...article} key={i} id={i} openCopyLinkSnackBar={props.openCopyLinkSnackBar}/>
                     )
                 })
             }
@@ -254,8 +255,8 @@ function LoadedArticles(props: LoadedArticlesProps) {
     )
 }
 
-interface ArticlesProps extends Pick<InitState, 'articles'> {
-    dispatcher: any,
+interface ArticlesProps extends Pick<State, 'articles'> {
+    openCopyLinkSnackBar: () => void
 }
 
 function Articles(props: ArticlesProps) {
@@ -290,7 +291,7 @@ function Articles(props: ArticlesProps) {
             </>
         )
     } else {
-        content = <LoadedArticles articles={props.articles.articles} dispatcher={props.dispatcher}/>
+        content = <LoadedArticles articles={props.articles.articles} openCopyLinkSnackBar={props.openCopyLinkSnackBar}/>
     }
 
     return (

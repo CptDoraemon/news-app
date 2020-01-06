@@ -1,6 +1,8 @@
 import React from "react";
-import {Categories, fetchArticles, setCategoryIfNeeded} from "../../redux/actions";
 import {AppBar, Container, makeStyles, Tab, Tabs, Theme, Toolbar, Typography,} from "@material-ui/core";
+import {Categories, Category, setCategoryIfNeeded} from "../../redux/actions/category";
+import {Dispatch} from "redux";
+import {useDispatch} from "react-redux";
 
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -15,15 +17,16 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface HeaderProps {
-    headers: Array<keyof typeof Categories>,
-    dispatcher: any,
-    category: Categories
+    headers: Categories
+    category: Category
 }
 
 function Header(props: HeaderProps) {
     const classes = useStyles();
-    const clickHandler = (category: Categories) => {
-        props.dispatcher(setCategoryIfNeeded(category));
+    const dispatcher = useDispatch();
+
+    const clickHandler = (category: Category) => {
+        dispatcher(setCategoryIfNeeded(category));
     };
 
     return (
@@ -43,7 +46,7 @@ function Header(props: HeaderProps) {
                     scrollButtons="auto"
                 >
                     {
-                        props.headers.map((_, i) => <Tab label={_} key={i} className={classes.tab} onClick={() => clickHandler(Categories[_])}/>)
+                        props.headers.map((_, i) => <Tab label={_} key={i} className={classes.tab} onClick={() => clickHandler(Category[_])}/>)
                     }
                 </Tabs>
         </AppBar>

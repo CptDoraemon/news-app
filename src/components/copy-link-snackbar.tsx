@@ -7,7 +7,6 @@ import {
 } from "@material-ui/core";
 import Close from '@material-ui/icons/Close';
 import {green} from '@material-ui/core/colors';
-import {closeCopyLinkSnackBar} from "../redux/actions";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 
 const useStyles = makeStyles(() => createStyles({
@@ -17,15 +16,15 @@ const useStyles = makeStyles(() => createStyles({
 }));
 
 interface CopyLinkSnackbarProps {
-    dispatcher: any,
-    isCopyLinkSnackbarActive: boolean
+    isActive: boolean,
+    closeCopyLinkSnackBar: () => void
 }
 
 function CopyLinkSnackbar(props: CopyLinkSnackbarProps) {
     const classes = useStyles();
 
     function closeHandlder() {
-        props.dispatcher(closeCopyLinkSnackBar())
+        props.closeCopyLinkSnackBar()
     }
 
     return (
@@ -34,7 +33,7 @@ function CopyLinkSnackbar(props: CopyLinkSnackbarProps) {
                 vertical: 'bottom',
                 horizontal: 'center',
             }}
-            open={props.isCopyLinkSnackbarActive}
+            open={props.isActive}
             autoHideDuration={3000}
             onClose={closeHandlder}
         >

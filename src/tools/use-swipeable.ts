@@ -6,7 +6,7 @@ export enum UseSwipeableDirections {
     RIGHT = 'RIGHT'
 }
 
-const DEBOUNCER = 20;
+const DEBOUNCER = 10;
 
 function useSwipeable(ref: RefObject<HTMLInputElement>, threshholdPx: number) {
     const [x1, setX1] = useState(0);
