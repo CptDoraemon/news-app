@@ -33,10 +33,43 @@ function setCategory(category: Categories) {
     }
 }
 
+function setCategoryAndFetchArticles(category: Categories) {
+    return (dispatch: any, getState: any) => {
+        dispatch(setCategory(category));
+        dispatch(fetchArticles(category));
+    };
+}
+
+export function setNextCategory() {
+    return (dispatch: any, getState: any) => {
+        const currentCategory = getState().category;
+        const currentIndex = categories.indexOf(currentCategory);
+        const isLast = currentIndex === categories.length - 1;
+        if (isLast) {
+            dispatch(setCategoryAndFetchArticles(Categories[categories[0]]));
+        } else {
+            dispatch(setCategoryAndFetchArticles(Categories[categories[currentIndex + 1]]));
+        }
+    };
+}
+
+export function setPreviousCategory() {
+    return (dispatch: any, getState: any) => {
+        const currentCategory = getState().category;
+        const currentIndex = categories.indexOf(currentCategory);
+        const isFirst = currentIndex === 0;
+        if (isFirst) {
+            dispatch(setCategoryAndFetchArticles(Categories[categories[categories.length - 1]]));
+        } else {
+            dispatch(setCategoryAndFetchArticles(Categories[categories[currentIndex - 1]]));
+        }
+    };
+}
+
 export function setCategoryIfNeeded(category: Categories) {
     return (dispatch: any, getState: any) => {
         if (getState().category === category) return;
-        dispatch(setCategory(category));
+        dispatch(setCategoryAndFetchArticles(category));
     };
 }
 

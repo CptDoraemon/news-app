@@ -5,20 +5,30 @@ import {
     Card,
     CardActions,
     CardContent,
-    CardMedia, createStyles,
-    Grid, IconButton, Link,
-    makeStyles, Snackbar, SnackbarContent, Theme,
-    Typography, useMediaQuery, useTheme, Zoom,
+    CardMedia,
+    createStyles,
+    Grid,
+    IconButton,
+    Link,
+    makeStyles,
+    Snackbar,
+    SnackbarContent,
+    Theme,
+    Typography,
+    useMediaQuery,
+    useTheme,
+    Zoom,
 } from "@material-ui/core";
 import Close from '@material-ui/icons/Close';
-import { green } from '@material-ui/core/colors';
+import {green} from '@material-ui/core/colors';
 import Skeleton from '@material-ui/lab/Skeleton';
 import {InitState} from "../../redux/reducers";
-import {ArticleType} from "../../redux/actions";
+import {ArticleType, setCategoryIfNeeded, setNextCategory, setPreviousCategory} from "../../redux/actions";
 import useLazyLoad from "../../tools/use-lazy-load";
 import getPublishTime from "../../tools/get-publish-time";
 import copyToClipboard from "../../tools/copy-to-clipboard";
 import {ThemeStyle} from "@material-ui/core/styles/createTypography";
+import useSwipeable, {UseSwipeableDirections} from "../../tools/use-swipeable";
 
 const useStyles = makeStyles((theme) => createStyles({
     successSnackBar: {
@@ -274,11 +284,29 @@ function LoadedArticles(props: LoadedArticlesProps) {
 }
 
 interface ArticlesProps extends Pick<InitState, 'articles'> {
-
+    dispatcher: any,
 }
 
 function Articles(props: ArticlesProps) {
     const classes = useStyles();
+    const containerRef = useRef(null);
+    const {
+        direction,
+        dragDistance,
+        resetSwipeStatus
+    } = useSwipeable(containerRef, 5);
+
+    useEffect(() => {
+        if (direction === UseSwipeableDirections.RIGHT) {
+            props.dispatcher(setPreviousCategory())
+        } else if (direction === UseSwipeableDirections.LEFT) {
+            props.dispatcher(setNextCategory())
+        }
+        return () => {
+            resetSwipeStatus();
+        }
+    });
+
     let content;
     if (props.articles.isError) {
         content = (
@@ -309,11 +337,16 @@ function Articles(props: ArticlesProps) {
     }
 
     return (
+        <div style={{
+            width: '100%',
+            transform: `translateX(${dragDistance}px)`,
+        }}>
         <Box className={classes.wrapper}>
-            <Grid container direction={"row"} alignContent={"center"} justify={"center"} spacing={2}>
+            <Grid container direction={"row"} alignContent={"center"} justify={"center"} spacing={2} ref={containerRef}>
                 { content }
             </Grid>
         </Box>
+        </div>
     )
 }
 

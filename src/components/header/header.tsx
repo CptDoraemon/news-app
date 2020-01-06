@@ -37,7 +37,6 @@ function Header(props: HeaderProps) {
             </Toolbar>
                 <Tabs
                     value={props.headers.indexOf(props.category)}
-                    onChange={() => props.dispatcher(fetchArticles(props.category))}
                     indicatorColor="secondary"
                     textColor="secondary"
                     variant="scrollable"

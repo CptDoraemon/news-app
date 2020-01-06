@@ -27,7 +27,7 @@ function InnerApp(props: InnerAppProps) {
     return (
         <Box width={'100vw'} minHeight={'100vh'} maxWidth={'100%'}>
             <Header headers={categories} dispatcher={props.dispatch} category={props.category}/>
-            <Articles articles={props.articles}/>
+            <Articles articles={props.articles} dispatcher={props.dispatch}/>
             <Attribution />
         </Box>
     )
