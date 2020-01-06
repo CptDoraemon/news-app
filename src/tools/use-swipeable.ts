@@ -6,11 +6,14 @@ export enum UseSwipeableDirections {
     RIGHT = 'RIGHT'
 }
 
+const DEBOUNCER = 20;
+
 function useSwipeable(ref: RefObject<HTMLInputElement>, threshholdPx: number) {
     const [x1, setX1] = useState(0);
     const [y1, setY1] = useState(0);
     const [direction, setDirection] = useState(UseSwipeableDirections.NULL);
     const [dragDistance, setDragDistance] = useState(0);
+    const [touchMoveLastTriggered, setTouchMoveLastTriggered] = useState(Date.now());
 
     function touchStartHandler(e: TouchEvent) {
         setX1(e.changedTouches[0].clientX);
@@ -18,11 +21,14 @@ function useSwipeable(ref: RefObject<HTMLInputElement>, threshholdPx: number) {
     }
 
     function touchMoveHandler(e: TouchEvent) {
+        const now = Date.now();
+        if (now - touchMoveLastTriggered < DEBOUNCER) return;
         const currentX = e.changedTouches[0].clientX;
         const currentY = e.changedTouches[0].clientY;
         if (Math.abs(currentX - x1) > Math.abs(currentY - y1)) {
             setDragDistance(e.changedTouches[0].clientX - x1)
         }
+        setTouchMoveLastTriggered(now);
     }
 
     function touchEndHandler(e: TouchEvent) {
