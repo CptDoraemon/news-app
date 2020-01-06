@@ -12,6 +12,7 @@ import {
 import Header from "./components/header/header";
 import Articles from "./components/articles/articles";
 import Attribution from "./components/attribution";
+import CopyLinkSnackbar from "./components/copy-link-snackbar";
 
 
 const store = configureStore();
@@ -36,11 +37,14 @@ function InnerApp(props: InnerAppProps) {
     useEffect(() => {
         props.dispatch(fetchArticles(Categories.HEADLINE))
     }, []);
+
+    console.log(props);
     return (
         <Box className={classes.root}>
             <Header headers={categories} dispatcher={props.dispatch} category={props.category}/>
             <Articles articles={props.articles} dispatcher={props.dispatch}/>
             <Attribution />
+            <CopyLinkSnackbar dispatcher={props.dispatch} isCopyLinkSnackbarActive={props.isCopyLinkSnackbarActive}/>
         </Box>
     )
 }

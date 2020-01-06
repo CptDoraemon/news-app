@@ -1,3 +1,5 @@
+import CopyLinkSnackbar from "../components/copy-link-snackbar";
+
 export enum Categories {
     HEADLINE= `HEADLINE`,
     BUSINESS= `BUSINESS`,
@@ -128,5 +130,23 @@ export function fetchArticles(category: keyof typeof Categories) {
                     dispatch(receiveArticles(json.data.getNews))
                 }
             })
+    }
+}
+
+export enum CopyLinkSnackbarActions {
+    CLOSE_SNACKBAR = 'CLOSE_SNACKBAR',
+    OPEN_SNACKBAR = 'OPEN_SNACKBAR'
+}
+
+export function closeCopyLinkSnackBar() {
+    return {
+        type: CopyLinkSnackbarActions.CLOSE_SNACKBAR
+    }
+}
+
+export function openCopyLinkSnackBar() {
+    console.log('called');
+    return {
+        type: CopyLinkSnackbarActions.OPEN_SNACKBAR
     }
 }

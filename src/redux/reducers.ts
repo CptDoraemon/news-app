@@ -1,4 +1,4 @@
-import {ArticleType, ArticleActions, Categories, CategoryActions} from "./actions";
+import {ArticleType, ArticleActions, Categories, CategoryActions, CopyLinkSnackbarActions} from "./actions";
 import { combineReducers } from "redux";
 
 export interface InitState {
@@ -7,7 +7,8 @@ export interface InitState {
         isError: boolean,
         isFetching: boolean,
         articles: Array<ArticleType>
-    }
+    },
+    isCopyLinkSnackbarActive: boolean
 }
 
 export const initState = {
@@ -16,7 +17,8 @@ export const initState = {
         isError: false,
         isFetching: true,
         articles: []
-    }
+    },
+    isCopyLinkSnackbarActive: false
 };
 
 function category (state = initState.category, action: {type: CategoryActions, category: Categories}) {
@@ -48,9 +50,21 @@ function articles(state = initState.articles, actions: any) {
     }
 }
 
+function isCopyLinkSnackbarActive(state = initState.isCopyLinkSnackbarActive, actions: any) {
+    switch(actions.type) {
+        case CopyLinkSnackbarActions.CLOSE_SNACKBAR:
+            return false;
+        case CopyLinkSnackbarActions.OPEN_SNACKBAR:
+            return true;
+        default:
+            return state
+    }
+}
+
 const rootReducers = combineReducers({
     category,
-    articles
+    articles,
+    isCopyLinkSnackbarActive
 });
 
 export default rootReducers;

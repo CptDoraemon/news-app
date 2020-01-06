@@ -19,11 +19,9 @@ import {
     useTheme,
     Zoom,
 } from "@material-ui/core";
-import Close from '@material-ui/icons/Close';
-import {green} from '@material-ui/core/colors';
 import Skeleton from '@material-ui/lab/Skeleton';
 import {InitState} from "../../redux/reducers";
-import {ArticleType, setNextCategory, setPreviousCategory} from "../../redux/actions";
+import {ArticleType, openCopyLinkSnackBar, setNextCategory, setPreviousCategory} from "../../redux/actions";
 import useLazyLoad from "../../tools/use-lazy-load";
 import getPublishTime from "../../tools/get-publish-time";
 import copyToClipboard from "../../tools/copy-to-clipboard";
@@ -31,9 +29,6 @@ import {ThemeStyle} from "@material-ui/core/styles/createTypography";
 import useSwipeable, {UseSwipeableDirections} from "../../tools/use-swipeable";
 
 const useStyles = makeStyles((theme) => createStyles({
-    successSnackBar: {
-        backgroundColor: green[600]
-    },
     wrapper: {
         width: 'calc(100% - 40px)',
         margin: '20px',
@@ -145,19 +140,16 @@ const useSecondaryCardStyles = makeStyles((theme) => createStyles({
 
 interface ButtonsProps {
     url: string,
-    className: string
+    className: string,
+    dispatcher: any
 }
 
 
 function Buttons(props: ButtonsProps) {
-    const classes = useStyles();
-    const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
-    function openSnackBar() {
+
+    function copyLinkHandler() {
         copyToClipboard(props.url);
-        setIsSnackbarOpen(true);
-    }
-    function closeSnackBar() {
-        setIsSnackbarOpen(false);
+        props.dispatcher(openCopyLinkSnackBar())
     }
 
     return (
@@ -167,36 +159,14 @@ function Buttons(props: ButtonsProps) {
                     Learn more
                 </Button>
             </Link>
-            <Button size="small" color="primary" onClick={openSnackBar}>Share</Button>
-            <Snackbar
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'center',
-                }}
-                open={isSnackbarOpen}
-                autoHideDuration={3000}
-                onClose={closeSnackBar}
-            >
-                    <SnackbarContent
-                        className={classes.successSnackBar}
-                        message={
-                        <span id="client-snackbar">
-                            Link copied to clipboard
-                        </span>
-                    }
-                        action={[
-                        <IconButton key="close" aria-label="close" color="inherit" onClick={closeSnackBar}>
-                            <Close/>
-                        </IconButton>,
-                        ]}
-                    />
-            </Snackbar>
+            <Button size="small" color="primary" onClick={copyLinkHandler}>Share</Button>
         </CardActions>
     )
 }
 
 interface ArticleProps extends ArticleType {
     id: number,
+    dispatcher: any
 }
 
 function Article(props: ArticleProps) {
@@ -253,7 +223,7 @@ function Article(props: ArticleProps) {
                         { props.content && props.content.replace(/\[\+[0-9]+\schars\]/ig, '') }
                     </Typography>
                 </CardContent>
-                <Buttons url={props.url} className={cardClasses.buttons}/>
+                <Buttons url={props.url} className={cardClasses.buttons} dispatcher={props.dispatcher}/>
             </Card>
         </Grid>
     );
@@ -266,7 +236,8 @@ function Article(props: ArticleProps) {
 }
 
 interface LoadedArticlesProps {
-    articles: Array<ArticleType>
+    articles: Array<ArticleType>,
+    dispatcher: any
 }
 
 function LoadedArticles(props: LoadedArticlesProps) {
@@ -275,7 +246,7 @@ function LoadedArticles(props: LoadedArticlesProps) {
             {
                 props.articles.map((article, i) => {
                     return (
-                        <Article {...article} key={i} id={i}/>
+                        <Article {...article} key={i} id={i} dispatcher={props.dispatcher}/>
                     )
                 })
             }
@@ -336,7 +307,7 @@ function Articles(props: ArticlesProps) {
             </>
         )
     } else {
-        content = <LoadedArticles articles={props.articles.articles}/>
+        content = <LoadedArticles articles={props.articles.articles} dispatcher={props.dispatcher}/>
     }
 
     return (
