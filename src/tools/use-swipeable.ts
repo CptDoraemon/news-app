@@ -8,9 +8,7 @@ export enum UseSwipeableDirections {
 
 function useSwipeable(ref: RefObject<HTMLInputElement>, threshholdPx: number) {
     const [x1, setX1] = useState(0);
-    const [x2, setX2] = useState(0);
     const [y1, setY1] = useState(0);
-    const [y2, setY2] = useState(0);
     const [direction, setDirection] = useState(UseSwipeableDirections.NULL);
     const [dragDistance, setDragDistance] = useState(0);
 
@@ -28,43 +26,31 @@ function useSwipeable(ref: RefObject<HTMLInputElement>, threshholdPx: number) {
     }
 
     function touchEndHandler(e: TouchEvent) {
-        setX2(e.changedTouches[0].clientX);
-        setY2(e.changedTouches[0].clientY);
+        const currentX = e.changedTouches[0].clientX;
+        const currentY = e.changedTouches[0].clientY;
+        if (Math.abs(currentX - x1) > Math.abs(currentY - y1) && Math.abs(currentX - x1) > threshholdPx) {
+            setDirection(currentX > x1 ? UseSwipeableDirections.RIGHT : UseSwipeableDirections.LEFT);
+        }
         setDragDistance(0);
     }
 
     function resetSwipeStatus() {
-        setDirection(UseSwipeableDirections.NULL)
+        setDirection(UseSwipeableDirections.NULL);
     }
-
-    useEffect(() => {
-        if (Math.abs(x2 - x1) > Math.abs(y2 - y1) && Math.abs(x2 - x1) > threshholdPx) {
-            console.log(x2 > x1 ? UseSwipeableDirections.RIGHT : UseSwipeableDirections.LEFT);
-            setDirection(x2 > x1 ? UseSwipeableDirections.RIGHT : UseSwipeableDirections.LEFT);
-        }
-    }, [x1, x2]);
 
     useEffect(() => {
         const currentElement = ref.current;
         if (!currentElement) return;
         currentElement.addEventListener('touchstart', touchStartHandler);
         currentElement.addEventListener('touchend', touchEndHandler);
+        currentElement.addEventListener('touchmove', touchMoveHandler);
 
         return () => {
             currentElement.removeEventListener('touchstart', touchStartHandler);
             currentElement.removeEventListener('touchend', touchEndHandler);
-        }
-    }, [ref]);
-
-    useEffect(() => {
-        const currentElement = ref.current;
-        if (!currentElement) return;
-        currentElement.addEventListener('touchmove', touchMoveHandler);
-
-        return () => {
             currentElement.removeEventListener('touchmove', touchMoveHandler);
         }
-    }, [ref, x1]);
+    });
 
     return {
         direction,

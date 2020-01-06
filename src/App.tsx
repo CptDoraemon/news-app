@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => createStyles({
     root: {
         width: '100vw',
         maxWidth: '100%',
-        minHeight: '1000px',
+        minHeight: '100vh',
         overflowX: 'hidden',
         paddingBottom: '10px',
         // overflowX is causing y-axis scroll problem, pb do the hack

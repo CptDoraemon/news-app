@@ -305,7 +305,7 @@ function Articles(props: ArticlesProps) {
         return () => {
             resetSwipeStatus();
         }
-    });
+    }, [direction]);
 
     let content;
     if (props.articles.isError) {
