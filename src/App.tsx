@@ -3,7 +3,7 @@ import {connect, Provider} from 'react-redux';
 import configureStore from "./redux/configureStore";
 import {InitState} from "./redux/reducers";
 import {categories, Categories, fetchArticles} from "./redux/actions";
-import {Box, CssBaseline} from "@material-ui/core";
+import {Box, createStyles, CssBaseline, makeStyles} from "@material-ui/core";
 import {
     createMuiTheme,
     responsiveFontSizes,
@@ -16,16 +16,26 @@ import Attribution from "./components/attribution";
 
 const store = configureStore();
 
+const useStyles = makeStyles((theme) => createStyles({
+    root: {
+        width: '100vw',
+        maxWidth: '100%',
+        minHeight: '100vh',
+        overflowX: 'hidden'
+    }
+}));
+
 interface InnerAppProps extends InitState{
     dispatch: any,
 }
 
 function InnerApp(props: InnerAppProps) {
+    const classes = useStyles();
     useEffect(() => {
         props.dispatch(fetchArticles(Categories.HEADLINE))
     }, []);
     return (
-        <Box width={'100vw'} minHeight={'100vh'} maxWidth={'100%'}>
+        <Box className={classes.root}>
             <Header headers={categories} dispatcher={props.dispatch} category={props.category}/>
             <Articles articles={props.articles} dispatcher={props.dispatch}/>
             <Attribution />

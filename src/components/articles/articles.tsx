@@ -23,7 +23,7 @@ import Close from '@material-ui/icons/Close';
 import {green} from '@material-ui/core/colors';
 import Skeleton from '@material-ui/lab/Skeleton';
 import {InitState} from "../../redux/reducers";
-import {ArticleType, setCategoryIfNeeded, setNextCategory, setPreviousCategory} from "../../redux/actions";
+import {ArticleType, setNextCategory, setPreviousCategory} from "../../redux/actions";
 import useLazyLoad from "../../tools/use-lazy-load";
 import getPublishTime from "../../tools/get-publish-time";
 import copyToClipboard from "../../tools/copy-to-clipboard";
@@ -344,11 +344,11 @@ function Articles(props: ArticlesProps) {
             width: '100%',
             transform: `translateX(${dragDistance}px)`,
         }}>
-        <Box className={classes.wrapper}>
-            <Grid container direction={"row"} alignContent={"center"} justify={"center"} spacing={2} ref={containerRef}>
-                { content }
-            </Grid>
-        </Box>
+            <Box className={classes.wrapper}>
+                <Grid container direction={"row"} alignContent={"center"} justify={"center"} spacing={2} ref={containerRef}>
+                    { content }
+                </Grid>
+            </Box>
         </div>
     )
 }
