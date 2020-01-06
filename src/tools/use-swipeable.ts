@@ -42,7 +42,7 @@ function useSwipeable(ref: RefObject<HTMLInputElement>, threshholdPx: number) {
             console.log(x2 > x1 ? UseSwipeableDirections.RIGHT : UseSwipeableDirections.LEFT);
             setDirection(x2 > x1 ? UseSwipeableDirections.RIGHT : UseSwipeableDirections.LEFT);
         }
-    }, [x2]);
+    }, [x1, x2]);
 
     useEffect(() => {
         const currentElement = ref.current;
