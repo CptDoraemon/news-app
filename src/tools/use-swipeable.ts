@@ -11,6 +11,7 @@ const DEBOUNCER = 10;
 function useSwipeable(ref: RefObject<HTMLInputElement>, threshholdPx: number) {
     const [x1, setX1] = useState(0);
     const [y1, setY1] = useState(0);
+    const [isSwiping, setIsSwiping] = useState(false);
     const [direction, setDirection] = useState(UseSwipeableDirections.NULL);
     const [dragDistance, setDragDistance] = useState(0);
     const [touchMoveLastTriggered, setTouchMoveLastTriggered] = useState(Date.now());
@@ -26,8 +27,11 @@ function useSwipeable(ref: RefObject<HTMLInputElement>, threshholdPx: number) {
         const currentX = e.changedTouches[0].clientX;
         const currentY = e.changedTouches[0].clientY;
         if (Math.abs(currentX - x1) > Math.abs(currentY - y1)) {
+            setIsSwiping(true);
+        }
+        if (isSwiping) {
             if (e.cancelable) e.preventDefault();
-            setDragDistance(e.changedTouches[0].clientX - x1)
+            setDragDistance(e.changedTouches[0].clientX - x1);
         }
         setTouchMoveLastTriggered(now);
     }
@@ -39,6 +43,7 @@ function useSwipeable(ref: RefObject<HTMLInputElement>, threshholdPx: number) {
             setDirection(currentX > x1 ? UseSwipeableDirections.RIGHT : UseSwipeableDirections.LEFT);
         }
         setDragDistance(0);
+        setIsSwiping(false);
     }
 
     function resetSwipeStatus() {
@@ -49,15 +54,31 @@ function useSwipeable(ref: RefObject<HTMLInputElement>, threshholdPx: number) {
         const currentElement = ref.current;
         if (!currentElement) return;
         currentElement.addEventListener('touchstart', touchStartHandler);
-        currentElement.addEventListener('touchend', touchEndHandler);
-        currentElement.addEventListener('touchmove', touchMoveHandler);
 
         return () => {
             currentElement.removeEventListener('touchstart', touchStartHandler);
-            currentElement.removeEventListener('touchend', touchEndHandler);
+        }
+    }, []);
+
+    useEffect(() => {
+        const currentElement = ref.current;
+        if (!currentElement) return;
+        currentElement.addEventListener('touchmove', touchMoveHandler);
+
+        return () => {
             currentElement.removeEventListener('touchmove', touchMoveHandler);
         }
-    });
+    }, [y1, touchMoveLastTriggered, isSwiping]);
+
+    useEffect(() => {
+        const currentElement = ref.current;
+        if (!currentElement) return;
+        currentElement.addEventListener('touchend', touchEndHandler);
+
+        return () => {
+            currentElement.removeEventListener('touchend', touchEndHandler);
+        }
+    }, [y1]);
 
     return {
         direction,

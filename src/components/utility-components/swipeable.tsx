@@ -1,9 +1,7 @@
 import React, {useEffect, useRef} from "react";
 import useSwipeable, {UseSwipeableDirections} from "../../tools/use-swipeable";
-
 import {connect} from "react-redux";
 import {setNextCategory, setPreviousCategory} from "../../redux/actions/category";
-import {Dispatch} from "redux";
 
 interface SwipeableProps {
     setPreviousCategory: () => void,
