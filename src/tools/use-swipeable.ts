@@ -26,6 +26,7 @@ function useSwipeable(ref: RefObject<HTMLInputElement>, threshholdPx: number) {
         const currentX = e.changedTouches[0].clientX;
         const currentY = e.changedTouches[0].clientY;
         if (Math.abs(currentX - x1) > Math.abs(currentY - y1)) {
+            e.preventDefault();
             setDragDistance(e.changedTouches[0].clientX - x1)
         }
         setTouchMoveLastTriggered(now);
