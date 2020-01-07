@@ -2,8 +2,9 @@ import {State} from "../redux/state";
 import {closeCopyLinkSnackBar} from "../redux/actions/copy-link-snackbar";
 import {connect} from "react-redux";
 import CopyLinkSnackbar from "../components/copy-link-snackbar";
+import {Dispatch} from "redux";
 
-function mapDispatchToProps(dispatch: any) {
+function mapDispatchToProps(dispatch: Dispatch) {
     return {
         closeCopyLinkSnackBar: () => dispatch(closeCopyLinkSnackBar())
     }

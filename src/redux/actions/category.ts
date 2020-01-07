@@ -1,6 +1,6 @@
 import {fetchArticles} from "./articles";
-import {ActionCreator, Dispatch} from "redux";
-import {ThunkAction} from "redux-thunk";
+import {ActionCreator, AnyAction} from "redux";
+import {ThunkDispatch} from "redux-thunk";
 import {State} from "../state";
 
 export enum Category {
@@ -35,16 +35,15 @@ const setCategory: ActionCreator<CategoryActions> = (category: Category) => {
     }
 };
 
-const setCategoryAndFetchArticles
-    = (category: Category) => {
-    return (dispatch: any) => {
+const setCategoryAndFetchArticles = (category: Category) => {
+    return (dispatch: ThunkDispatch<State, null, AnyAction>) => {
         dispatch(setCategory(category));
         dispatch(fetchArticles(category));
     };
 };
 
 export function setNextCategory() {
-    return (dispatch: any, getState: any) => {
+    return (dispatch: ThunkDispatch<State, null, AnyAction>, getState: () => State) => {
         const currentCategory = getState().category;
         const currentIndex = categories.indexOf(currentCategory);
         const isLast = currentIndex === categories.length - 1;
@@ -57,7 +56,7 @@ export function setNextCategory() {
 }
 
 export function setPreviousCategory() {
-    return (dispatch: any, getState: any) => {
+    return (dispatch: ThunkDispatch<State, null, AnyAction>, getState: () => State) => {
         const currentCategory = getState().category;
         const currentIndex = categories.indexOf(currentCategory);
         const isFirst = currentIndex === 0;
@@ -70,7 +69,7 @@ export function setPreviousCategory() {
 }
 
 export function setCategoryIfNeeded(category: Category) {
-    return (dispatch: any, getState: any) => {
+    return (dispatch: ThunkDispatch<State, null, AnyAction>, getState: () => State) => {
         if (getState().category === category) return;
         dispatch(setCategoryAndFetchArticles(category));
     };

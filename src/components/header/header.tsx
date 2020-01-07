@@ -1,7 +1,6 @@
 import React from "react";
 import {AppBar, Container, makeStyles, Tab, Tabs, Theme, Toolbar, Typography,} from "@material-ui/core";
 import {Categories, Category, setCategoryIfNeeded} from "../../redux/actions/category";
-import {Dispatch} from "redux";
 import {useDispatch} from "react-redux";
 
 

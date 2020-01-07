@@ -8,11 +8,8 @@ import {
     CardMedia,
     createStyles,
     Grid,
-    IconButton,
     Link,
     makeStyles,
-    Snackbar,
-    SnackbarContent,
     Theme,
     Typography,
     useMediaQuery,
@@ -25,7 +22,6 @@ import getPublishTime from "../../tools/get-publish-time";
 import copyToClipboard from "../../tools/copy-to-clipboard";
 import {ThemeStyle} from "@material-ui/core/styles/createTypography";
 import Swipeable from '../utility-components/swipeable';
-import {openCopyLinkSnackBar} from "../../redux/actions/copy-link-snackbar";
 import { Article as ArticleType} from "../../redux/actions/articles";
 import {State} from "../../redux/state";
 

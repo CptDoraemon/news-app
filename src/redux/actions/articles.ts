@@ -1,5 +1,7 @@
-import {ActionCreator, Dispatch} from "redux";
+import {Action, ActionCreator, AnyAction} from "redux";
 import { Category } from './category';
+import {State} from "../state";
+import {ThunkDispatch} from "redux-thunk";
 
 export interface Article {
     source: string,
@@ -53,8 +55,7 @@ const receiveArticles: ActionCreator<ArticlesReceiveAction> = (articles: Array<A
 
 const NEWS_API = 'https://www.xiaoxihome.com/api/news?query=';
 
-export const fetchArticles
-    = (category: Category) => {
+export const fetchArticles = (category: Category) => {
     const QUERY = `
         {
             getNews(category: ${category}) {
@@ -70,7 +71,7 @@ export const fetchArticles
         }
     `;
 
-    return (dispatch: any) => {
+    return (dispatch: ThunkDispatch<State, null, AnyAction>) => {
         dispatch(requestArticles());
         return fetch(NEWS_API + encodeURIComponent(QUERY))
             .then(res => res.json())
