@@ -4,8 +4,8 @@ import {connect} from "react-redux";
 import {setNextCategory, setPreviousCategory} from "../../redux/actions/category";
 
 interface SwipeableProps {
-    setPreviousCategory: () => void,
-    setNextCategory: () => void,
+    goPrevious: () => void,
+    goNext: () => void,
 }
 
 const Swipeable: React.FC<SwipeableProps> = (props) => {
@@ -18,9 +18,9 @@ const Swipeable: React.FC<SwipeableProps> = (props) => {
 
     useEffect(() => {
         if (direction === UseSwipeableDirections.RIGHT) {
-            props.setPreviousCategory()
+            props.goPrevious()
         } else if (direction === UseSwipeableDirections.LEFT) {
-            props.setNextCategory()
+            props.goNext()
         }
         return () => {
             resetSwipeStatus();
@@ -45,8 +45,8 @@ const Swipeable: React.FC<SwipeableProps> = (props) => {
 
 function mapDispatchToProps(dispatch: any) {
     return {
-        setPreviousCategory: () => dispatch(setPreviousCategory()),
-        setNextCategory: () => dispatch(setNextCategory())
+        goPrevious: () => dispatch(setPreviousCategory()),
+        goNext: () => dispatch(setNextCategory())
     }
 }
 
