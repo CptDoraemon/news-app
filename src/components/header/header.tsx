@@ -42,23 +42,23 @@ function Header(props: HeaderProps) {
                 </Container>
             </Toolbar>
         </AppBar>
-            <StickyComponent
-                fixedStartHeight={firstAppBarRef !== null ? firstAppBarRef.current.getBoundingClientRect().height : 50}
-                zIndex={1100}>
-                <AppBar color="primary" position={'static'}>
-                    <Tabs
-                        value={props.headers.indexOf(props.category)}
-                        indicatorColor="secondary"
-                        textColor="secondary"
-                        variant="scrollable"
-                        scrollButtons="auto"
-                    >
-                        {
-                            props.headers.map((_, i) => <Tab label={_} key={i} className={classes.tab} onClick={() => clickHandler(Category[_])}/>)
-                        }
-                    </Tabs>
-                </AppBar>
-            </StickyComponent>
+        <StickyComponent
+            fixedStartHeight={firstAppBarRef !== null ? firstAppBarRef.current.getBoundingClientRect().height : 50}
+            zIndex={1100}>
+            <AppBar color="primary" position={'static'}>
+                <Tabs
+                    value={props.headers.indexOf(props.category)}
+                    indicatorColor="secondary"
+                    textColor="secondary"
+                    variant="scrollable"
+                    scrollButtons="auto"
+                >
+                    {
+                        props.headers.map((_, i) => <Tab label={_} key={i} className={classes.tab} onClick={() => clickHandler(Category[_])}/>)
+                    }
+                </Tabs>
+            </AppBar>
+        </StickyComponent>
         </>
     )
 }

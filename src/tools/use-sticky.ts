@@ -30,8 +30,15 @@ function useSticky(fixedStartHeight: number) {
     const shouldBeExecuted = useDebounce(10);
 
     function scrollHandler() {
-        if (!shouldBeExecuted()) return;
         const scrolled = window.scrollY;
+        if (scrolled === 0 && style !== Style.RELATIVE) {
+            // don't debounce when fast scrolling to top
+            setStyle(Style.RELATIVE);
+            setIsFixed(false);
+            return;
+        }
+
+        if (!shouldBeExecuted()) return;
         if (scrolled >= fixedStartHeight && style !== Style.FIXED) {
             setStyle(Style.FIXED);
             setIsFixed(true);
