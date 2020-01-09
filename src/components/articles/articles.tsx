@@ -258,6 +258,11 @@ interface ArticlesProps extends Pick<State, 'articles'> {
 function Articles(props: ArticlesProps) {
     const classes = useStyles();
 
+    // scroll to top after is category changed
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    });
+
     let content;
     if (props.articles.isError) {
         content = (

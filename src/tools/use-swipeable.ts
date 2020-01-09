@@ -1,4 +1,5 @@
 import {RefObject, useEffect, useState} from "react";
+import useDebounce from "./use-debounce";
 
 export enum UseSwipeableDirections {
     NULL= 'NULL',
@@ -20,7 +21,7 @@ function useSwipeable(ref: RefObject<HTMLInputElement>, threshholdPx: number) {
     const [userAction, setUserAction] = useState(UserAction.NULL);
     const [direction, setDirection] = useState(UseSwipeableDirections.NULL);
     const [dragDistance, setDragDistance] = useState(0);
-    const [touchMoveLastTriggered, setTouchMoveLastTriggered] = useState(Date.now());
+    const shouldBeExecuted = useDebounce(DEBOUNCER);
 
     function touchStartHandler(e: TouchEvent) {
         setX1(e.changedTouches[0].clientX);
@@ -28,8 +29,7 @@ function useSwipeable(ref: RefObject<HTMLInputElement>, threshholdPx: number) {
     }
 
     function touchMoveHandler(e: TouchEvent) {
-        const now = Date.now();
-        if (now - touchMoveLastTriggered < DEBOUNCER) return;
+        if (!shouldBeExecuted()) return;
         const currentX = e.changedTouches[0].clientX;
         const currentY = e.changedTouches[0].clientY;
 
@@ -42,7 +42,6 @@ function useSwipeable(ref: RefObject<HTMLInputElement>, threshholdPx: number) {
             setUserAction(UserAction.SCROLL)
         }
 
-        setTouchMoveLastTriggered(now);
     }
 
     function touchEndHandler(e: TouchEvent) {
@@ -71,7 +70,7 @@ function useSwipeable(ref: RefObject<HTMLInputElement>, threshholdPx: number) {
         return () => {
             currentElement.removeEventListener('touchstart', touchStartHandler);
         }
-    }, []);
+    }, [ref]);
 
     useEffect(() => {
         const currentElement = ref.current;
@@ -81,7 +80,7 @@ function useSwipeable(ref: RefObject<HTMLInputElement>, threshholdPx: number) {
         return () => {
             currentElement.removeEventListener('touchmove', touchMoveHandler);
         }
-    }, [y1, touchMoveLastTriggered, userAction]);
+    }, [y1, userAction, ref]);
 
     useEffect(() => {
         const currentElement = ref.current;
@@ -91,7 +90,7 @@ function useSwipeable(ref: RefObject<HTMLInputElement>, threshholdPx: number) {
         return () => {
             currentElement.removeEventListener('touchend', touchEndHandler);
         }
-    }, [y1, userAction]);
+    }, [y1, userAction, ref]);
 
     return {
         direction,
