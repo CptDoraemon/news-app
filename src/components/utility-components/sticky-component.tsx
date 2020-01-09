@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from "react";
+import React, {useRef} from "react";
 import useSticky from "../../tools/use-sticky";
 
 interface StickyComponentProps {

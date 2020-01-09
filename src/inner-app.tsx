@@ -1,6 +1,6 @@
 import {State} from "./redux/state";
 import React, {useEffect} from "react";
-import {Box, createStyles, makeStyles} from "@material-ui/core";
+import {Box, makeStyles} from "@material-ui/core";
 import Header from "./components/header/header";
 import {categories, Category} from "./redux/actions/category";
 import ArticlesContainer from "./containers/articles-container";
@@ -9,7 +9,7 @@ import CopyLinkSnackBarContainer from "./containers/copy-link-snackbar-container
 import {fetchArticles} from "./redux/actions/articles";
 import {connect} from "react-redux";
 
-const useStyles = makeStyles((theme) => createStyles({
+const useStyles = makeStyles(() => ({
     root: {
         width: '100vw',
         maxWidth: '100%',

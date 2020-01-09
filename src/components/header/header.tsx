@@ -13,6 +13,12 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     toolbar: {
         textTransform: 'uppercase'
+    },
+    appBarNoBoxShadow: {
+        boxShadow: 'none'
+    },
+    appBarBottomBoxShadow: {
+        boxShadow: '0px 4px 4px -1px rgba(0,0,0,0.2), 0px 5px 5px 0px rgba(0,0,0,0.14), 0px 10px 10px 0px rgba(0,0,0,0.12)'
     }
 }));
 
@@ -33,7 +39,7 @@ function Header(props: HeaderProps) {
 
     return (
         <>
-        <AppBar color="primary" position={'static'} ref={firstAppBarRef}>
+        <AppBar color="primary" position={'static'} ref={firstAppBarRef} className={classes.appBarNoBoxShadow}>
             <Toolbar>
                 <Container>
                     <Typography align={"center"} className={classes.toolbar} variant={"h1"} component={'h1'}>
@@ -45,7 +51,7 @@ function Header(props: HeaderProps) {
         <StickyComponent
             fixedStartHeight={firstAppBarRef !== null ? firstAppBarRef.current.getBoundingClientRect().height : 50}
             zIndex={1100}>
-            <AppBar color="primary" position={'static'}>
+            <AppBar color="primary" position={'static'} className={classes.appBarBottomBoxShadow}>
                 <Tabs
                     value={props.headers.indexOf(props.category)}
                     indicatorColor="secondary"
