@@ -10,7 +10,8 @@ export interface State {
     },
     copyLinkSnackBar: {
         isActive: boolean
-    }
+    },
+    searchKeyword: string
 }
 
 export const initState: State = {
@@ -22,5 +23,6 @@ export const initState: State = {
     },
     copyLinkSnackBar: {
         isActive: false
-    }
+    },
+    searchKeyword: ''
 };

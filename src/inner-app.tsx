@@ -8,6 +8,7 @@ import Attribution from "./components/attribution";
 import CopyLinkSnackBarContainer from "./containers/copy-link-snackbar-container";
 import {fetchArticles} from "./redux/actions/articles";
 import {connect} from "react-redux";
+import SearchedArticlesContainer from "./containers/searched-articles-container";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -21,7 +22,8 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface InnerAppProps extends Pick<State, 'category' | 'articles'> {
-    fetchArticlesAfterMount: () => void
+    fetchArticlesAfterMount: () => void,
+    isSearching: boolean
 }
 
 function InnerApp(props: InnerAppProps) {
@@ -33,16 +35,21 @@ function InnerApp(props: InnerAppProps) {
     return (
         <Box className={classes.root}>
             <Header headers={categories} category={props.category} />
-            <ArticlesContainer articles={props.articles} />
+            {
+                props.isSearching ? <SearchedArticlesContainer/> : <ArticlesContainer articles={props.articles} />
+            }
             <Attribution />
             <CopyLinkSnackBarContainer />
         </Box>
     )
 }
 function mapStateToProps(state: State) {
+    const isSearching = state.category === Category.SEARCH;
+
     return {
         category: state.category,
-        articles: state.articles
+        articles: state.articles,
+        isSearching
     }
 }
 function mapDispatchToProps(dispatch: any) {

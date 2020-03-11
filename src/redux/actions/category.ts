@@ -11,6 +11,7 @@ export enum Category {
     SCIENCE= `SCIENCE`,
     SPORTS= `SPORTS`,
     TECHNOLOGY= `TECHNOLOGY`,
+    SEARCH=`SEARCH`
 }
 
 export type Categories = Array<keyof typeof Category>;
@@ -34,6 +35,13 @@ const setCategory: ActionCreator<CategoryActions> = (category: Category) => {
         category
     }
 };
+
+export function goToSearchPanel() {
+    return {
+        type: CategoryActionsType.SET_CATEGORY,
+        category: Category.SEARCH
+    }
+}
 
 const setCategoryAndFetchArticles = (category: Category) => {
     return (dispatch: ThunkDispatch<State, null, AnyAction>) => {
