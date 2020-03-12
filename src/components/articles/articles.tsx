@@ -306,4 +306,4 @@ function Articles(props: ArticlesProps) {
     )
 }
 
-export default Articles;
+export {Article, Articles as default}

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {FormEvent, useEffect, useState} from "react";
 import IconButton from "@material-ui/core/IconButton";
 import SearchIcon from "@material-ui/icons/Search";
 import TextField from '@material-ui/core/TextField';
@@ -32,10 +32,14 @@ const HeaderSearch: React.FC<HeaderSearchProps> = ({search}) => {
         setInput(e.target.value)
     };
 
-    const handleSubmit = () => {
-        if (!input.length) setIsEmpty(true);
-        search(input);
-        handleClose();
+    const handleSubmit = (e: FormEvent) => {
+        e.preventDefault();
+        if (!input.length) {
+            setIsEmpty(true);
+        } else {
+            search(input);
+            handleClose();
+        }
     };
 
     return (
@@ -44,28 +48,30 @@ const HeaderSearch: React.FC<HeaderSearchProps> = ({search}) => {
                 <SearchIcon/>
             </IconButton>
             <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-                <DialogTitle style={{minWidth: '50vw'}}>Search from archived news</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        error={isEmpty}
-                        autoFocus
-                        margin="dense"
-                        label="Keywords"
-                        type="news keyword"
-                        fullWidth
-                        value={input}
-                        onChange={handleInputChange}
-                        helperText={isEmpty ? 'Keyword cannot be empty.' : ' '}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose} color="primary">
-                        Cancel
-                    </Button>
-                    <Button onClick={handleSubmit} color="primary">
-                        Search
-                    </Button>
-                </DialogActions>
+                <form action='/' onSubmit={handleSubmit}>
+                    <DialogTitle style={{minWidth: '50vw'}}>Search from archived news</DialogTitle>
+                    <DialogContent>
+                        <TextField
+                            error={isEmpty}
+                            autoFocus
+                            margin="dense"
+                            label="Keywords"
+                            type="news keyword"
+                            fullWidth
+                            value={input}
+                            onChange={handleInputChange}
+                            helperText={isEmpty ? 'Keyword cannot be empty.' : ' '}
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose} color="primary">
+                            Cancel
+                        </Button>
+                        <Button type="submit" color="primary">
+                            Search
+                        </Button>
+                    </DialogActions>
+                </form>
             </Dialog>
         </div>
     )
