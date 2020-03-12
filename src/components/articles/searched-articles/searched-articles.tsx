@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Box, makeStyles} from "@material-ui/core";
 import Card from "@material-ui/core/Card";
 import CardActionArea from '@material-ui/core/CardActionArea';
@@ -14,6 +14,7 @@ import LoadMoreMessage from "./message-components/load-more-message";
 import HighlightedContent from "./highlighted-content";
 import SortPanel from "./sort/sort-panel";
 import GenericMessage from "./message-components/generic-message";
+import SearchedArticleCard from "./searched-article-card";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -94,37 +95,8 @@ const SearchedArticles: React.FC<SearchedArticlesProps> = ({keyword}) => {
                 { status === Status.ERROR && <GenericMessage message={'Server error please try later'}/>}
                 {
                     data.length > 0 &&
-                        data.map((article: any, i: number) =>
-                            <Card key={article._id} className={classes.cardRoot}>
-                                <CardActionArea className={classes.cardActionArea}>
-                                    <a href={article.url} target='_blank'>
-                                        <CardMedia
-                                            component="img"
-                                            alt={article.title}
-                                            className={classes.cardMedia}
-                                            image={article.urlToImage}
-                                            title={article.title}
-                                        />
-                                        <CardContent className={classes.cardContent}>
-                                            <Typography variant="body1" component="h2">
-                                                <Box fontWeight={700}>
-                                                    <HighlightedContent content={article.title} keyword={keyword}/>
-                                                </Box>
-                                            </Typography>
-                                            <Typography variant="body2" component="div" color="textSecondary">
-                                                <Box fontWeight={700}>
-                                                    {
-                                                        new Date(article.publishedAt).toDateString()
-                                                    }
-                                                </Box>
-                                            </Typography>
-                                            <Typography variant="body2" color="textSecondary" component="p">
-                                                <HighlightedContent content={article.content.replace(/\[\+[0-9]+\schars\]/ig, '')} keyword={keyword}/>
-                                            </Typography>
-                                        </CardContent>
-                                    </a>
-                                </CardActionArea>
-                            </Card>
+                        data.map((article: any) =>
+                            <SearchedArticleCard article={article} keyword={keyword} key={article._id}/>
                         )
                 }
                 { status === Status.LOADING && <LoadingMessage/> }
