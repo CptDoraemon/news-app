@@ -15,6 +15,7 @@ import HighlightedContent from "./highlighted-content";
 import SortPanel from "./sort/sort-panel";
 import GenericMessage from "./message-components/generic-message";
 import SearchedArticleCard from "./searched-article-card";
+import ScrollToTopButton from "./scroll-to-top-button";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -77,11 +78,11 @@ interface SearchedArticlesProps {
 
 const SearchedArticles: React.FC<SearchedArticlesProps> = ({keyword}) => {
 
-    const {status, data, setStatus, setData, sortType, sortByRelevance, sortByDate} = useSearchNews(keyword);
+    const {status, data, setStatus, setData, sortType, sortByRelevance, sortByDate, setTotalCount, totalCount} = useSearchNews(keyword);
     const classes = useStyles();
 
     const loadMoreNews = () => {
-        requestSearchNews(keyword, data.length, setStatus, setData, data);
+        requestSearchNews(keyword, data.length, setStatus, setData, data, setTotalCount);
     };
 
     const newsCount = data.length;
@@ -89,9 +90,9 @@ const SearchedArticles: React.FC<SearchedArticlesProps> = ({keyword}) => {
     return (
         <div className={classes.root}>
             <div className={classes.widthWrapper}>
-                { newsCount > 0 && <ResultsCountMessage count={newsCount} keyword={keyword}/> }
+                { newsCount > 0 && <ResultsCountMessage count={totalCount} keyword={keyword} currentLength={data.length}/> }
                 { newsCount > 0 && <SortPanel sortType={sortType} sortByRelevance={sortByRelevance} sortByDate={sortByDate} /> }
-                { status === Status.LOADED_EMPTY && <GenericMessage message={`No news article related to "${keyword}" found`}/>}
+                { status === Status.LOADED_EMPTY && <GenericMessage message={`No news article related to "${keyword}" was found`}/>}
                 { status === Status.ERROR && <GenericMessage message={'Server error please try later'}/>}
                 {
                     data.length > 0 &&
@@ -100,9 +101,11 @@ const SearchedArticles: React.FC<SearchedArticlesProps> = ({keyword}) => {
                         )
                 }
                 { status === Status.LOADING && <LoadingMessage/> }
-                { status === Status.LOADED_NORMAL && <LoadMoreMessage onClick={loadMoreNews}/> }
-                { status === Status.LOADED_NO_MORE && <GenericMessage message={'No more news found'}/>}
+                { status === Status.LOADED_NORMAL && newsCount < totalCount && totalCount > 0 && <LoadMoreMessage onClick={loadMoreNews}/> }
+                { newsCount === totalCount && totalCount > 0 && <GenericMessage message={'End of results'} divider/>}
             </div>
+
+            <ScrollToTopButton />
         </div>
     )
 };

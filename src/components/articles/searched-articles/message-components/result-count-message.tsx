@@ -11,17 +11,18 @@ const useStyles = makeStyles((theme) => ({
 
 interface ResultsCountMessageProps {
     count: number,
-    keyword: string
+    keyword: string,
+    currentLength: number
 }
 
-const ResultsCountMessage: React.FC<ResultsCountMessageProps> = ({count, keyword}) => {
+const ResultsCountMessage: React.FC<ResultsCountMessageProps> = ({count, keyword, currentLength}) => {
     const article = count === 1 ? 'article' : 'articles';
     const classes = useStyles();
 
     return (
         <Typography variant="body1" component="div" className={classes.root}>
             <Box fontWeight={700}>
-                {`${count} news ${article} found related to "${keyword}"`}
+                {`${count} news ${article} found related to "${keyword}", displaying 1 - ${currentLength}`}
             </Box>
         </Typography>
     )

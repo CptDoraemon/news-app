@@ -3,7 +3,16 @@ import Status from "./status";
 
 const baseUrl = 'https://www.xiaoxihome.com/api/search-news';
 
-const requestSearchNews = (keyword: string, skip: number, setStatus: Dispatch<SetStateAction<Status>>, setData: Dispatch<SetStateAction<any>>, data: any) => {
+const requestSearchNews = (
+    keyword: string,
+    skip: number,
+    setStatus: Dispatch<SetStateAction<Status>>,
+    setData: Dispatch<SetStateAction<any>>,
+    data: any,
+    setTotalCount: any
+) => {
+    setStatus(Status.LOADING);
+
     const url = skip === 0 ?
         `${baseUrl}?keyword=${keyword}` :
         `${baseUrl}?keyword=${keyword}&skip=${skip}`;
@@ -14,13 +23,11 @@ const requestSearchNews = (keyword: string, skip: number, setStatus: Dispatch<Se
             if (json.status === 'error') {
                 setStatus(Status.ERROR)
             } else {
-                if (!json.resultsFound) {
-                    if (data.length > 0) {
-                        setStatus(Status.LOADED_NO_MORE);
-                    } else {
-                        setStatus(Status.LOADED_EMPTY);
-                    }
+                if (!json.totalCount) {
+                    setTotalCount(0);
+                    setStatus(Status.LOADED_EMPTY);
                 } else {
+                    setTotalCount(json.totalCount);
                     setData((prevData: any) => [...prevData, ...json.data]);
                     setStatus(Status.LOADED_NORMAL);
                 }
