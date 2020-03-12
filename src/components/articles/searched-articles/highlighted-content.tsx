@@ -24,8 +24,8 @@ const HighlightedContent: React.FC<HighlightedContentProps> = ({content, keyword
             {contentArray.map((content, i) => {
                 const isKeyword = i % 2 === 1;
                 return isKeyword ?
-                    <span className={classes.highlight}>{ content }</span> :
-                    content
+                    <span className={classes.highlight} key={i}>{ content }</span> :
+                    <span key={i}>{ content }</span>
             })}
         </>
     )

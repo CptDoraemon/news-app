@@ -7,12 +7,21 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
+import makeStyles from "@material-ui/core/styles/makeStyles";
+
+const useStyles = makeStyles(theme => ({
+    dialog: {
+        minWidth: '50vw'
+    }
+}));
 
 interface HeaderSearchProps {
     search: (keyword: string) => void
 }
 
 const HeaderSearch: React.FC<HeaderSearchProps> = ({search}) => {
+
+    const classes = useStyles();
 
     const [open, setOpen] = useState(false);
     const [input, setInput] = useState('');
@@ -47,9 +56,9 @@ const HeaderSearch: React.FC<HeaderSearchProps> = ({search}) => {
             <IconButton aria-label="search" color={"inherit"} onClick={handleClickOpen}>
                 <SearchIcon/>
             </IconButton>
-            <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+            <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title" fullWidth maxWidth='sm'>
                 <form action='/' onSubmit={handleSubmit}>
-                    <DialogTitle style={{minWidth: '50vw'}}>Search from archived news</DialogTitle>
+                    <DialogTitle>Search from archived news</DialogTitle>
                     <DialogContent>
                         <TextField
                             error={isEmpty}

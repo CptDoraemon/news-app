@@ -29,7 +29,7 @@ const useSearchNews = (keyword: string) => {
 
     useEffect(() => {
         setData([]);
-        requestSearchNews(keyword, 0, setStatus, setData, data)
+        requestSearchNews(keyword, 0, setStatus, setData, [])
     }, [keyword]);
 
     return {

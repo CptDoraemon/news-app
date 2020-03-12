@@ -13,6 +13,7 @@ import LoadingMessage from "./message-components/loading-message";
 import LoadMoreMessage from "./message-components/load-more-message";
 import HighlightedContent from "./highlighted-content";
 import SortPanel from "./sort/sort-panel";
+import GenericMessage from "./message-components/generic-message";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -29,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'flex-start',
-        margin: theme.spacing(2, 0),
+        padding: theme.spacing(2),
         [theme.breakpoints.down('md')]: {
             width: '100%'
         }
@@ -39,8 +40,11 @@ const useStyles = makeStyles((theme) => ({
         margin: theme.spacing(2, 0),
     },
     cardActionArea: {
+        width: '100%',
+        height: '100%',
         '& a': {
             width: '100%',
+            height: '100%',
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
@@ -54,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
     },
     cardMedia: {
         width: '20%',
-        height: '100%',
+        height: '100%'
     },
     cardContent: {
         width: '80%',
@@ -86,8 +90,8 @@ const SearchedArticles: React.FC<SearchedArticlesProps> = ({keyword}) => {
             <div className={classes.widthWrapper}>
                 { newsCount > 0 && <ResultsCountMessage count={newsCount} keyword={keyword}/> }
                 { newsCount > 0 && <SortPanel sortType={sortType} sortByRelevance={sortByRelevance} sortByDate={sortByDate} /> }
-                { status === Status.LOADED_EMPTY && `No news article related to "${keyword}" found`}
-                { status === Status.ERROR && 'Server error please try later'}
+                { status === Status.LOADED_EMPTY && <GenericMessage message={`No news article related to "${keyword}" found`}/>}
+                { status === Status.ERROR && <GenericMessage message={'Server error please try later'}/>}
                 {
                     data.length > 0 &&
                         data.map((article: any, i: number) =>
@@ -125,13 +129,7 @@ const SearchedArticles: React.FC<SearchedArticlesProps> = ({keyword}) => {
                 }
                 { status === Status.LOADING && <LoadingMessage/> }
                 { status === Status.LOADED_NORMAL && <LoadMoreMessage onClick={loadMoreNews}/> }
-                { status === Status.LOADED_NO_MORE &&
-                    <Typography variant="body1" component="div">
-                        <Box fontWeight={700}>
-                            No more news
-                        </Box>
-                    </Typography>
-                }
+                { status === Status.LOADED_NO_MORE && <GenericMessage message={'No more news found'}/>}
             </div>
         </div>
     )

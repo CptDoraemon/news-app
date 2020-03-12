@@ -82,7 +82,7 @@ function Header(props: HeaderProps) {
             zIndex={1100}>
             <AppBar color="primary" position={'static'} className={classes.appBarBottomBoxShadow}>
                 <Tabs
-                    value={props.headers.indexOf(props.category)}
+                    value={props.headers.indexOf(props.category) === -1 ? false : props.headers.indexOf(props.category)}
                     indicatorColor="secondary"
                     textColor="secondary"
                     variant="scrollable"

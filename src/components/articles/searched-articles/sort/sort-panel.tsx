@@ -4,10 +4,18 @@ import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import SortTypes from "./sort-types";
+import {MenuItem} from "@material-ui/core";
+
+const capitalizeString = (string: string) => {
+    const lowercase = string.toLowerCase();
+    return lowercase.charAt(0).toUpperCase() + lowercase.slice(1);
+
+};
 
 const useStyles = makeStyles((theme) => ({
     root: {
         margin: theme.spacing(2, 0),
+        minWidth: 200
     }
 }));
 
@@ -40,7 +48,6 @@ const SortPanel: React.FC<SortPanelProps> = ({sortByDate, sortByRelevance, sortT
         <FormControl className={classes.root} color={"secondary"}>
             <InputLabel htmlFor="searched-article-sort">Sort By</InputLabel>
             <Select
-                native
                 value={sortType}
                 onChange={handleChange}
                 inputProps={{
@@ -48,8 +55,8 @@ const SortPanel: React.FC<SortPanelProps> = ({sortByDate, sortByRelevance, sortT
                     id: 'searched-article-sort',
                 }}
             >
-                <option value={SortTypes.RELEVANCE}>{SortTypes.RELEVANCE.toLowerCase()}</option>
-                <option value={SortTypes.DATE}>{SortTypes.DATE.toLowerCase()}</option>
+                <MenuItem value={SortTypes.RELEVANCE}>{capitalizeString(SortTypes.RELEVANCE)}</MenuItem>
+                <MenuItem value={SortTypes.DATE}>{capitalizeString(SortTypes.DATE)}</MenuItem>
             </Select>
         </FormControl>
     )

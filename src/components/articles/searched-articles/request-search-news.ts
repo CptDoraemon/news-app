@@ -11,7 +11,6 @@ const requestSearchNews = (keyword: string, skip: number, setStatus: Dispatch<Se
     fetch(url)
         .then(res => res.json())
         .then(json => {
-            console.log(json);
             if (json.status === 'error') {
                 setStatus(Status.ERROR)
             } else {
