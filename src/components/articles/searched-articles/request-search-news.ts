@@ -9,12 +9,13 @@ const requestSearchNews = (
     setStatus: Dispatch<SetStateAction<Status>>,
     setData: Dispatch<SetStateAction<any>>,
     data: any,
-    setTotalCount: any
+    setTotalCount: any,
+    setFrequencyData?: any
 ) => {
     setStatus(Status.LOADING);
 
     const url = skip === 0 ?
-        `${baseUrl}?keyword=${keyword}` :
+        `${baseUrl}?keyword=${keyword}&frequency=true` :
         `${baseUrl}?keyword=${keyword}&skip=${skip}`;
 
     fetch(url)
@@ -30,6 +31,14 @@ const requestSearchNews = (
                     setTotalCount(json.totalCount);
                     setData((prevData: any) => [...prevData, ...json.data]);
                     setStatus(Status.LOADED_NORMAL);
+
+                    // set frequency data if available
+                    if (json.frequency && setFrequencyData) {
+                        setFrequencyData(Object.assign({}, {
+                            bin: json.frequency.bin.weeklyBin,
+                            frequency: json.frequency.frequency
+                        }))
+                    }
                 }
             }
         })

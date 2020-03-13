@@ -9,6 +9,7 @@ const useSearchNews = (keyword: string) => {
     const [data, setData] = useState<any>([]);
     const [sortType, setSortType] = useState(SortTypes.RELEVANCE);
     const [totalCount, setTotalCount] = useState(0);
+    const [frequencyData, setFrequency] = useState<any>(null);
 
     const sortByDate = () => {
         setData((prevData: any) => {
@@ -30,7 +31,7 @@ const useSearchNews = (keyword: string) => {
 
     useEffect(() => {
         setData([]);
-        requestSearchNews(keyword, 0, setStatus, setData, [], setTotalCount)
+        requestSearchNews(keyword, 0, setStatus, setData, [], setTotalCount, setFrequency)
     }, [keyword]);
 
     return {
@@ -42,7 +43,8 @@ const useSearchNews = (keyword: string) => {
         sortByDate,
         sortByRelevance,
         totalCount,
-        setTotalCount
+        setTotalCount,
+        frequencyData
     };
 };
 
