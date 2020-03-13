@@ -30,15 +30,15 @@ const requestSearchNews = (
                 } else {
                     setTotalCount(json.totalCount);
                     setData((prevData: any) => [...prevData, ...json.data]);
-                    setStatus(Status.LOADED_NORMAL);
-
                     // set frequency data if available
                     if (json.frequency && setFrequencyData) {
                         setFrequencyData(Object.assign({}, {
-                            bin: json.frequency.bin.weeklyBin,
+                            bin: json.frequency.bin,
                             frequency: json.frequency.frequency
                         }))
                     }
+                    //
+                    setStatus(Status.LOADED_NORMAL);
                 }
             }
         })

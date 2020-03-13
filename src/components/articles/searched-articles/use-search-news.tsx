@@ -9,7 +9,7 @@ const useSearchNews = (keyword: string) => {
     const [data, setData] = useState<any>([]);
     const [sortType, setSortType] = useState(SortTypes.RELEVANCE);
     const [totalCount, setTotalCount] = useState(0);
-    const [frequencyData, setFrequency] = useState<any>(null);
+    const [frequencyData, setFrequencyData] = useState<any>(null);
 
     const sortByDate = () => {
         setData((prevData: any) => {
@@ -30,8 +30,13 @@ const useSearchNews = (keyword: string) => {
     };
 
     useEffect(() => {
+        // Called upon new keyword received
+        // Reset data
         setData([]);
-        requestSearchNews(keyword, 0, setStatus, setData, [], setTotalCount, setFrequency)
+        setFrequencyData(null);
+        setTotalCount(0);
+        setSortType(SortTypes.RELEVANCE);
+        requestSearchNews(keyword, 0, setStatus, setData, [], setTotalCount, setFrequencyData)
     }, [keyword]);
 
     return {

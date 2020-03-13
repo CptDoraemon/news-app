@@ -31,8 +31,8 @@ const KeywordFrequency: React.FC<KeywordFrequencyProps> = ({bin, frequency}) => 
         const margin = {top: 30, right: 10, bottom: 30, left: 50};
         const svgWidth = wrapperRef.current.getBoundingClientRect().width;
         const svgHeight = 200;
-        const width = svgWidth - margin.left - margin.right;
-        const height = svgHeight - margin.top - margin.bottom;
+        const width = svgWidth;
+        const height = svgHeight;
         const barWidth = width / (dataCount + 1);
         const barOffset = 20;
 
