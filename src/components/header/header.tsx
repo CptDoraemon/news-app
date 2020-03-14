@@ -1,5 +1,5 @@
 import React, {useRef} from "react";
-import {AppBar, Grid, Tab, Tabs, Theme, Toolbar, Typography,} from "@material-ui/core";
+import {AppBar, Grid, Tab, Tabs, Theme, Toolbar, Tooltip, Typography,} from "@material-ui/core";
 import { fade, makeStyles } from '@material-ui/core/styles';
 import {Categories, Category, setCategoryIfNeeded} from "../../redux/actions/category";
 import {useDispatch} from "react-redux";
@@ -7,6 +7,7 @@ import StickyComponent from "../utility-components/sticky-component";
 import IconButton from '@material-ui/core/IconButton';
 import AssessmentIcon from '@material-ui/icons/Assessment';
 import HeaderSearchContainer from "../../containers/header-search-container";
+import Zoom from "@material-ui/core/Zoom";
 
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -68,9 +69,11 @@ function Header(props: HeaderProps) {
                                 <HeaderSearchContainer/>
                             </Grid>
                             <Grid item>
-                                <IconButton aria-label="news trend" color={"inherit"}>
-                                    <AssessmentIcon/>
-                                </IconButton>
+                                <Tooltip title="Analytics" TransitionComponent={Zoom}>
+                                    <IconButton aria-label="news trend" color={"inherit"}>
+                                        <AssessmentIcon/>
+                                    </IconButton>
+                                </Tooltip>
                             </Grid>
                         </Grid>
                     </Grid>

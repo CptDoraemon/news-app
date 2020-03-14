@@ -32,6 +32,8 @@ const KeywordFrequency: React.FC<KeywordFrequencyProps> = ({bin, frequency}) => 
         })
     }, [bin]);
 
+    console.log(binDateStringArray);
+
     const delayArray = useMemo(() => {
         const array = [];
         let delay = TRANSITION_DELAY;
@@ -51,10 +53,11 @@ const KeywordFrequency: React.FC<KeywordFrequencyProps> = ({bin, frequency}) => 
         console.log(bin, frequency);
 
         const maxFrequency = Math.max.apply(Math, frequency);
+        const binLength = bin.length;
 
         const svgWidth = wrapperRef.current.getBoundingClientRect().width;
         const svgHeight = Math.min(Math.round(svgWidth / 3), 200);
-        const m = {t: 10, r: 0, b: 30, l: 30}; // margin
+        const m = {t: 10, r: 30, b: 30, l: 30}; // margin
         const chartWidth = svgWidth - m.l - m.r;
         const chartHeight = svgHeight - m.t - m.b;
         const chartX = m.l;
@@ -110,7 +113,7 @@ const KeywordFrequency: React.FC<KeywordFrequencyProps> = ({bin, frequency}) => 
             .range([chartHeight, 0]);
         const yAxis = d3.axisLeft(yAxisScale);
         const yLegends = svg.append('g');
-        yAxis.ticks(2);
+        yAxis.tickValues([0, Math.floor(maxFrequency * 0.5 * 0.1) * 10, maxFrequency]);
         yLegends
             .style('transform', `translate(${chartX}px, ${svgHeight}px)`)
             .style('opacity', 0)
@@ -122,8 +125,8 @@ const KeywordFrequency: React.FC<KeywordFrequencyProps> = ({bin, frequency}) => 
         const xLegends = svg.append('g');
         const xAxis = d3.axisBottom(xAxisScale);
         // @ts-ignore
-        xAxis.tickFormat((d, i) => binDateStringArray[d]);
-        xAxis.ticks(4);
+        xAxis.tickFormat((d, i) => binDateStringArray[d])
+            .tickValues([0, Math.floor(binLength * 0.25), Math.floor(binLength * 0.5), Math.floor(binLength * 0.75), binLength - 1]);
         xLegends
             .style('transform', `translate(${-0.5*svgWidth}px, ${chartHeight + chartY}px)`)
             .style('opacity', 0)

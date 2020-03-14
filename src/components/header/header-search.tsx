@@ -8,6 +8,8 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import makeStyles from "@material-ui/core/styles/makeStyles";
+import {Tooltip} from "@material-ui/core";
+import Zoom from "@material-ui/core/Zoom";
 
 const useStyles = makeStyles(theme => ({
     dialog: {
@@ -53,10 +55,12 @@ const HeaderSearch: React.FC<HeaderSearchProps> = ({search}) => {
 
     return (
         <div>
-            <IconButton aria-label="search" color={"inherit"} onClick={handleClickOpen}>
-                <SearchIcon/>
-            </IconButton>
-            <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title" fullWidth maxWidth='sm'>
+            <Tooltip title="Search" TransitionComponent={Zoom}>
+                <IconButton aria-label="search" color={"inherit"} onClick={handleClickOpen}>
+                    <SearchIcon/>
+                </IconButton>
+            </Tooltip>
+            <Dialog open={open} onClose={handleClose} fullWidth maxWidth='sm'>
                 <form action='/' onSubmit={handleSubmit}>
                     <DialogTitle>Search from archived news</DialogTitle>
                     <DialogContent>
@@ -73,10 +77,10 @@ const HeaderSearch: React.FC<HeaderSearchProps> = ({search}) => {
                         />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleClose} color="primary">
+                        <Button onClick={handleClose} color="primary" aria-label='cancel'>
                             Cancel
                         </Button>
-                        <Button type="submit" color="primary">
+                        <Button type="submit" color="primary" aria-label='submit search'>
                             Search
                         </Button>
                     </DialogActions>
