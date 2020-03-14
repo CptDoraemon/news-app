@@ -6,6 +6,7 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 import HighlightedContent from "./highlighted-content";
+import {Skeleton} from "@material-ui/lab";
 
 const useGetHeight = () => {
     const [cardHeight, setCardHeight] = useState(0);
@@ -74,13 +75,17 @@ const SearchedArticleCard: React.FC<SearchedArticleCardProps> = ({article, keywo
         <Card className={classes.cardRoot} style={{height: cardHeight ? `${cardHeight}px` : 'auto'}}>
             <CardActionArea className={classes.cardActionArea}>
                 <a href={article.url} target='_blank' rel="noopener noreferrer">
-                    <CardMedia
-                        component="img"
-                        alt={article.title}
-                        className={classes.cardMedia}
-                        image={article.urlToImage}
-                        title={article.title}
-                    />
+                    {
+                        article.urlToImage ?
+                            <CardMedia
+                                component="img"
+                                alt={article.title}
+                                className={classes.cardMedia}
+                                image={article.urlToImage}
+                                title={article.title}
+                            /> :
+                            <Skeleton variant="rect" className={classes.cardMedia}/>
+                    }
                     <CardContent className={classes.cardContent} ref={heightRef}>
                         <Typography variant="body1" component="h2">
                             <Box fontWeight={700}>
