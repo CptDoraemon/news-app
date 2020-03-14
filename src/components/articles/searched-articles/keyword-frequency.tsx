@@ -113,7 +113,7 @@ const KeywordFrequency: React.FC<KeywordFrequencyProps> = ({bin, frequency}) => 
             .range([chartHeight, 0]);
         const yAxis = d3.axisLeft(yAxisScale);
         const yLegends = svg.append('g');
-        yAxis.tickValues([0, Math.floor(maxFrequency * 0.5 * 0.1) * 10, maxFrequency]);
+        yAxis.tickValues([0, Math.floor(maxFrequency * 0.5), maxFrequency]);
         yLegends
             .style('transform', `translate(${chartX}px, ${svgHeight}px)`)
             .style('opacity', 0)
