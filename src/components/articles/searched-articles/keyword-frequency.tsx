@@ -109,18 +109,20 @@ const KeywordFrequency: React.FC<KeywordFrequencyProps> = ({bin, frequency}) => 
             .style('fill', lightColor)
             .style('opacity', 0)
             .attr('width', barWidth)
-            .attr('height', chartHeight)
+            .attr('height', svgHeight)
             .attr('x', barX)
-            .attr('y', chartY);
+            .attr('y', 0);
 
 
         // Axes
+        // yScale is up side down
         const yAxisScale = d3.scaleLinear()
             .domain([0, maxFrequency])
             .range([chartHeight, 0]);
         const yAxis = d3.axisLeft(yAxisScale);
         const yLegends = svg.append('g');
         yAxis
+            .tickSizeOuter(0)
             .tickFormat(d3.format("d"))
             .tickValues([0, Math.floor(maxFrequency * 0.5), maxFrequency]);
         yLegends
@@ -128,14 +130,12 @@ const KeywordFrequency: React.FC<KeywordFrequencyProps> = ({bin, frequency}) => 
             .style('opacity', 0)
             .style('color', darkColor);
 
-        const xAxisScale = d3.scaleLinear()
-            .domain([0, binDateStringArray.length - 1])
-            .range([0, chartWidth]);
         const xLegends = svg.append('g');
-        const xAxis = d3.axisBottom(xAxisScale);
-        // @ts-ignore
-        xAxis.tickFormat((d, i) => binDateStringArray[d])
-            .tickValues([0, Math.floor(binLength * 0.25), Math.floor(binLength * 0.5), Math.floor(binLength * 0.75), binLength - 1]);
+        const xAxis = d3.axisBottom(xScale);
+        xAxis
+            .tickSizeOuter(0)
+            .tickFormat((d, i) => binDateStringArray[parseInt(d)])
+            .tickValues([0, Math.floor(binLength * 0.25), Math.floor(binLength * 0.5), Math.floor(binLength * 0.75), binLength - 1].map(_=>`${_}`));
         xLegends
             .style('transform', `translate(${-0.5*svgWidth}px, ${chartHeight + chartY}px)`)
             .style('opacity', 0)
@@ -170,20 +170,18 @@ const KeywordFrequency: React.FC<KeywordFrequencyProps> = ({bin, frequency}) => 
 
         // Hover Date Text
         let hoverDateText = svg.append('g');
-        const hoverDateTextAxis = d3.axisBottom(xAxisScale);
+        const hoverDateTextAxis = d3.axisBottom(xScale);
         hoverDateText.style('opacity', 0)
             .style('transform', `translate(${chartX}px, ${chartHeight + chartY}px)`);
         hoverDateTextAxis
-            // @ts-ignore
-            .tickFormat((d) => binDateStringArray[d]);
+            .tickFormat((d) => binDateStringArray[parseInt(d)]);
 
         // Hover Frequency Text
         let hoverFreqText = svg.append('g');
-        const hoverFreqTextAxis = d3.axisBottom(xAxisScale);
+        const hoverFreqTextAxis = d3.axisBottom(xScale);
         hoverFreqText.style('opacity', 0);
         hoverFreqTextAxis
-            // @ts-ignore
-            .tickFormat((d) => frequency[d])
+            .tickFormat((d) => `${frequency[parseInt(d)]}`)
             .tickSize(0)
             .tickPadding(-9);
 
@@ -198,14 +196,36 @@ const KeywordFrequency: React.FC<KeywordFrequencyProps> = ({bin, frequency}) => 
                 grid.selectAll(".domain").remove();
                 grid.style('opacity', 1);
 
+                const gridTextBox = grid.select<SVGTextElement>('text').node()?.getBBox();
+                if (gridTextBox) {
+                    grid.selectAll('g.tick').insert('rect',
+                        ':first-child')
+                        .attr('width', gridTextBox.width)
+                        .attr('height', gridTextBox.height)
+                        .attr('x', gridTextBox.x)
+                        .attr('y', gridTextBox.y)
+                        .style('fill', backgroundColor);
+                }
+
                 hoverDateTextAxis
-                    .tickValues([i]);
+                    .tickValues([`${i}`]);
                 hoverDateTextAxis(hoverDateText);
                 hoverDateText.selectAll(".domain").remove();
                 hoverDateText.style('opacity', 1);
 
+                const hoverDateTextBox = hoverDateText.select<SVGTextElement>('text').node()?.getBBox();
+                if (hoverDateTextBox) {
+                    hoverDateText.selectAll('g.tick').insert('rect',
+                        ':first-child')
+                        .attr('width', hoverDateTextBox.width)
+                        .attr('height', hoverDateTextBox.height)
+                        .attr('x', hoverDateTextBox.x)
+                        .attr('y', hoverDateTextBox.y)
+                        .style('fill', backgroundColor);
+                }
+
                 hoverFreqTextAxis
-                    .tickValues([i]);
+                    .tickValues([`${i}`]);
                 hoverFreqTextAxis(hoverFreqText);
                 hoverFreqText.selectAll(".domain").remove();
                 hoverFreqText
@@ -218,6 +238,7 @@ const KeywordFrequency: React.FC<KeywordFrequencyProps> = ({bin, frequency}) => 
             .on('mouseout', function(data, i) {
                 grid.style('opacity', 0);
                 hoverDateText.style('opacity', 0);
+                hoverFreqText.style('opacity', 0);
 
                 bars.filter((d, index) => index === i)
                     .style('fill', lightColor);
