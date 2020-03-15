@@ -1,8 +1,6 @@
 import {Theme} from "@material-ui/core";
 import * as d3 from "d3";
 
-// TODO: clean up all any types
-
 class FrequencyChartD3 {
     dataArray: {
         bin: number[],
@@ -37,25 +35,30 @@ class FrequencyChartD3 {
         chartY: number
     };
 
-    scales: any;
+    scales: {
+        x: d3.ScaleBand<string>,
+        y: d3.ScaleLinear<number, number>
+    };
+
+    svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>;
 
     references: {
-        svg: any
-        bars: any,
-        axisX: any,
-        axisY: any,
-        axisXHoverDate: any,
-        axisXHoverFrequency: any,
-        axisYHover: any,
-        hoverDetection: any
+        svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>,
+        bars: d3.Selection<SVGRectElement, number, SVGGElement, unknown>,
+        axisX: d3.Selection<SVGGElement, unknown, HTMLElement, any>,
+        axisY: d3.Selection<SVGGElement, unknown, HTMLElement, any>,
+        axisXHoverDate: d3.Selection<SVGGElement, unknown, HTMLElement, any>,
+        axisXHoverFrequency: d3.Selection<SVGGElement, unknown, HTMLElement, any>,
+        axisYHover: d3.Selection<SVGGElement, unknown, HTMLElement, any>,
+        hoverDetection: d3.Selection<SVGRectElement, number, SVGGElement, unknown>,
     };
 
     axis: {
-        x: any,
-        y: any,
-        xHoverDate: any,
-        xHoverFrequency: any,
-        yHover: any
+        x: d3.Axis<string>,
+        y: d3.Axis<number | {valueOf(): number;}>,
+        xHoverDate: d3.Axis<string>,
+        xHoverFrequency: d3.Axis<string>,
+        yHover: d3.Axis<number | {valueOf(): number;}>,
     };
 
     constructor(theme: Theme, bin: number[], frequency: number[], width: number, selector: string) {
@@ -64,8 +67,8 @@ class FrequencyChartD3 {
             frequency
         };
         this.auxArray = {
-            binDate: [],
-            barTransitionDelay: []
+            binDate: this.getBinDateArray(bin),
+            barTransitionDelay: this.getBarTransitionDelayArray(500, frequency)
         };
         this.params = {
             lightColor: theme.palette.secondary.light,
@@ -79,59 +82,65 @@ class FrequencyChartD3 {
             argWidth: width,
             selector
         };
-        this.dimension = {
-            svgWidth: 0,
-            svgHeight: 0,
-            m: {t: 0, r: 0, b: 0, l: 0},
-            chartWidth: 0,
-            chartHeight: 0,
-            chartX: 0,
-            chartY: 0
-        };
+        this.dimension = this.getDimensions(width);
+        this.svg = d3.select(`#${this.params.selector}`).append('svg');
         this.references = {
-            svg: null,
-            bars: null,
-            axisX: null,
-            axisY: null,
-            axisXHoverDate: null,
-            axisXHoverFrequency: null,
-            axisYHover: null,
-            hoverDetection: null
+            svg: this.svg,
+            bars: this.svg
+                .append('g')
+                .selectAll('rect').data(this.dataArray.frequency)
+                .enter().append('rect'),
+            axisX: this.svg.append('g'),
+            axisY: this.svg.append('g'),
+            axisXHoverDate: this.svg.append('g'),
+            axisXHoverFrequency: this.svg.append('g'),
+            axisYHover: this.svg.append('g'),
+            hoverDetection: this.svg
+                .append('g')
+                .selectAll('rect').data(this.dataArray.frequency)
+                .enter().append('rect'),
         };
-
+        this.scales = {
+            x: d3.scaleBand()
+                .domain(this.dataArray.frequency.map((_, i) => i.toString()))
+                .range([0, this.dimension.chartWidth]),
+            y: d3.scaleLinear()
+                .domain([0, this.params.maxFrequency])
+                .range([this.dimension.chartHeight, 0])
+        };
         this.axis = {
-            x: null,
-            y: null,
-            xHoverDate: null,
-            xHoverFrequency: null,
-            yHover: null
+            x: d3.axisBottom(this.scales.x),
+            y: d3.axisLeft(this.scales.y),
+            xHoverDate: d3.axisBottom(this.scales.x),
+            xHoverFrequency: d3.axisBottom(this.scales.x),
+            yHover: d3.axisLeft(this.scales.y)
         };
         this.setHoverDetectionEventHandlers = this.setHoverDetectionEventHandlers.bind(this);
     }
 
-    createBinDateArray() {
-        this.auxArray.binDate = this.dataArray.bin.map(num => {
+    getBinDateArray(binArray: number[]) {
+        return binArray.map(num => {
             const date = new Date(num);
             return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`
         })
     }
 
-    createBarTransitionDelayArray() {
+    getBarTransitionDelayArray(transitionDelay: number, frequencyDataArray: number[]) {
         const array = [];
-        let delay = this.params.TRANSITION_DELAY;
+        let delay = transitionDelay;
         let step = 20;
-        for (let i=0; i<this.dataArray.frequency.length; i++) {
-            if (this.dataArray.frequency[i] === 0) {
+        for (let i=0; i<frequencyDataArray.length; i++) {
+            if (frequencyDataArray[i] === 0) {
                 array.push(delay)
             } else {
                 array.push(delay+=step);
             }
         }
-        this.auxArray.barTransitionDelay = array.slice();
+        return array
     }
 
-    setDimensions() {
-        const svgWidth = this.params.argWidth;
+    getDimensions(width: number) {
+        const svgWidth = width;
         const svgHeight = Math.min(Math.round(svgWidth / 3), 200);
         const m = {t: 10, r: 30, b: 30, l: 30}; // margin
         const chartWidth = svgWidth - m.l - m.r;
@@ -139,7 +148,7 @@ class FrequencyChartD3 {
         const chartX = m.l;
         const chartY = m.t;
 
-        this.dimension = {
+        return {
             svgWidth,
             svgHeight,
             m,
@@ -150,19 +159,7 @@ class FrequencyChartD3 {
         }
     }
 
-    setScales() {
-        this.scales = {
-            x: d3.scaleBand()
-                .domain(this.dataArray.frequency.map((_, i) => i.toString()))
-                .range([0, this.dimension.chartWidth]),
-            y: d3.scaleLinear()
-                .domain([0, this.params.maxFrequency])
-                .range([this.dimension.chartHeight, 0])
-        };
-    }
-
     setSvg() {
-        this.references.svg = d3.select(`#${this.params.selector}`).append('svg');
         this.references.svg
             .attr('width', this.dimension.svgWidth)
             .attr('height', this.dimension.svgHeight)
@@ -171,14 +168,10 @@ class FrequencyChartD3 {
     }
 
     setBars() {
-        this.references.bars = this.references.svg.append('g')
-            .selectAll('rect').data(this.dataArray.frequency)
-            .enter().append('rect');
-
         const barWidth = this.scales.x.bandwidth();
         const barHeight = (d: number) => this.dimension.chartHeight - this.scales.y(d);
-        const barX = (d: any, i: number) => this.dimension.chartX + (this.scales.x(i.toString()) || 0);
-        const barY = (d: any) => this.dimension.chartY + this.dimension.chartHeight - barHeight(d);
+        const barX = (d: number, i: number) => this.dimension.chartX + (this.scales.x(i.toString()) || 0);
+        const barY = (d: number) => this.dimension.chartY + this.dimension.chartHeight - barHeight(d);
 
         this.references.bars
             .style('fill', this.params.lightColor)
@@ -192,17 +185,15 @@ class FrequencyChartD3 {
             .transition()
             .attr('height', barHeight)
             .attr('y', barY)
-            .delay((d: any, i: any) => this.auxArray.barTransitionDelay[i])
+            .delay((d: number, i: number) => this.auxArray.barTransitionDelay[i])
             .duration(this.params.BAR_TRANSITION_DURATION)
             .ease(d3.easeElastic);
     }
 
     setAxisX() {
-        this.references.axisX = this.references.svg.append('g');
-        this.axis.x = d3.axisBottom(this.scales.x);
         this.axis.x
             .tickSizeOuter(0)
-            .tickFormat((d: any, i: any) => this.auxArray.binDate[parseInt(d)])
+            .tickFormat((d, i) => this.auxArray.binDate[parseInt(d)])
             .tickValues([0, Math.floor(this.params.binLength * 0.25), Math.floor(this.params.binLength * 0.5), Math.floor(this.params.binLength * 0.75), this.params.binLength - 1].map(_=>`${_}`));
         this.references.axisX
             .style('transform', `translate(${-0.5*this.dimension.svgWidth}px, ${this.dimension.svgHeight + this.dimension.chartY}px)`)
@@ -220,8 +211,6 @@ class FrequencyChartD3 {
     }
 
     setAxisY() {
-        this.references.axisY = this.references.svg.append('g');
-        this.axis.y = d3.axisLeft(this.scales.y);
         this.axis.y
             .tickSizeOuter(0)
             .tickFormat(d3.format("d"))
@@ -242,29 +231,21 @@ class FrequencyChartD3 {
     }
 
     setAxisXHoverDate() {
-        this.references.axisXHoverDate = this.references.svg.append('g');
-        this.axis.xHoverDate = d3.axisBottom(this.scales.x);
-
         this.references.axisXHoverDate.style('opacity', 0)
             .style('transform', `translate(${this.dimension.chartX}px, ${this.dimension.chartHeight + this.dimension.chartY}px)`);
         this.axis.xHoverDate
-            .tickFormat((d: any) => this.auxArray.binDate[parseInt(d)]);
+            .tickFormat((d) => this.auxArray.binDate[parseInt(d)]);
     }
 
     setAxisXHoverFrequency() {
-        this.references.axisXHoverFrequency = this.references.svg.append('g');
-        this.axis.xHoverFrequency = d3.axisBottom(this.scales.x);
-
         this.references.axisXHoverFrequency.style('opacity', 0);
         this.axis.xHoverFrequency
-            .tickFormat((d: any) => `${this.dataArray.frequency[parseInt(d)]}`)
+            .tickFormat((d) => `${this.dataArray.frequency[parseInt(d)]}`)
             .tickSize(0)
             .tickPadding(-9);
     }
 
     setAxisYHover() {
-        this.references.axisYHover = this.references.svg.append('g');
-        this.axis.yHover = d3.axisLeft(this.scales.y);
         this.references.axisYHover.style('opacity', 0)
             .style('transform', `translate(${this.dimension.chartX}px, ${this.dimension.chartY}px)`);
         this.axis.yHover
@@ -276,12 +257,7 @@ class FrequencyChartD3 {
 
     setHoverDetection() {
         const barWidth = this.scales.x.bandwidth();
-        const barX = (d: any, i: number) => this.dimension.chartX + (this.scales.x(i.toString()) || 0);
-
-        this.references.hoverDetection = this.references.svg
-            .append('g')
-            .selectAll('rect').data(this.dataArray.frequency)
-            .enter().append('rect');
+        const barX = (d: number, i: number) => this.dimension.chartX + (this.scales.x(i.toString()) || 0);
 
         this.references.hoverDetection
             .style('opacity', 0)
@@ -295,7 +271,7 @@ class FrequencyChartD3 {
 
     setHoverDetectionEventHandlers() {
         this.references.hoverDetection
-            .on('mouseover', (d: any, i: any) => {
+            .on('mouseover', (d, i) => {
                 this.axis.yHover.tickValues([d]);
                 this.axis.yHover(this.references.axisYHover);
 
@@ -306,8 +282,7 @@ class FrequencyChartD3 {
                 this.references.axisYHover.selectAll(".domain").remove();
                 this.references.axisYHover.style('opacity', 1);
 
-                // const gridTextBox = this.references.hoverDetection.select<SVGTextElement>('text').node()?.getBBox();
-                const gridTextBox = this.references.axisYHover.select('text').node()?.getBBox();
+                const gridTextBox = this.references.axisYHover.select<SVGTextElement>('text').node()?.getBBox();
                 if (gridTextBox) {
                     this.references.axisYHover.selectAll('g.tick').insert('rect',
                         ':first-child')
@@ -324,8 +299,7 @@ class FrequencyChartD3 {
                 this.references.axisXHoverDate.selectAll(".domain").remove();
                 this.references.axisXHoverDate.style('opacity', 1);
 
-                // const hoverDateTextBox = hoverDateText.select<SVGTextElement>('text').node()?.getBBox();
-                const hoverDateTextBox = this.references.axisXHoverDate.select('text').node()?.getBBox();
+                const hoverDateTextBox = this.references.axisXHoverDate.select<SVGTextElement>('text').node()?.getBBox();
                 if (hoverDateTextBox) {
                     this.references.axisXHoverDate.selectAll('g.tick').insert('rect',
                         ':first-child')
@@ -344,25 +318,18 @@ class FrequencyChartD3 {
                     .style('transform', `translate(${this.dimension.chartX}px, ${this.scales.y(d) + this.dimension.chartY}px)`)
                     .style('opacity', 1);
 
-                const bar = this.references.bars.filter((d: any, index: any) => index === i);
+                const bar = this.references.bars.filter((d, index) => index === i);
                 bar.style('fill', this.params.primaryColor);
             })
-            .on('mouseout', (d: any, i: any) => {
+            .on('mouseout', (d, i) => {
                 this.references.axisYHover.style('opacity', 0);
                 this.references.axisXHoverFrequency.style('opacity', 0);
                 this.references.axisXHoverDate.style('opacity', 0);
 
-                this.references.bars.filter((d: any, index: any) => index === i)
+                this.references.bars.filter((d, index) => index === i)
                     .style('fill', this.params.lightColor);
 
             });
-    }
-
-    init() {
-        this.createBinDateArray();
-        this.createBarTransitionDelayArray();
-        this.setDimensions();
-        this.setScales();
     }
 
     draw() {
@@ -377,7 +344,6 @@ class FrequencyChartD3 {
     }
 
     main() {
-        this.init();
         this.draw();
     }
 }
