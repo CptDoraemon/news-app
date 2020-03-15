@@ -82,10 +82,6 @@ const KeywordFrequency: React.FC<KeywordFrequencyProps> = ({bin, frequency}) => 
         const bars = svg.append('g')
             .selectAll('rect').data(frequency)
             .enter().append('rect');
-        const hoverDetectionBars = svg
-            .append('g')
-            .selectAll('rect').data(frequency)
-            .enter().append('rect');
 
         svg.attr('width', svgWidth)
             .attr('height', svgHeight)
@@ -104,15 +100,6 @@ const KeywordFrequency: React.FC<KeywordFrequencyProps> = ({bin, frequency}) => 
             .delay((d, i) => delayArray[i])
             .duration(BAR_TRANSITION_DURATION)
             .ease(d3.easeElastic);
-
-        hoverDetectionBars
-            .style('fill', lightColor)
-            .style('opacity', 0)
-            .attr('width', barWidth)
-            .attr('height', svgHeight)
-            .attr('x', barX)
-            .attr('y', 0);
-
 
         // Axes
         // yScale is up side down
@@ -185,6 +172,20 @@ const KeywordFrequency: React.FC<KeywordFrequencyProps> = ({bin, frequency}) => 
             .tickSize(0)
             .tickPadding(-9);
 
+        // hoverDetectionBars is here because it has to be the most top layer
+        const hoverDetectionBars = svg
+            .append('g')
+            .selectAll('rect').data(frequency)
+            .enter().append('rect');
+
+        hoverDetectionBars
+            .style('fill', lightColor)
+            .style('opacity', 0)
+            .attr('width', barWidth)
+            .attr('height', svgHeight)
+            .attr('x', barX)
+            .attr('y', 0);
+
         hoverDetectionBars
             .on('mouseover', function(d, i) {
                 gridLine
@@ -217,9 +218,9 @@ const KeywordFrequency: React.FC<KeywordFrequencyProps> = ({bin, frequency}) => 
                 if (hoverDateTextBox) {
                     hoverDateText.selectAll('g.tick').insert('rect',
                         ':first-child')
-                        .attr('width', hoverDateTextBox.width)
+                        .attr('width', hoverDateTextBox.width*1.2)
                         .attr('height', hoverDateTextBox.height)
-                        .attr('x', hoverDateTextBox.x)
+                        .attr('x', hoverDateTextBox.x-0.1*hoverDateTextBox.width)
                         .attr('y', hoverDateTextBox.y)
                         .style('fill', backgroundColor);
                 }
