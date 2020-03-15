@@ -16,7 +16,7 @@ import SortPanel from "./sort/sort-panel";
 import GenericMessage from "./message-components/generic-message";
 import SearchedArticleCard from "./searched-article-card";
 import ScrollToTopButton from "./scroll-to-top-button";
-import KeywordFrequency from "./keyword-frequency";
+import KeywordFrequency from "./frequency-chart/keyword-frequency";
 
 const useStyles = makeStyles((theme) => ({
     root: {
