@@ -1,18 +1,38 @@
-import React, {useEffect, useRef, useState} from "react";
-import {Box, makeStyles} from "@material-ui/core";
+import React, {useEffect, useState} from "react";
+import {makeStyles} from "@material-ui/core";
 import useSearchNews from "./requests/use-search-news";
-import requestSearchNews from "./requests/request-search-news";
 import Status from "./utilities/status";
 import ResultsCountMessage from "./message-components/result-count-message";
 import LoadingMessage from "./message-components/loading-message";
 import LoadMoreMessage from "./message-components/load-more-message";
-import SortPanel from "./filters/sort-panel";
 import GenericMessage from "./message-components/generic-message";
 import SearchedArticleCard from "./searched-article-card";
 import ScrollToTopButton from "./utilities/scroll-to-top-button";
 import KeywordFrequency from "./frequency-chart/keyword-frequency";
 import Filters from "./filters/filters";
 import getDateString from "./utilities/get-date-string";
+import {ISearchedArticle, IFrequencyData} from "./requests/response-types";
+
+const useShowChartAndFilters = (data: ISearchedArticle[], frequencyData: IFrequencyData | null, keyword: string) => {
+    // reset when new keyword is searched
+    // show chart and filter if initial search found some data
+    // sequential searches on same keyword caused by applied filters
+    // keep chart and filter visible after initial search is made
+
+    const [foundDataOnKeyword, setFoundDataOnKeyword] = useState(false);
+
+    useEffect(() => {
+        if (data.length > 0 && frequencyData) {
+            setFoundDataOnKeyword(true)
+        }
+    }, [data, frequencyData]);
+
+    useEffect(() => {
+        setFoundDataOnKeyword(false)
+    }, [keyword]);
+
+    return foundDataOnKeyword
+};
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -22,6 +42,7 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'flex-start',
+        margin: theme.spacing(2, 0)
     },
     widthWrapper: {
         width: '1000px',
@@ -96,24 +117,19 @@ const SearchedArticles: React.FC<SearchedArticlesProps> = ({keyword}) => {
     const endOfResultMessage = 'End of results';
     const errorMessage = 'Server error please try later';
 
-    const displayNotFoundMessage = status === Status.LOADED_EMPTY || status === Status.LOADED_EMPTY_WITH_DATAFILTER;
-    const displayChart =
-        (hasData && frequencyData) ||
-        (status === Status.LOADED_EMPTY_WITH_DATAFILTER && frequencyData);
-    const displayFilters = hasData || status === Status.LOADED_EMPTY_WITH_DATAFILTER;
-
+    const showChartAndFilters = useShowChartAndFilters(data, frequencyData, keyword);
 
     return (
-        <div className={classes.root}>
+        <div className={classes.root} key={keyword}>
             <div className={classes.widthWrapper}>
+                { showChartAndFilters && frequencyData && <KeywordFrequency bin={frequencyData.bin} frequency={frequencyData.frequency} setDate={setPendingDateFilter}/>}
+                { showChartAndFilters && <Filters sortType={sortType} toggleSort={toggleSort} pendingDateFilter={pendingDateFilter} dateFilter={dateFilter} setDateFilter={setDateFilter}/> }
                 { hasData && <ResultsCountMessage count={totalCount} keyword={keyword} currentLength={data.length} dateFilter={dateFilter}/> }
-                { displayNotFoundMessage && <GenericMessage message={notFoundMessage}/>}
-                { displayChart && <KeywordFrequency bin={frequencyData.bin} frequency={frequencyData.frequency} setDate={setPendingDateFilter}/>}
-                { displayFilters && <Filters sortType={sortType} toggleSort={toggleSort} pendingDateFilter={pendingDateFilter} dateFilter={dateFilter} setDateFilter={setDateFilter}/> }
+                { status === Status.LOADED_EMPTY && <GenericMessage message={notFoundMessage}/>}
                 { status === Status.ERROR && <GenericMessage message={errorMessage}/>}
                 {
                     hasData &&
-                        data.map((article: any) =>
+                        data.map((article) =>
                             <SearchedArticleCard article={article} keyword={keyword} key={article._id}/>
                         )
                 }

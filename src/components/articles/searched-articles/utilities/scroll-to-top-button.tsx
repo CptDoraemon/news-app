@@ -4,6 +4,11 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import Tooltip from "@material-ui/core/Tooltip";
 import Fade from "@material-ui/core/Fade";
+// @ts-ignore
+import  smoothscroll from 'smoothscroll-polyfill';
+
+// kick off the polyfill!
+smoothscroll.polyfill();
 
 const useActivateByScrollY = () => {
     const [isActive, setIsActive] = useState(false);
@@ -55,9 +60,8 @@ const ScrollToTopButton: React.FC<ScrollToTopButtonProps> = () => {
     const classes = useStyles();
 
     const isActive = useActivateByScrollY();
-
     const scrollToTop = () => {
-        window.scrollTo(0, 0);
+        window.scroll({ top: 0, left: 0, behavior: 'smooth' });
     };
 
     return (

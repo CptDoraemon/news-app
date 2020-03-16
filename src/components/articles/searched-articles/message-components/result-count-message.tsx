@@ -6,7 +6,7 @@ import getDateString from "../utilities/get-date-string";
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        margin: theme.spacing(2, 0)
+        margin: theme.spacing(1, 0)
     }
 }));
 

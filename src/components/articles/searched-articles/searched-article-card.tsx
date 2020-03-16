@@ -7,6 +7,7 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 import HighlightedContent from "./highlighted-content";
 import {Skeleton} from "@material-ui/lab";
+import {ISearchedArticle} from "./requests/response-types";
 
 const useGetHeight = () => {
     const [cardHeight, setCardHeight] = useState(0);
@@ -62,7 +63,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface SearchedArticleCardProps {
-    article: any,
+    article: ISearchedArticle,
     keyword: string
 }
 

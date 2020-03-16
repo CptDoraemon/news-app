@@ -1,4 +1,5 @@
 import SortTypes from "../filters/sort-types";
+import {IResponse} from "./response-types";
 
 const baseUrl = 'https://www.xiaoxihome.com/api/search-news';
 
@@ -9,7 +10,7 @@ const requestSearchNews = (
     sort?: SortTypes,
     date?: number
 ) => {
-    return new Promise((resolve, reject) => {
+    return new Promise<IResponse>((resolve, reject) => {
         const dateComponent = date ? `&date=${date}` : '';
         sort = sort || SortTypes.relevance;
         const url = `${baseUrl}?keyword=${keyword}&frequency=${frequency}&skip=${skip}&sort=${sort}${dateComponent}`;

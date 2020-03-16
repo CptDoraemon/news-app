@@ -2,14 +2,15 @@ import {useEffect, useState} from "react";
 import requestSearchNews from "./request-search-news";
 import Status from "../utilities/status";
 import SortTypes from "../filters/sort-types";
+import {IFrequencyData, ISearchedArticle, IResponse} from "./response-types";
 
 const useSearchNews = (keyword: string) => {
 
     const [status, setStatus] = useState(Status.LOADING);
-    const [data, setData] = useState<any>([]);
+    const [data, setData] = useState<ISearchedArticle[]>([]);
     const [sortType, setSortType] = useState(SortTypes.relevance);
     const [totalCount, setTotalCount] = useState(0);
-    const [frequencyData, setFrequencyData] = useState<any>(null);
+    const [frequencyData, setFrequencyData] = useState<IFrequencyData | null>(null);
     const [pendingDateFilter, _setPendingDateFilter] = useState<number>(0);
     const [dateFilter, _setDateFilter] = useState<number>(0);
 
@@ -24,11 +25,11 @@ const useSearchNews = (keyword: string) => {
 
 
             setStatus(Status.LOADING);
-            const json: any = await requestSearchNews(keyword, 0, true);
+            const json: IResponse = await requestSearchNews(keyword, 0, true);
             setData(json.data);
             setFrequencyData(json.frequency);
             setTotalCount(json.totalCount);
-            setLoadedStatus(json.data.length, json.totalCount, dateFilter);
+            setLoadedStatus(json.data.length, json.totalCount);
         } catch (e) {
             setStatus(Status.ERROR)
         }
@@ -39,14 +40,14 @@ const useSearchNews = (keyword: string) => {
             if (status === Status.LOADING) return;
 
             setStatus(Status.LOADING);
-            const json: any = await requestSearchNews(keyword, data.length, false, sortType, dateFilter);
+            const json: IResponse = await requestSearchNews(keyword, data.length, false, sortType, dateFilter);
 
             let updatedDataLength = 0;
-            setData((prevData: any[]) => {
+            setData((prevData) => {
                 updatedDataLength = prevData.length + json.data.length;
                 return [...prevData, ...json.data]
             });
-            setLoadedStatus(updatedDataLength, json.totalCount, dateFilter)
+            setLoadedStatus(updatedDataLength, json.totalCount)
         } catch (e) {
             setStatus(Status.ERROR)
         }
@@ -62,9 +63,9 @@ const useSearchNews = (keyword: string) => {
 
             //
             setStatus(Status.LOADING);
-            const json: any = await requestSearchNews(keyword, 0, false, type, dateFilter);
+            const json: IResponse = await requestSearchNews(keyword, 0, false, type, dateFilter);
             setData(json.data);
-            setLoadedStatus(json.data.length, json.totalCount, dateFilter)
+            setLoadedStatus(json.data.length, json.totalCount)
         } catch (e) {
             setStatus(Status.ERROR)
         }
@@ -86,24 +87,20 @@ const useSearchNews = (keyword: string) => {
 
             //
             setStatus(Status.LOADING);
-            const json: any = await requestSearchNews(keyword, 0, false, sortType, date);
+            const json: IResponse = await requestSearchNews(keyword, 0, false, sortType, date);
             setData(json.data);
             setTotalCount(json.totalCount);
-            setLoadedStatus(json.data.length, json.totalCount, date)
+            setLoadedStatus(json.data.length, json.totalCount)
         } catch (e) {
             setStatus(Status.ERROR)
         }
     };
 
-    const setLoadedStatus = (updatedDataLength: number, totalCount: number, dateFilter: number) => {
+    const setLoadedStatus = (updatedDataLength: number, totalCount: number) => {
         if (updatedDataLength === totalCount && totalCount !== 0) {
             setStatus(Status.LOADED_NO_MORE)
         } else if (totalCount === 0) {
-            if (dateFilter) {
-                setStatus(Status.LOADED_EMPTY_WITH_DATAFILTER)
-            } else {
-                setStatus(Status.LOADED_EMPTY)
-            }
+            setStatus(Status.LOADED_EMPTY)
         } else {
             setStatus((Status.LOADED_NORMAL))
         }
