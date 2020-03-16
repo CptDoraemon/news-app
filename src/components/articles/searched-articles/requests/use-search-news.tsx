@@ -19,6 +19,9 @@ const useSearchNews = (keyword: string) => {
             setFrequencyData(null);
             setTotalCount(0);
             setSortType(SortTypes.relevance);
+            _setPendingDateFilter(0);
+            _setDateFilter(0);
+
 
             setStatus(Status.LOADING);
             const json: any = await requestSearchNews(keyword, 0, true);
@@ -54,7 +57,7 @@ const useSearchNews = (keyword: string) => {
 
             //
             setStatus(Status.LOADING);
-            const json: any = await requestSearchNews(keyword, 0, false, type);
+            const json: any = await requestSearchNews(keyword, 0, false, type, dateFilter);
             setData(json.data);
             setLoadedStatus(json)
         } catch (e) {
@@ -72,6 +75,7 @@ const useSearchNews = (keyword: string) => {
             if (date === dateFilter) return;
             // reset
             setData([]);
+            setTotalCount(0);
             _setPendingDateFilter(0);
             _setDateFilter(date);
 
@@ -79,6 +83,7 @@ const useSearchNews = (keyword: string) => {
             setStatus(Status.LOADING);
             const json: any = await requestSearchNews(keyword, 0, false, sortType, date);
             setData(json.data);
+            setTotalCount(json.totalCount);
             setLoadedStatus(json)
         } catch (e) {
             setStatus(Status.ERROR)
@@ -86,7 +91,7 @@ const useSearchNews = (keyword: string) => {
     };
 
     const setLoadedStatus = (json: any) => {
-        if (json.data.length === json.totalCount) {
+        if (json.data.length === json.totalCount && json.totalCount !== 0) {
             setStatus(Status.LOADED_NO_MORE)
         } else if (json.totalCount === 0) {
             setStatus(Status.LOADED_EMPTY)

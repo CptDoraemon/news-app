@@ -12,6 +12,7 @@ import SearchedArticleCard from "./searched-article-card";
 import ScrollToTopButton from "./utilities/scroll-to-top-button";
 import KeywordFrequency from "./frequency-chart/keyword-frequency";
 import Filters from "./filters/filters";
+import getDateString from "./utilities/get-date-string";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -91,14 +92,18 @@ const SearchedArticles: React.FC<SearchedArticlesProps> = ({keyword}) => {
 
     const hasData = data.length > 0;
 
+    const notFoundMessage =`No news article related to "${keyword}" was found ${dateFilter ? 'on ' + getDateString(dateFilter) : ''}`;
+    const endOfResultMessage = 'End of results';
+    const errorMessage = 'Server error please try later';
+
     return (
         <div className={classes.root}>
             <div className={classes.widthWrapper}>
-                { hasData && <ResultsCountMessage count={totalCount} keyword={keyword} currentLength={data.length}/> }
+                { hasData && <ResultsCountMessage count={totalCount} keyword={keyword} currentLength={data.length} dateFilter={dateFilter}/> }
                 { hasData && frequencyData && <KeywordFrequency bin={frequencyData.bin} frequency={frequencyData.frequency} setDate={setPendingDateFilter}/>}
                 { hasData && <Filters sortType={sortType} toggleSort={toggleSort} pendingDateFilter={pendingDateFilter} dateFilter={dateFilter} setDateFilter={setDateFilter}/> }
-                { status === Status.LOADED_EMPTY && <GenericMessage message={`No news article related to "${keyword}" was found`}/>}
-                { status === Status.ERROR && <GenericMessage message={'Server error please try later'}/>}
+                { status === Status.LOADED_EMPTY && <GenericMessage message={notFoundMessage}/>}
+                { status === Status.ERROR && <GenericMessage message={errorMessage}/>}
                 {
                     hasData &&
                         data.map((article: any) =>
@@ -107,7 +112,7 @@ const SearchedArticles: React.FC<SearchedArticlesProps> = ({keyword}) => {
                 }
                 { status === Status.LOADING && <LoadingMessage/> }
                 { status === Status.LOADED_NORMAL && <LoadMoreMessage onClick={loadMore}/> }
-                { status === Status.LOADED_NO_MORE && <GenericMessage message={'End of results'} divider/>}
+                { status === Status.LOADED_NO_MORE && <GenericMessage message={endOfResultMessage} divider/>}
             </div>
 
             <ScrollToTopButton />
