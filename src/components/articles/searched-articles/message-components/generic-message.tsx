@@ -21,7 +21,7 @@ const GenericMessage: React.FC<GenericMessageProps> = ({message, divider}) => {
     return (
         <>
             <Typography variant="body1" component="div" className={classes.root}>
-                <Box fontWeight={700}>
+                <Box fontWeight={700} textAlign={'center'}>
                     {message}
                 </Box>
             </Typography>

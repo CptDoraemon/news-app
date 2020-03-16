@@ -28,7 +28,7 @@ const useSearchNews = (keyword: string) => {
             setData(json.data);
             setFrequencyData(json.frequency);
             setTotalCount(json.totalCount);
-            setLoadedStatus(json.data.length, json.totalCount);
+            setLoadedStatus(json.data.length, json.totalCount, dateFilter);
         } catch (e) {
             setStatus(Status.ERROR)
         }
@@ -46,7 +46,7 @@ const useSearchNews = (keyword: string) => {
                 updatedDataLength = prevData.length + json.data.length;
                 return [...prevData, ...json.data]
             });
-            setLoadedStatus(updatedDataLength, json.totalCount)
+            setLoadedStatus(updatedDataLength, json.totalCount, dateFilter)
         } catch (e) {
             setStatus(Status.ERROR)
         }
@@ -64,7 +64,7 @@ const useSearchNews = (keyword: string) => {
             setStatus(Status.LOADING);
             const json: any = await requestSearchNews(keyword, 0, false, type, dateFilter);
             setData(json.data);
-            setLoadedStatus(json.data.length, json.totalCount)
+            setLoadedStatus(json.data.length, json.totalCount, dateFilter)
         } catch (e) {
             setStatus(Status.ERROR)
         }
@@ -89,17 +89,21 @@ const useSearchNews = (keyword: string) => {
             const json: any = await requestSearchNews(keyword, 0, false, sortType, date);
             setData(json.data);
             setTotalCount(json.totalCount);
-            setLoadedStatus(json.data.length, json.totalCount)
+            setLoadedStatus(json.data.length, json.totalCount, date)
         } catch (e) {
             setStatus(Status.ERROR)
         }
     };
 
-    const setLoadedStatus = (updatedDataLength: number, totalCount: number) => {
+    const setLoadedStatus = (updatedDataLength: number, totalCount: number, dateFilter: number) => {
         if (updatedDataLength === totalCount && totalCount !== 0) {
             setStatus(Status.LOADED_NO_MORE)
         } else if (totalCount === 0) {
-            setStatus(Status.LOADED_EMPTY)
+            if (dateFilter) {
+                setStatus(Status.LOADED_EMPTY_WITH_DATAFILTER)
+            } else {
+                setStatus(Status.LOADED_EMPTY)
+            }
         } else {
             setStatus((Status.LOADED_NORMAL))
         }

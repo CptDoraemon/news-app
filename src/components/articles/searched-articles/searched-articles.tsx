@@ -96,13 +96,20 @@ const SearchedArticles: React.FC<SearchedArticlesProps> = ({keyword}) => {
     const endOfResultMessage = 'End of results';
     const errorMessage = 'Server error please try later';
 
+    const displayNotFoundMessage = status === Status.LOADED_EMPTY || status === Status.LOADED_EMPTY_WITH_DATAFILTER;
+    const displayChart =
+        (hasData && frequencyData) ||
+        (status === Status.LOADED_EMPTY_WITH_DATAFILTER && frequencyData);
+    const displayFilters = hasData || status === Status.LOADED_EMPTY_WITH_DATAFILTER;
+
+
     return (
         <div className={classes.root}>
             <div className={classes.widthWrapper}>
                 { hasData && <ResultsCountMessage count={totalCount} keyword={keyword} currentLength={data.length} dateFilter={dateFilter}/> }
-                { status === Status.LOADED_EMPTY && <GenericMessage message={notFoundMessage}/>}
-                { hasData && frequencyData && <KeywordFrequency bin={frequencyData.bin} frequency={frequencyData.frequency} setDate={setPendingDateFilter}/>}
-                { hasData && <Filters sortType={sortType} toggleSort={toggleSort} pendingDateFilter={pendingDateFilter} dateFilter={dateFilter} setDateFilter={setDateFilter}/> }
+                { displayNotFoundMessage && <GenericMessage message={notFoundMessage}/>}
+                { displayChart && <KeywordFrequency bin={frequencyData.bin} frequency={frequencyData.frequency} setDate={setPendingDateFilter}/>}
+                { displayFilters && <Filters sortType={sortType} toggleSort={toggleSort} pendingDateFilter={pendingDateFilter} dateFilter={dateFilter} setDateFilter={setDateFilter}/> }
                 { status === Status.ERROR && <GenericMessage message={errorMessage}/>}
                 {
                     hasData &&

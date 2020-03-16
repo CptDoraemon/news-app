@@ -38,7 +38,7 @@ const SortPanel: React.FC<SortPanelProps> = ({toggleSort, sortType}) => {
 
     return (
         <FormControl className={classes.root} color={"secondary"}>
-            <InputLabel htmlFor="searched-article-sort">Sort By</InputLabel>
+            <InputLabel htmlFor="searched-article-sort">Sort by</InputLabel>
             <Select
                 value={sortType}
                 onChange={handleChange}
