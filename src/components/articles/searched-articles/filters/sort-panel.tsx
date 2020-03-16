@@ -14,12 +14,14 @@ const capitalizeString = (string: string) => {
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        margin: theme.spacing(2, 0),
         minWidth: 200
+    },
+    resetFontSize: {
+        fontSize: theme.typography.fontSize
     }
 }));
 
-interface SortPanelProps{
+export interface SortPanelProps{
     toggleSort: (sortType: SortTypes) => void,
     sortType: SortTypes
 }
@@ -44,9 +46,10 @@ const SortPanel: React.FC<SortPanelProps> = ({toggleSort, sortType}) => {
                     name: 'sort',
                     id: 'searched-article-sort',
                 }}
+                className={classes.resetFontSize}
             >
-                <MenuItem value={SortTypes.relevance}>{capitalizeString(SortTypes.relevance)}</MenuItem>
-                <MenuItem value={SortTypes.date}>{capitalizeString(SortTypes.date)}</MenuItem>
+                <MenuItem value={SortTypes.relevance} className={classes.resetFontSize}>{capitalizeString(SortTypes.relevance)}</MenuItem>
+                <MenuItem value={SortTypes.date} className={classes.resetFontSize}>{capitalizeString(SortTypes.date)}</MenuItem>
             </Select>
         </FormControl>
     )

@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import requestSearchNews from "./request-search-news";
-import Status from "./status";
-import SortTypes from "./sort/sort-types";
+import Status from "../utilities/status";
+import SortTypes from "../filters/sort-types";
 
 const useSearchNews = (keyword: string) => {
 
@@ -10,7 +10,8 @@ const useSearchNews = (keyword: string) => {
     const [sortType, setSortType] = useState(SortTypes.relevance);
     const [totalCount, setTotalCount] = useState(0);
     const [frequencyData, setFrequencyData] = useState<any>(null);
-    const [filterDate, setFilterDate] = useState<number>(0);
+    const [pendingDateFilter, _setPendingDateFilter] = useState<number>(0);
+    const [dateFilter, _setDateFilter] = useState<number>(0);
 
     const newSearch = async () => {
         try {
@@ -35,7 +36,7 @@ const useSearchNews = (keyword: string) => {
             if (status === Status.LOADING) return;
 
             setStatus(Status.LOADING);
-            const json: any = await requestSearchNews(keyword, data.length, false, sortType, filterDate);
+            const json: any = await requestSearchNews(keyword, data.length, false, sortType, dateFilter);
             setData((prevData: any[]) => [...prevData, ...json.data]);
             setLoadedStatus(json)
         } catch (e) {
@@ -45,7 +46,6 @@ const useSearchNews = (keyword: string) => {
 
     const toggleSort = async (type: SortTypes) => {
         try {
-            console.log(type, sortType);
             if (status === Status.LOADING) return;
             if (type === sortType) return;
             // reset
@@ -55,6 +55,29 @@ const useSearchNews = (keyword: string) => {
             //
             setStatus(Status.LOADING);
             const json: any = await requestSearchNews(keyword, 0, false, type);
+            setData(json.data);
+            setLoadedStatus(json)
+        } catch (e) {
+            setStatus(Status.ERROR)
+        }
+    };
+
+    const setPendingDateFilter = (date: number) => {
+        _setPendingDateFilter(date);
+    };
+
+    const setDateFilter = async (date: number) => {
+        try {
+            if (status === Status.LOADING) return;
+            if (date === dateFilter) return;
+            // reset
+            setData([]);
+            _setPendingDateFilter(0);
+            _setDateFilter(date);
+
+            //
+            setStatus(Status.LOADING);
+            const json: any = await requestSearchNews(keyword, 0, false, sortType, date);
             setData(json.data);
             setLoadedStatus(json)
         } catch (e) {
@@ -82,8 +105,12 @@ const useSearchNews = (keyword: string) => {
         frequencyData,
         sortType,
         totalCount,
+        pendingDateFilter,
+        dateFilter,
         toggleSort,
         loadMore,
+        setPendingDateFilter,
+        setDateFilter,
     };
 };
 

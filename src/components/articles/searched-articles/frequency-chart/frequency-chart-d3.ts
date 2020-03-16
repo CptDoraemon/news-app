@@ -1,5 +1,6 @@
 import {Theme} from "@material-ui/core";
 import * as d3 from "d3";
+import getDateString from "../utilities/get-date-string";
 
 class FrequencyChartD3 {
     dataArray: {
@@ -119,10 +120,7 @@ class FrequencyChartD3 {
     }
 
     getBinDateArray(binArray: number[]) {
-        return binArray.map(num => {
-            const date = new Date(num);
-            return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`
-        })
+        return binArray.map(getDateString)
     }
 
     getBarTransitionDelayArray(transitionDelay: number, frequencyDataArray: number[]) {
@@ -329,7 +327,14 @@ class FrequencyChartD3 {
                 this.references.bars.filter((d, index) => index === i)
                     .style('fill', this.params.lightColor);
 
-            });
+            })
+    }
+
+    bindSetDate(setDate: (date: number) => void) {
+        this.references.hoverDetection
+            .on('click', (d, i) => {
+                setDate(this.dataArray.bin[i])
+            })
     }
 
     draw() {

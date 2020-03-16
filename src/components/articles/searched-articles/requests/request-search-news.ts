@@ -1,4 +1,4 @@
-import SortTypes from "./sort/sort-types";
+import SortTypes from "../filters/sort-types";
 
 const baseUrl = 'https://www.xiaoxihome.com/api/search-news';
 

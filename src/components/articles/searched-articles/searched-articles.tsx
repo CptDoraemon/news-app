@@ -1,16 +1,17 @@
 import React, {useEffect, useRef, useState} from "react";
 import {Box, makeStyles} from "@material-ui/core";
-import useSearchNews from "./use-search-news";
-import requestSearchNews from "./request-search-news";
-import Status from "./status";
+import useSearchNews from "./requests/use-search-news";
+import requestSearchNews from "./requests/request-search-news";
+import Status from "./utilities/status";
 import ResultsCountMessage from "./message-components/result-count-message";
 import LoadingMessage from "./message-components/loading-message";
 import LoadMoreMessage from "./message-components/load-more-message";
-import SortPanel from "./sort/sort-panel";
+import SortPanel from "./filters/sort-panel";
 import GenericMessage from "./message-components/generic-message";
 import SearchedArticleCard from "./searched-article-card";
-import ScrollToTopButton from "./scroll-to-top-button";
+import ScrollToTopButton from "./utilities/scroll-to-top-button";
 import KeywordFrequency from "./frequency-chart/keyword-frequency";
+import Filters from "./filters/filters";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -73,7 +74,19 @@ interface SearchedArticlesProps {
 
 const SearchedArticles: React.FC<SearchedArticlesProps> = ({keyword}) => {
 
-    const {data, frequencyData, status, sortType, totalCount, loadMore, toggleSort} = useSearchNews(keyword);
+    const {
+        data,
+        frequencyData,
+        status,
+        sortType,
+        totalCount,
+        pendingDateFilter,
+        dateFilter,
+        setPendingDateFilter,
+        setDateFilter,
+        loadMore,
+        toggleSort
+    } = useSearchNews(keyword);
     const classes = useStyles();
 
     const hasData = data.length > 0;
@@ -82,8 +95,8 @@ const SearchedArticles: React.FC<SearchedArticlesProps> = ({keyword}) => {
         <div className={classes.root}>
             <div className={classes.widthWrapper}>
                 { hasData && <ResultsCountMessage count={totalCount} keyword={keyword} currentLength={data.length}/> }
-                { hasData && frequencyData && <KeywordFrequency bin={frequencyData.bin} frequency={frequencyData.frequency}/>}
-                { hasData && <SortPanel sortType={sortType} toggleSort={toggleSort} /> }
+                { hasData && frequencyData && <KeywordFrequency bin={frequencyData.bin} frequency={frequencyData.frequency} setDate={setPendingDateFilter}/>}
+                { hasData && <Filters sortType={sortType} toggleSort={toggleSort} pendingDateFilter={pendingDateFilter} dateFilter={dateFilter} setDateFilter={setDateFilter}/> }
                 { status === Status.LOADED_EMPTY && <GenericMessage message={`No news article related to "${keyword}" was found`}/>}
                 { status === Status.ERROR && <GenericMessage message={'Server error please try later'}/>}
                 {
