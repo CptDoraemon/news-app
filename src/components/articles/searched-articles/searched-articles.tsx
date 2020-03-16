@@ -1,17 +1,11 @@
-import React, {RefObject, useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Box, makeStyles} from "@material-ui/core";
-import Card from "@material-ui/core/Card";
-import CardActionArea from '@material-ui/core/CardActionArea';
-import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
-import Typography from '@material-ui/core/Typography';
 import useSearchNews from "./use-search-news";
 import requestSearchNews from "./request-search-news";
 import Status from "./status";
 import ResultsCountMessage from "./message-components/result-count-message";
 import LoadingMessage from "./message-components/loading-message";
 import LoadMoreMessage from "./message-components/load-more-message";
-import HighlightedContent from "./highlighted-content";
 import SortPanel from "./sort/sort-panel";
 import GenericMessage from "./message-components/generic-message";
 import SearchedArticleCard from "./searched-article-card";
@@ -79,34 +73,28 @@ interface SearchedArticlesProps {
 
 const SearchedArticles: React.FC<SearchedArticlesProps> = ({keyword}) => {
 
-    const {status, data, setStatus, setData, sortType, sortByRelevance, sortByDate, setTotalCount, totalCount, frequencyData} = useSearchNews(keyword);
+    const {data, frequencyData, status, sortType, totalCount, loadMore, toggleSort} = useSearchNews(keyword);
     const classes = useStyles();
 
-    const loadMoreNews = () => {
-        requestSearchNews(keyword, data.length, setStatus, setData, data, setTotalCount);
-    };
-
-    const resultsFound = data.length > 0;
-    const hasMoreData = data.length < totalCount;
-    const endOfResult = data.length === totalCount;
+    const hasData = data.length > 0;
 
     return (
         <div className={classes.root}>
             <div className={classes.widthWrapper}>
-                { resultsFound && <ResultsCountMessage count={totalCount} keyword={keyword} currentLength={data.length}/> }
-                { frequencyData && resultsFound && <KeywordFrequency bin={frequencyData.bin} frequency={frequencyData.frequency}/>}
-                { resultsFound && <SortPanel sortType={sortType} sortByRelevance={sortByRelevance} sortByDate={sortByDate} /> }
+                { hasData && <ResultsCountMessage count={totalCount} keyword={keyword} currentLength={data.length}/> }
+                { hasData && frequencyData && <KeywordFrequency bin={frequencyData.bin} frequency={frequencyData.frequency}/>}
+                { hasData && <SortPanel sortType={sortType} toggleSort={toggleSort} /> }
                 { status === Status.LOADED_EMPTY && <GenericMessage message={`No news article related to "${keyword}" was found`}/>}
                 { status === Status.ERROR && <GenericMessage message={'Server error please try later'}/>}
                 {
-                    resultsFound &&
+                    hasData &&
                         data.map((article: any) =>
                             <SearchedArticleCard article={article} keyword={keyword} key={article._id}/>
                         )
                 }
                 { status === Status.LOADING && <LoadingMessage/> }
-                { status === Status.LOADED_NORMAL && hasMoreData && totalCount > 0 && <LoadMoreMessage onClick={loadMoreNews}/> }
-                { endOfResult && totalCount > 0 && <GenericMessage message={'End of results'} divider/>}
+                { status === Status.LOADED_NORMAL && <LoadMoreMessage onClick={loadMore}/> }
+                { status === Status.LOADED_NO_MORE && <GenericMessage message={'End of results'} divider/>}
             </div>
 
             <ScrollToTopButton />

@@ -1,6 +1,6 @@
 enum SortTypes {
-    RELEVANCE='RELEVANCE',
-    DATE='DATE'
+    relevance='relevance',
+    date='date'
 }
 
 export default SortTypes

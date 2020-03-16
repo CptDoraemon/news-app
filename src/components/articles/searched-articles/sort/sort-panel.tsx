@@ -20,28 +20,18 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface SortPanelProps{
-    sortByDate: () => void,
-    sortByRelevance: () => void,
+    toggleSort: (sortType: SortTypes) => void,
     sortType: SortTypes
 }
 
-const SortPanel: React.FC<SortPanelProps> = ({sortByDate, sortByRelevance, sortType}) => {
+const SortPanel: React.FC<SortPanelProps> = ({toggleSort, sortType}) => {
     const classes = useStyles();
 
     const handleChange = (e: any) => {
         const newType = e.target.value;
         if (newType === sortType) return;
 
-        switch (newType) {
-            case SortTypes.RELEVANCE:
-                sortByRelevance();
-                break;
-            case SortTypes.DATE:
-                sortByDate();
-                break;
-            default:
-                sortByRelevance();
-        }
+        toggleSort(newType);
     };
 
     return (
@@ -55,8 +45,8 @@ const SortPanel: React.FC<SortPanelProps> = ({sortByDate, sortByRelevance, sortT
                     id: 'searched-article-sort',
                 }}
             >
-                <MenuItem value={SortTypes.RELEVANCE}>{capitalizeString(SortTypes.RELEVANCE)}</MenuItem>
-                <MenuItem value={SortTypes.DATE}>{capitalizeString(SortTypes.DATE)}</MenuItem>
+                <MenuItem value={SortTypes.relevance}>{capitalizeString(SortTypes.relevance)}</MenuItem>
+                <MenuItem value={SortTypes.date}>{capitalizeString(SortTypes.date)}</MenuItem>
             </Select>
         </FormControl>
     )
