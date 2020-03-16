@@ -28,7 +28,7 @@ const useSearchNews = (keyword: string) => {
             setData(json.data);
             setFrequencyData(json.frequency);
             setTotalCount(json.totalCount);
-            setLoadedStatus(json);
+            setLoadedStatus(json.data.length, json.totalCount);
         } catch (e) {
             setStatus(Status.ERROR)
         }
@@ -40,8 +40,13 @@ const useSearchNews = (keyword: string) => {
 
             setStatus(Status.LOADING);
             const json: any = await requestSearchNews(keyword, data.length, false, sortType, dateFilter);
-            setData((prevData: any[]) => [...prevData, ...json.data]);
-            setLoadedStatus(json)
+
+            let updatedDataLength = 0;
+            setData((prevData: any[]) => {
+                updatedDataLength = prevData.length + json.data.length;
+                return [...prevData, ...json.data]
+            });
+            setLoadedStatus(updatedDataLength, json.totalCount)
         } catch (e) {
             setStatus(Status.ERROR)
         }
@@ -59,7 +64,7 @@ const useSearchNews = (keyword: string) => {
             setStatus(Status.LOADING);
             const json: any = await requestSearchNews(keyword, 0, false, type, dateFilter);
             setData(json.data);
-            setLoadedStatus(json)
+            setLoadedStatus(json.data.length, json.totalCount)
         } catch (e) {
             setStatus(Status.ERROR)
         }
@@ -84,16 +89,16 @@ const useSearchNews = (keyword: string) => {
             const json: any = await requestSearchNews(keyword, 0, false, sortType, date);
             setData(json.data);
             setTotalCount(json.totalCount);
-            setLoadedStatus(json)
+            setLoadedStatus(json.data.length, json.totalCount)
         } catch (e) {
             setStatus(Status.ERROR)
         }
     };
 
-    const setLoadedStatus = (json: any) => {
-        if (json.data.length === json.totalCount && json.totalCount !== 0) {
+    const setLoadedStatus = (updatedDataLength: number, totalCount: number) => {
+        if (updatedDataLength === totalCount && totalCount !== 0) {
             setStatus(Status.LOADED_NO_MORE)
-        } else if (json.totalCount === 0) {
+        } else if (totalCount === 0) {
             setStatus(Status.LOADED_EMPTY)
         } else {
             setStatus((Status.LOADED_NORMAL))
