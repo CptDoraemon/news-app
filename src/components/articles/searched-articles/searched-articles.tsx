@@ -92,7 +92,7 @@ const SearchedArticles: React.FC<SearchedArticlesProps> = ({keyword}) => {
 
     const hasData = data.length > 0;
 
-    const notFoundMessage =`No news article related to "${keyword}" was found ${dateFilter ? 'on ' + getDateString(dateFilter) : ''}`;
+    const notFoundMessage =`No news article related to "${keyword}"${dateFilter ? ' on ' + getDateString(dateFilter) : ''} was found`;
     const endOfResultMessage = 'End of results';
     const errorMessage = 'Server error please try later';
 
@@ -100,9 +100,9 @@ const SearchedArticles: React.FC<SearchedArticlesProps> = ({keyword}) => {
         <div className={classes.root}>
             <div className={classes.widthWrapper}>
                 { hasData && <ResultsCountMessage count={totalCount} keyword={keyword} currentLength={data.length} dateFilter={dateFilter}/> }
+                { status === Status.LOADED_EMPTY && <GenericMessage message={notFoundMessage}/>}
                 { hasData && frequencyData && <KeywordFrequency bin={frequencyData.bin} frequency={frequencyData.frequency} setDate={setPendingDateFilter}/>}
                 { hasData && <Filters sortType={sortType} toggleSort={toggleSort} pendingDateFilter={pendingDateFilter} dateFilter={dateFilter} setDateFilter={setDateFilter}/> }
-                { status === Status.LOADED_EMPTY && <GenericMessage message={notFoundMessage}/>}
                 { status === Status.ERROR && <GenericMessage message={errorMessage}/>}
                 {
                     hasData &&
