@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 
-export default function useLazyLoad(ref: React.RefObject<HTMLInputElement>) {
+export default function useLazyLoad(ref: React.RefObject<HTMLDivElement>) {
     const [isVisible, setIsVisible] = useState(false);
     let scrollHandlerLastCalledAt = Date.now() - 1000;
 

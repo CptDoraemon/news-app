@@ -12,6 +12,7 @@ import KeywordFrequency from "./frequency-chart/keyword-frequency";
 import Filters from "./filters/filters";
 import getDateString from "./utilities/get-date-string";
 import {ISearchedArticle, IFrequencyData} from "./requests/response-types";
+import {page1000WidthWrapper, pageRoot} from "../../../styles/styles";
 
 const useShowChartAndFilters = (data: ISearchedArticle[], frequencyData: IFrequencyData | null, keyword: string) => {
     // reset when new keyword is searched
@@ -36,23 +37,10 @@ const useShowChartAndFilters = (data: ISearchedArticle[], frequencyData: IFreque
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        margin: theme.spacing(2, 0, 15, 0)
+        ...pageRoot(theme)
     },
     widthWrapper: {
-        width: '1000px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        padding: theme.spacing(2),
-        [theme.breakpoints.down('md')]: {
-            width: '100%'
-        }
+        ...page1000WidthWrapper(theme)
     },
     cardRoot: {
         width: '100%',
