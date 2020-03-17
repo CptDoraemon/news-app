@@ -37,12 +37,11 @@ const useShowChartAndFilters = (data: ISearchedArticle[], frequencyData: IFreque
 const useStyles = makeStyles((theme) => ({
     root: {
         width: '100%',
-        minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'flex-start',
-        margin: theme.spacing(2, 0)
+        margin: theme.spacing(2, 0, 15, 0)
     },
     widthWrapper: {
         width: '1000px',

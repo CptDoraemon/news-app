@@ -28,12 +28,12 @@ import {State} from "../../redux/state";
 const useStyles = makeStyles((theme) => createStyles({
     wrapper: {
         width: 'calc(100% - 40px)',
-        margin: '20px',
+        margin: '20px 20px 150px 20px',
     },
     [theme.breakpoints.down("sm")]: {
         wrapper: {
             width: 'calc(100% - 16px)',
-            margin: '8px'
+            margin: '8px 8px 150px 8px'
         },
     },
 }));

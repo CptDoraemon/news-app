@@ -11,13 +11,14 @@ export enum Category {
     SCIENCE= `SCIENCE`,
     SPORTS= `SPORTS`,
     TECHNOLOGY= `TECHNOLOGY`,
-    SEARCH=`SEARCH`
+    SEARCH=`SEARCH`,
+    ANALYTICS='ANALYTICS'
 }
 
-export type Categories = Array<keyof typeof Category>;
+export type Categories = Array<Category>;
 
 export const categories: Categories = [
-    `HEADLINE`, `BUSINESS`, `ENTERTAINMENT`, `HEALTH`, `SCIENCE`, `SPORTS`, `TECHNOLOGY`
+    Category.HEADLINE, Category.BUSINESS, Category.ENTERTAINMENT, Category.HEALTH, Category.SCIENCE, Category.SPORTS, Category.TECHNOLOGY
 ];
 
 export enum CategoryActionsType {
@@ -40,6 +41,13 @@ export function goToSearchPanel() {
     return {
         type: CategoryActionsType.SET_CATEGORY,
         category: Category.SEARCH
+    }
+}
+
+export function goToAnalyticsPanel() {
+    return {
+        type: CategoryActionsType.SET_CATEGORY,
+        category: Category.ANALYTICS
     }
 }
 

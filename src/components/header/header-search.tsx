@@ -18,10 +18,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface HeaderSearchProps {
-    search: (keyword: string) => void
+    goToSearch: (keyword: string) => void
 }
 
-const HeaderSearch: React.FC<HeaderSearchProps> = ({search}) => {
+const HeaderSearch: React.FC<HeaderSearchProps> = ({goToSearch}) => {
 
     const classes = useStyles();
 
@@ -48,7 +48,7 @@ const HeaderSearch: React.FC<HeaderSearchProps> = ({search}) => {
         if (!input.length) {
             setIsEmpty(true);
         } else {
-            search(input);
+            goToSearch(input);
             handleClose();
         }
     };

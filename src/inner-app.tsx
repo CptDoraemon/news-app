@@ -9,6 +9,8 @@ import CopyLinkSnackBarContainer from "./containers/copy-link-snackbar-container
 import {fetchArticles} from "./redux/actions/articles";
 import {connect} from "react-redux";
 import SearchedArticlesContainer from "./containers/searched-articles-container";
+import Analytics from "./components/analytics/analytics";
+import HeaderContainer from "./containers/header-container";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -17,13 +19,18 @@ const useStyles = makeStyles(() => ({
         minHeight: '100vh',
         overflowX: 'hidden',
         paddingBottom: '10px',
-        // overflowX is causing y-axis scroll problem, pb do the hack
+        // overflowX is causing y-axis scroll problem, pb do the hack,
+        position: 'relative'
+    },
+    attribution: {
+        position: 'absolute',
+        left: 10,
+        bottom: 10
     }
 }));
 
 interface InnerAppProps extends Pick<State, 'category' | 'articles'> {
     fetchArticlesAfterMount: () => void,
-    isSearching: boolean
 }
 
 function InnerApp(props: InnerAppProps) {
@@ -32,24 +39,39 @@ function InnerApp(props: InnerAppProps) {
         props.fetchArticlesAfterMount()
     }, []);
 
+    const main = () => {
+        let component;
+        switch (props.category) {
+            case Category.ANALYTICS:
+                component = <Analytics />;
+                break;
+            case Category.SEARCH:
+                component = <SearchedArticlesContainer/>;
+                break;
+            default:
+                component = <ArticlesContainer articles={props.articles} />;
+        }
+
+        return component
+    };
+
     return (
         <Box className={classes.root}>
-            <Header headers={categories} category={props.category} />
+            <HeaderContainer/>
             {
-                props.isSearching ? <SearchedArticlesContainer/> : <ArticlesContainer articles={props.articles} />
+                main()
             }
-            <Attribution />
+            <div className={classes.attribution}>
+                <Attribution />
+            </div>
             <CopyLinkSnackBarContainer />
         </Box>
     )
 }
 function mapStateToProps(state: State) {
-    const isSearching = state.category === Category.SEARCH;
-
     return {
         category: state.category,
         articles: state.articles,
-        isSearching
     }
 }
 function mapDispatchToProps(dispatch: any) {

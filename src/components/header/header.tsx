@@ -1,13 +1,12 @@
 import React, {useRef} from "react";
 import {AppBar, Grid, Tab, Tabs, Theme, Toolbar, Tooltip, Typography,} from "@material-ui/core";
-import { fade, makeStyles } from '@material-ui/core/styles';
-import {Categories, Category, setCategoryIfNeeded} from "../../redux/actions/category";
-import {useDispatch} from "react-redux";
+import { makeStyles } from '@material-ui/core/styles';
+import {Categories, Category} from "../../redux/actions/category";
 import StickyComponent from "../utility-components/sticky-component";
 import IconButton from '@material-ui/core/IconButton';
 import AssessmentIcon from '@material-ui/icons/Assessment';
-import HeaderSearchContainer from "../../containers/header-search-container";
 import Zoom from "@material-ui/core/Zoom";
+import HeaderSearch from "./header-search";
 
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -36,19 +35,16 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface HeaderProps {
-    headers: Categories
-    category: Category
+    headers: Categories,
+    category: Category,
+    goToSearch: (keyword: string) => void,
+    goToAnalytics: () => void,
+    setCategory: (category: Category) => void
 }
 
-function Header(props: HeaderProps) {
+const Header: React.FC<HeaderProps> = ({headers, category, goToSearch, goToAnalytics, setCategory}) => {
     const classes = useStyles();
-    const dispatcher = useDispatch();
     const appBarRef = useRef(document.createElement('div'));
-
-    const clickHandler = (category: Category) => {
-        dispatcher(setCategoryIfNeeded(category));
-    };
-
 
     return (
         <>
@@ -66,11 +62,11 @@ function Header(props: HeaderProps) {
                     <Grid item xs={4} md={3}>
                         <Grid container alignItems={'center'} justify={"flex-end"}>
                             <Grid item>
-                                <HeaderSearchContainer/>
+                                <HeaderSearch goToSearch={goToSearch}/>
                             </Grid>
                             <Grid item>
                                 <Tooltip title="Analytics" TransitionComponent={Zoom}>
-                                    <IconButton aria-label="news trend" color={"inherit"}>
+                                    <IconButton aria-label="news trend" color={"inherit"} onClick={goToAnalytics}>
                                         <AssessmentIcon/>
                                     </IconButton>
                                 </Tooltip>
@@ -85,14 +81,14 @@ function Header(props: HeaderProps) {
             zIndex={1100}>
             <AppBar color="primary" position={'static'} className={classes.appBarBottomBoxShadow}>
                 <Tabs
-                    value={props.headers.indexOf(props.category) === -1 ? false : props.headers.indexOf(props.category)}
+                    value={headers.indexOf(category) === -1 ? false : headers.indexOf(category)}
                     indicatorColor="secondary"
                     textColor="secondary"
                     variant="scrollable"
                     scrollButtons="auto"
                 >
                     {
-                        props.headers.map((_, i) => <Tab label={_} key={i} className={classes.tab} onClick={() => clickHandler(Category[_])}/>)
+                        headers.map((_, i) => <Tab label={_} key={i} className={classes.tab} onClick={() => setCategory(Category[_])}/>)
                     }
                 </Tabs>
             </AppBar>
