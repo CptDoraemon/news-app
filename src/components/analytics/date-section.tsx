@@ -1,5 +1,5 @@
 import React, {useRef} from "react";
-import CountUp from 'react-countup';
+import { useCountUp } from 'react-countup';
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {Typography} from "@material-ui/core";
 import Box from "@material-ui/core/Box";
@@ -25,8 +25,9 @@ const DateSection: React.FC<RollingNumberSection> = ({text, number}) => {
     const classes = useStyles();
     const containerRef = useRef<HTMLDivElement>(null);
     const isVisible = useLazyLoad(containerRef);
+    const { countUp } = useCountUp({start: 0, end: number, duration: 5});
 
-    const date = new Date(number);
+    const date = new Date(+countUp);
 
     return (
         <Fade in={isVisible} timeout={2000}>
@@ -35,33 +36,19 @@ const DateSection: React.FC<RollingNumberSection> = ({text, number}) => {
                     <Box>{ text }</Box>
                 </Typography>
                 <Typography variant={'h2'} component={'p'}>
-                    <DateComponent isVisible={isVisible} number={date.getUTCFullYear()} start={2000}/>
+                    <span>{date.getUTCFullYear()}</span>
                     -
-                    <DateComponent isVisible={isVisible} number={date.getUTCMonth() + 1}/>
+                    <span>{formatDate(date.getUTCMonth() + 1)}</span>
                     -
-                    <DateComponent isVisible={isVisible} number={date.getUTCDate()}/>
+                    <span>{formatDate(date.getUTCDate())}</span>
                 </Typography>
             </div>
         </Fade>
     )
 };
 
-interface DateComponentProps {
-    isVisible: boolean,
-    number: number,
-    start?: number
+function formatDate(number: number) {
+    return number < 10 ? `0${number}` : `${number}`
 }
-
-const DateComponent: React.FC<DateComponentProps> = ({isVisible, number, start}) => {
-    return (
-        <span>
-            {
-                isVisible ?
-                    <CountUp end={number} start={start || 0} duration={5} delay={0}/> :
-                    <CountUp end={number} start={number} duration={0}/>
-            }
-        </span>
-    )
-};
 
 export default DateSection
