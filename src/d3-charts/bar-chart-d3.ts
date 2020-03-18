@@ -10,7 +10,7 @@ type ArcData = {
 class BarChartD3 {
 
     readonly getColor = (index: number) => {
-        const colors = ['#99B898', '#F8B195', '#F67280' ,'#C06C84' ,'#6C5B7B' ,'#355C7D' ,'#2A363B'];
+        const colors = ['#003f5c', '#374c80', '#7a5195' ,'#bc5090' ,'#ef5675' ,'#ff764a' ,'#ffa600'];
         return colors[index > colors.length - 1 ? 0 : index]
     };
     id: string;
@@ -25,29 +25,34 @@ class BarChartD3 {
         text: d3.Selection<SVGTextElement, d3.PieArcDatum<ArcData>, SVGGElement, any>,
     };
     data: {
-        data: BarChartData,
+        pieZero: d3.PieArcDatum<ArcData>[],
         pie: d3.PieArcDatum<ArcData>[],
     };
 
     constructor(id: string, data: BarChartData, width: number) {
         this.id = id;
         this.width = width;
-        this.height = width;
+        this.height = this.width * 0.6;
         this.svg = d3.select(`#${id}`).append("svg");
         this.data = {
-            data,
-            // pie: this.getPie(data.map(_=>_.value))
+            pieZero: this.getPieData(data.map(_=>({
+                value: 0,
+                title: _.title
+            }))),
             pie: this.getPieData(data)
         };
         this.references = this.createReferences();
     }
 
-    createReferences() {
-        // const innerSliceClass = `${this.id}-innerSlice`;
-        // const topSliceClass = `${this.id}-topSlice`;
-        // const outerSliceClass = `${this.id}-outerSlice`;
-        // const textClass = `${this.id}-text`;
+    getPieData(data: BarChartData) {
+        const _data =d3.pie<ArcData>()
+            .value((d) => d.value)
+            (data);
+        console.log(_data);
+        return _data
+    }
 
+    createReferences() {
         const pie = this.svg.append('g');
 
         const innerSlice = pie
@@ -81,25 +86,68 @@ class BarChartD3 {
         this.references.pie.attr("transform", "translate(" + x + "," + y + ")");
 
         this.references.innerSlice
-            .style("fill", (d, i) => d3.hsl(this.getColor(i)).darker().toString())
-            .attr("d", (d) => this.pieInner(d, rx+0.5,ry+0.5, h, ir));
+            .style("fill", (d, i) => d3.hsl(this.getColor(i)).darker().toString());
 
         this.references.topSlice
-            .style("fill", (d, i) => this.getColor(i))
-            // .style("stroke", 'blue')
-            .attr("d",(d) => this.pieTop(d, rx, ry, ir));
+            .style("fill", (d, i) => this.getColor(i));
 
         this.references.outerSlice
-            .style("fill", (d, i) => d3.hsl(this.getColor(i)).darker().toString())
-            .attr("d",(d) => this.pieOuter(d, rx-.5,ry-.5, h));
-            // .each(function(d){this._current=d;});
+            .style("fill", (d, i) => d3.hsl(this.getColor(i)).darker().toString());
 
         this.references.text
-            .attr("x",(d) => 0.6*rx*Math.cos(0.5*(d.startAngle+d.endAngle)))
-            .attr("y",(d) => 0.6*ry*Math.sin(0.5*(d.startAngle+d.endAngle)))
+            .attr("x",'0')
+            .attr("y",'0')
             .style('fill', 'white')
-            .text(d => d.data.title);
+            .text(d => d.data.title.toUpperCase());
 
+    }
+
+    pieTransition(rx: number, ry: number, h: number, ir: number, initData: d3.PieArcDatum<ArcData>[], targetData: d3.PieArcDatum<ArcData>[]) {
+        const thisClass = this;
+        const duration = 5000;
+        const raiseDuration = 2000;
+
+        const iRaise = d3.interpolate(0, h);
+
+        function arcTweenInner(d: d3.PieArcDatum<ArcData>) {
+            return (t: number) => thisClass.pieInner(d, rx+0.5, ry+0.5, iRaise(t), ir);
+        }
+        function arcTweenTop(d: d3.PieArcDatum<ArcData>) {
+            const i = d3.interpolate(initData.filter(obj => obj.index === d.index)[0], targetData.filter(obj => obj.index === d.index)[0]);
+            return (t: number) => thisClass.pieTop(i(t), rx, ry, ir);
+        }
+        function arcTweenOuter(d: d3.PieArcDatum<ArcData>) {
+            return (t: number) => thisClass.pieOuter(d, rx-.5, ry-.5, iRaise(t));
+        }
+        function textTweenX(d: d3.PieArcDatum<ArcData>) {
+            const i = d3.interpolate(initData.filter(obj => obj.index === d.index)[0], targetData.filter(obj => obj.index === d.index)[0]);
+            return (t: number) => `${0.6*rx*Math.cos(0.5*(i(t).startAngle+i(t).endAngle))}`;
+        }
+        function textTweenY(d: d3.PieArcDatum<ArcData>) {
+            const i = d3.interpolate(initData.filter(obj => obj.index === d.index)[0], targetData.filter(obj => obj.index === d.index)[0]);
+            return (t: number) => `${0.6*ry*Math.sin(0.5*(i(t).startAngle+i(t).endAngle))}`;
+        }
+
+
+        this.references.innerSlice
+            .transition()
+            .duration(raiseDuration)
+            .delay(duration)
+            .attrTween('d', arcTweenInner);
+        this.references.topSlice
+            .transition()
+            .duration(duration)
+            .attrTween('d', arcTweenTop);
+        this.references.outerSlice
+            .transition()
+            .duration(raiseDuration)
+            .delay(duration)
+            .attrTween('d', arcTweenOuter);
+        this.references.text
+            .transition()
+            .duration(duration)
+            .attrTween('x', textTweenX)
+            .attrTween('y', textTweenY);
     }
 
     pieTop(d: d3.PieArcDatum<ArcData>, rx: number, ry: number, ir: number){
@@ -143,14 +191,6 @@ class BarChartD3 {
         return ret.join(" ");
     }
 
-    getPieData(data: BarChartData) {
-        const _data =d3.pie<ArcData>()
-            .value((d) => d.value)
-        (data);
-        console.log(_data);
-        return _data
-    }
-
     styleSvg() {
         this.svg
             .attr("width", this.width)
@@ -158,8 +198,14 @@ class BarChartD3 {
     }
 
     main() {
+        const rx = this.width / 2 * 0.8;
+        const ry = this.height / 2 - 0.1 * this.height;
+        const h = 0.1 * this.height;
+        const ir = 0.4;
+
         this.styleSvg();
-        this.drawPie(this.width / 2, this.height / 2, this.width / 2 * 0.8, this.width / 2 * 0.8 * 0.6, 50, 0.4);
+        this.drawPie(this.width / 2, this.height / 2, rx, ry, h, ir);
+        this.pieTransition(rx, ry, h, ir, this.data.pieZero, this.data.pie);
     }
 }
 
