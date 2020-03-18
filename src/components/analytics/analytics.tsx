@@ -2,16 +2,21 @@ import React, {useEffect, useRef} from "react";
 import useGetAnalytics, {AnalyticsPageStatus} from "./use-get-analytics";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {page1000WidthWrapper, pageRoot} from "../../styles/styles";
-import {CircularProgress} from "@material-ui/core";
+import {CircularProgress, Typography} from "@material-ui/core";
 import NumberSection from "./number-section";
 import DateSection from "./date-section";
 import BarChartD3 from "../../d3-charts/bar-chart-d3";
 import SectionWrapper from "./section-wrapper";
+import Box from "@material-ui/core/Box";
+import DocumentsByCategoryBarChart from "./documents-by-category-bar-chart";
 
 const useStyles = makeStyles(theme => ({
     root: {
         ...pageRoot(theme),
-        margin: theme.spacing(10, 0, 15, 0)
+        margin: theme.spacing(5, 0, 15, 0),
+        [theme.breakpoints.down('sm')]: {
+            margin: theme.spacing(2, 0, 15, 0),
+        }
     },
     widthWrapper: {
         ...page1000WidthWrapper(theme)
@@ -29,21 +34,6 @@ const Analytics: React.FC<AnalyticsProps> = () => {
         status,
         summaryStatisticsData
     } = useGetAnalytics();
-
-    useEffect(() => {
-        if (status === AnalyticsPageStatus.loaded && summaryStatisticsData && wrapperRef.current) {
-            const data = summaryStatisticsData.documentsCountByCategory.map(obj => ({
-                title: obj.category,
-                value: obj.count
-            }));
-            const barChart = new BarChartD3(
-                'analytics-documents-count-by-category',
-                data,
-                wrapperRef.current.getBoundingClientRect().width
-            );
-            barChart.main();
-        }
-    }, [status, summaryStatisticsData, wrapperRef]);
 
     return (
         <div className={classes.root}>
@@ -65,9 +55,15 @@ const Analytics: React.FC<AnalyticsProps> = () => {
                             <DateSection text={'Most recent news'} number={summaryStatisticsData.latestDocumentDate}/>
                         </SectionWrapper>
                         <SectionWrapper>
-                            <div id='analytics-documents-count-by-category'/>
+                            <DocumentsByCategoryBarChart status={status} summaryStatisticsData={summaryStatisticsData} width={wrapperRef?.current?.getBoundingClientRect().width}/>
                         </SectionWrapper>
                     </>
+                }
+                {
+                    status === AnalyticsPageStatus.error &&
+                    <Typography variant={'body2'} component={'h1'}>
+                        <Box fontWeight={700}>Server error, please try again later</Box>
+                    </Typography>
                 }
             </div>
         </div>

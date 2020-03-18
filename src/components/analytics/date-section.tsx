@@ -11,7 +11,7 @@ const useStyles = makeStyles(theme => ({
 
 interface RollingNumberSection {
     text: string,
-    number: number
+    number: number,
 }
 
 const DateSection: React.FC<RollingNumberSection> = ({text, number}) => {

@@ -6,7 +6,7 @@ export enum AnalyticsPageStatus {
     error='error'
 }
 
-interface summaryStatisticsData {
+export interface SummaryStatisticsData {
     totalDocuments: number,
     earliestDocumentDate: number,
     latestDocumentDate: number,
@@ -19,7 +19,7 @@ interface summaryStatisticsData {
 
 const useGetAnalytics = () => {
     const [status, setStatus] = useState(AnalyticsPageStatus.loading);
-    const [summaryStatisticsData, setSummaryStatisticsData] = useState<summaryStatisticsData | null>(null);
+    const [summaryStatisticsData, setSummaryStatisticsData] = useState<SummaryStatisticsData | null>(null);
 
     useEffect(() => {
         fetch('https://www.xiaoxihome.com/api/news-analytics')
@@ -29,7 +29,7 @@ const useGetAnalytics = () => {
                     console.log(json);
                     setStatus(AnalyticsPageStatus.error)
                 } else {
-                    setSummaryStatisticsData(json.summaryStatistics as summaryStatisticsData);
+                    setSummaryStatisticsData(json.summaryStatistics as SummaryStatisticsData);
                     setStatus(AnalyticsPageStatus.loaded)
                 }
             })

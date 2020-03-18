@@ -22,7 +22,7 @@ const NumberSection: React.FC<RollingNumberSection> = ({text, number}) => {
 
     return (
             <>
-                <Typography variant={'body2'} component={'h2'}>
+                <Typography variant={'body2'} component={'h2'} ref={containerRef}>
                     <Box>{ text }</Box>
                 </Typography>
                 <Typography variant={'h2'} component={'p'}>
