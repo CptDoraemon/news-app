@@ -4,16 +4,9 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import {Typography} from "@material-ui/core";
 import Box from "@material-ui/core/Box";
 import useLazyLoad from "../../tools/use-lazy-load";
-import Fade from "@material-ui/core/Fade";
 
 const useStyles = makeStyles(theme => ({
-    root: {
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center'
-    }
+
 }));
 
 interface RollingNumberSection {
@@ -30,8 +23,7 @@ const DateSection: React.FC<RollingNumberSection> = ({text, number}) => {
     const date = new Date(+countUp);
 
     return (
-        <Fade in={isVisible} timeout={2000}>
-            <div className={classes.root} ref={containerRef}>
+            <>
                 <Typography variant={'body2'} component={'h2'}>
                     <Box>{ text }</Box>
                 </Typography>
@@ -42,8 +34,7 @@ const DateSection: React.FC<RollingNumberSection> = ({text, number}) => {
                     -
                     <span>{formatDate(date.getUTCDate())}</span>
                 </Typography>
-            </div>
-        </Fade>
+            </>
     )
 };
 

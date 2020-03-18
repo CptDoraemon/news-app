@@ -1,6 +1,6 @@
 import {Theme} from "@material-ui/core";
 import * as d3 from "d3";
-import getDateString from "../utilities/get-date-string";
+import getDateString from "../components/articles/searched-articles/utilities/get-date-string";
 
 class FrequencyChartD3 {
     dataArray: {
