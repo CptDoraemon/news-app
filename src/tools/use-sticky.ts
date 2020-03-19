@@ -1,4 +1,4 @@
-import {useState, CSSProperties, useEffect} from "react";
+import {useState, CSSProperties, useEffect, RefObject} from "react";
 import useDebounce from "./use-debounce";
 
 
@@ -24,9 +24,9 @@ const getStyle = (styleName: Style) => {
     return {...style[styleName]};
 };
 
-function useSticky(fixedStartHeight: number) {
+// set sticky when scroll passed ref element's bottom
+function useSticky(refObject: RefObject<HTMLElement>) {
     const [style, setStyle] = useState(Style.RELATIVE);
-    const [isFixed, setIsFixed] = useState(false);
     const shouldBeExecuted = useDebounce(10);
 
     function scrollHandler() {
@@ -34,17 +34,17 @@ function useSticky(fixedStartHeight: number) {
         if (scrolled === 0 && style !== Style.RELATIVE) {
             // don't debounce when fast scrolling to top
             setStyle(Style.RELATIVE);
-            setIsFixed(false);
             return;
         }
+
+        if (!refObject.current) return;
+        const fixedStartHeight = refObject.current.offsetTop + refObject.current.offsetHeight;
 
         if (!shouldBeExecuted()) return;
         if (scrolled >= fixedStartHeight && style !== Style.FIXED) {
             setStyle(Style.FIXED);
-            setIsFixed(true);
         } else if (scrolled < fixedStartHeight && style !== Style.RELATIVE) {
             setStyle(Style.RELATIVE);
-            setIsFixed(false);
         }
     }
 
@@ -54,11 +54,11 @@ function useSticky(fixedStartHeight: number) {
         return () => {
             document.removeEventListener('scroll', scrollHandler);
         }
-    }, [style]);
+    }, [style, refObject]);
 
     return {
         style: getStyle(style),
-        isFixed
+        isFixed: style === Style.FIXED
     };
 }
 

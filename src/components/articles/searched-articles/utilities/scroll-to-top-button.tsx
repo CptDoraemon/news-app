@@ -35,6 +35,7 @@ const useActivateByScrollY = () => {
 const useStyles = makeStyles(theme => ({
     root: {
         position: 'fixed',
+        zIndex: theme.zIndex.modal,
         bottom: '50px',
         right: '50px',
         backgroundColor: theme.palette.secondary.main,

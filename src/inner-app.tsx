@@ -12,7 +12,7 @@ import SearchedArticlesContainer from "./containers/searched-articles-container"
 import Analytics from "./components/analytics/analytics";
 import HeaderContainer from "./containers/header-container";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
     root: {
         width: '100vw',
         maxWidth: '100%',
@@ -24,6 +24,7 @@ const useStyles = makeStyles(() => ({
     },
     attribution: {
         position: 'absolute',
+        zIndex: theme.zIndex.appBar,
         left: 10,
         bottom: 10
     }

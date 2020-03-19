@@ -1,8 +1,8 @@
-import React, {useRef} from "react";
+import React, {RefObject, useRef} from "react";
 import useSticky from "../../tools/use-sticky";
 
 interface StickyComponentProps {
-    fixedStartHeight: number,
+    refObject: RefObject<HTMLDivElement>,
     zIndex?: number,
 }
 
@@ -10,16 +10,21 @@ const StickyComponent: React.FC<StickyComponentProps> = (props) => {
     const {
         style,
         isFixed
-    } = useSticky(props.fixedStartHeight);
-    const childrenRef = useRef(document.createElement('div'));
+    } = useSticky(props.refObject);
+
+    const elementRef = useRef<HTMLDivElement>(null);
 
     return (
         <>
-            { isFixed &&
-            <div style={{visibility: 'hidden'}}>
-                { props.children }
-            </div> }
-            <div style={{...style, zIndex: props.zIndex ? props.zIndex : 'auto'}} ref={childrenRef}>
+            {
+                isFixed && elementRef.current &&
+                <div style={{
+                    width: `${elementRef.current.offsetWidth}px`,
+                    height: `${elementRef.current.offsetHeight}px`
+                }}>
+                </div>
+            }
+            <div style={{...style, zIndex: props.zIndex ? props.zIndex : 'auto'}} ref={elementRef}>
                 { props.children }
             </div>
         </>

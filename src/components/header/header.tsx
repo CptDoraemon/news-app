@@ -1,4 +1,4 @@
-import React, {useRef} from "react";
+import React, {useEffect, useRef} from "react";
 import {AppBar, Grid, Tab, Tabs, Theme, Toolbar, Tooltip, Typography,} from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
 import {Categories, Category} from "../../redux/actions/category";
@@ -7,6 +7,7 @@ import IconButton from '@material-ui/core/IconButton';
 import AssessmentIcon from '@material-ui/icons/Assessment';
 import Zoom from "@material-ui/core/Zoom";
 import HeaderSearch from "./header-search";
+import useTheme from "@material-ui/core/styles/useTheme";
 
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -44,7 +45,8 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({headers, category, goToSearch, goToAnalytics, setCategory}) => {
     const classes = useStyles();
-    const appBarRef = useRef(document.createElement('div'));
+    const appBarRef = useRef<HTMLDivElement>(null);
+    const theme = useTheme();
 
     return (
         <>
@@ -77,8 +79,8 @@ const Header: React.FC<HeaderProps> = ({headers, category, goToSearch, goToAnaly
             </Toolbar>
         </AppBar>
         <StickyComponent
-            fixedStartHeight={appBarRef !== null ? appBarRef.current.offsetTop + appBarRef.current.offsetHeight : 50}
-            zIndex={1100}>
+            refObject={appBarRef}
+            zIndex={theme.zIndex.appBar}>
             <AppBar color="primary" position={'static'} className={classes.appBarBottomBoxShadow}>
                 <Tabs
                     value={headers.indexOf(category) === -1 ? false : headers.indexOf(category)}

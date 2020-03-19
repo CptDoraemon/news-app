@@ -23,7 +23,7 @@ interface CopyLinkSnackbarProps {
 function CopyLinkSnackbar(props: CopyLinkSnackbarProps) {
     const classes = useStyles();
 
-    function closeHandlder() {
+    function closeHandler() {
         props.closeCopyLinkSnackBar()
     }
 
@@ -35,7 +35,7 @@ function CopyLinkSnackbar(props: CopyLinkSnackbarProps) {
             }}
             open={props.isActive}
             autoHideDuration={3000}
-            onClose={closeHandlder}
+            onClose={closeHandler}
         >
             <SnackbarContent
                 className={classes.successSnackBar}
@@ -45,7 +45,7 @@ function CopyLinkSnackbar(props: CopyLinkSnackbarProps) {
                     </span>
                 }
                 action={[
-                        <IconButton key="close" aria-label="close" color="inherit" onClick={closeHandlder}>
+                        <IconButton key="close" aria-label="close" color="inherit" onClick={closeHandler}>
                     <Close/>
                     </IconButton>,
             ]}
