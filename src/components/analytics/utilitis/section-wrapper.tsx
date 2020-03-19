@@ -1,4 +1,4 @@
-import React, {useRef} from "react";
+import React, {useRef, useState} from "react";
 import CountUp from 'react-countup';
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import Fade from "@material-ui/core/Fade";
@@ -30,7 +30,7 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({children}) => {
 
     return (
         <Fade in={isVisible} timeout={2000}>
-            <div className={classes.root} ref={containerRef}>
+            <div className={classes.root} ref={containerRef} style={{height: `${Math.min(window.innerHeight * 0.8, 800)}px`}}>
                 { children }
             </div>
         </Fade>

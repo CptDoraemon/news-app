@@ -76,7 +76,6 @@ class BarChartD3 {
             .startAngle(this.params.startAngle)
             .endAngle(this.params.endAngle)
             (data);
-        console.log(_data);
         return _data
     }
 

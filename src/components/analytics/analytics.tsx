@@ -15,10 +15,6 @@ import Status from "../articles/searched-articles/utilities/status";
 const useStyles = makeStyles(theme => ({
     root: {
         ...pageRoot(theme),
-        margin: theme.spacing(5, 0, 15, 0),
-        [theme.breakpoints.down('sm')]: {
-            margin: theme.spacing(2, 0, 15, 0),
-        }
     },
     widthWrapper: {
         ...page1000WidthWrapper(theme)
@@ -52,11 +48,7 @@ const Analytics: React.FC<AnalyticsProps> = () => {
                     <>
                         <SectionWrapper>
                             <NumberSection text={'Total news achieved'} number={summaryStatisticsData.totalDocuments}/>
-                        </SectionWrapper>
-                        <SectionWrapper>
                             <DateSection text={'First news achieved'} number={summaryStatisticsData.earliestDocumentDate}/>
-                        </SectionWrapper>
-                        <SectionWrapper>
                             <DateSection text={'Most recent news'} number={summaryStatisticsData.latestDocumentDate}/>
                         </SectionWrapper>
                         <SectionWrapper>

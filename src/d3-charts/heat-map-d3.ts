@@ -303,7 +303,7 @@ class HeatMapD3 {
                 const tooltipWidth = textWidth * px;
                 const tooltipHeight = textHeight * py;
                 let toolTipX = x + 0.5 * width;
-                let toolTipY = y - 0.2 * height;
+                let toolTipY = y - 0.5 * tooltipHeight;
                 const borderX0 = -thisClass.params.m.l;
                 const borderX1 = thisClass.params.width - thisClass.params.m.l;
                 const borderY0 = -thisClass.params.m.t;
@@ -316,7 +316,7 @@ class HeatMapD3 {
                 }
                 // handle if y of tooltip is out of border
                 if (toolTipY - tooltipHeight < borderY0) {
-                    toolTipY = borderY0 + 0.5 * tooltipHeight
+                    toolTipY = borderY0 + tooltipHeight
                 } else if (toolTipY + tooltipHeight > borderY1) {
                     toolTipY = borderY1 - 0.5 * tooltipHeight;
                 }
