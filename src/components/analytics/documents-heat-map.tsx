@@ -33,9 +33,9 @@ const DocumentsHeatMap: React.FC<DocumentsHeatMapProps> = ({isLoaded, data, widt
     }, [isLoaded, data, width]);
 
     useEffect(() => {
-        // if (heatMap && isVisible) {
-        //     heatMap.animate();
-        // }
+        if (heatMap && isVisible) {
+            heatMap.animate();
+        }
     }, [heatMap, isVisible]);
 
     return (

@@ -25,7 +25,7 @@ const getStyle = (styleName: Style) => {
 };
 
 // set sticky when scroll passed ref element's bottom
-function useSticky(refObject: RefObject<HTMLElement>) {
+function useSticky(anchorRef: RefObject<HTMLElement>) {
     const [style, setStyle] = useState(Style.RELATIVE);
     const shouldBeExecuted = useDebounce(10);
 
@@ -37,8 +37,8 @@ function useSticky(refObject: RefObject<HTMLElement>) {
             return;
         }
 
-        if (!refObject.current) return;
-        const fixedStartHeight = refObject.current.offsetTop + refObject.current.offsetHeight;
+        if (!anchorRef.current) return;
+        const fixedStartHeight = anchorRef.current.offsetTop + anchorRef.current.offsetHeight;
 
         if (!shouldBeExecuted()) return;
         if (scrolled >= fixedStartHeight && style !== Style.FIXED) {
@@ -54,7 +54,7 @@ function useSticky(refObject: RefObject<HTMLElement>) {
         return () => {
             document.removeEventListener('scroll', scrollHandler);
         }
-    }, [style, refObject]);
+    }, [style, anchorRef]);
 
     return {
         style: getStyle(style),

@@ -2,7 +2,7 @@ import React, {RefObject, useRef} from "react";
 import useSticky from "../../tools/use-sticky";
 
 interface StickyComponentProps {
-    refObject: RefObject<HTMLDivElement>,
+    anchorRef: RefObject<HTMLDivElement>,
     zIndex?: number,
 }
 
@@ -10,7 +10,7 @@ const StickyComponent: React.FC<StickyComponentProps> = (props) => {
     const {
         style,
         isFixed
-    } = useSticky(props.refObject);
+    } = useSticky(props.anchorRef);
 
     const elementRef = useRef<HTMLDivElement>(null);
 

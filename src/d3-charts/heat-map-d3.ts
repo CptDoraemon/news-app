@@ -32,6 +32,7 @@ class HeatMapD3 {
         xAxis: d3.Selection<SVGGElement, unknown, HTMLElement, any>,
         yAxis: d3.Selection<SVGGElement, unknown, HTMLElement, any>,
         rects: d3.Selection<SVGRectElement, {count: number, time: number}, SVGGElement, any>,
+        tooltipBackground: d3.Selection<SVGRectElement, unknown, HTMLElement, any>,
         tooltip: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
         tooltipText1: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
         tooltipText2: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
@@ -194,12 +195,15 @@ class HeatMapD3 {
                 .selectAll('rect').data(this.data.data)
                 .enter().append('rect');
         // tooltips has to be here to be rendered on top
-        const tooltip = this.svg.append('g').append('text');
+        const tooltipGroup = this.svg.append('g');
+        const tooltipBackground = tooltipGroup.append('rect');
+        const tooltip = tooltipGroup.append('text');
 
         return {
             xAxis,
             yAxis,
             rects,
+            tooltipBackground,
             tooltip,
             tooltipText1: tooltip.append('tspan'),
             tooltipText2: tooltip.append('tspan'),
@@ -244,8 +248,6 @@ class HeatMapD3 {
 
     styleRects() {
         this.references.rects
-            .style('fill', (d) => this.getColor(this.scales.color(d.count)))
-            // .style('opacity', (d) => this.scales.color(d.count))
             .style('transform', `translate(${this.params.chart.x}px, ${this.params.chart.y}px)`)
             .attr('width', this.scales.x.bandwidth())
             .attr('height', this.scales.y.bandwidth())
@@ -256,14 +258,29 @@ class HeatMapD3 {
     styleTooltip() {
         this.references.tooltip
             .style('transform', `translate(${this.params.chart.x}px, ${this.params.chart.y}px)`)
-            .attr('text-anchor', 'middle');
+            .attr('text-anchor', 'middle')
+            .attr('alignment-baseline', 'middle');
 
         this.references.tooltipText1
             .style('font-weight', 700)
+            .style('fill', 'white');
+
+        this.references.tooltipText2
+            .style('fill', 'white');
+
+        this.references.tooltipBackground
+            .style('transform', `translate(${this.params.chart.x}px, ${this.params.chart.y}px)`)
+            .style('fill', '#000')
+            .style('opacity', 0.8)
+            .attr('rx', '5')
+            .attr('ry', '5');
     }
 
     addMouseEventToRects() {
         const thisClass = this;
+        // tooltip padding
+        const px = 1.2;
+        const py = 2.5;
 
         this.references.rects
             .on('mouseover', function(this: SVGRectElement, d) {
@@ -272,20 +289,72 @@ class HeatMapD3 {
                 const width = parseInt(this.getAttribute("width") || '0');
                 const height = parseInt(this.getAttribute("height") || '0');
 
-                thisClass.references.tooltip
-                    .attr("x", x + 0.5 * width)
-                    .attr("y", y - 0.5 * height);
-
+                // append texts to tspans first
                 thisClass.references.tooltipText1.text(`${d.count} news archived on `);
 
                 const date = new Date(d.time);
                 thisClass.references.tooltipText2.text(`${thisClass.monthStrings[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}`)
+
+                // get dimension of text
+                // tooltip has text-anchor: middle
+                const bBox = thisClass.references.tooltip.node()?.getBBox();
+                const textWidth = bBox?.width || 0;
+                const textHeight = bBox?.height || 0;
+                const tooltipWidth = textWidth * px;
+                const tooltipHeight = textHeight * py;
+                let toolTipX = x + 0.5 * width;
+                let toolTipY = y - 0.2 * height;
+                const borderX0 = -thisClass.params.m.l;
+                const borderX1 = thisClass.params.width - thisClass.params.m.l;
+                const borderY0 = -thisClass.params.m.t;
+                const borderY1 = thisClass.params.height - thisClass.params.m.t;
+                // handle if x of tooltip is out of border
+                if (toolTipX - 0.5 * tooltipWidth < borderX0) {
+                    toolTipX = borderX0 + 0.5 * tooltipWidth
+                } else if (toolTipX + 0.5 * tooltipWidth > borderX1) {
+                    toolTipX = borderX1 - 0.5 * tooltipWidth;
+                }
+                // handle if y of tooltip is out of border
+                if (toolTipY - tooltipHeight < borderY0) {
+                    toolTipY = borderY0 + 0.5 * tooltipHeight
+                } else if (toolTipY + tooltipHeight > borderY1) {
+                    toolTipY = borderY1 - 0.5 * tooltipHeight;
+                }
+                thisClass.references.tooltip
+                    .attr("x", toolTipX)
+                    .attr("y", toolTipY);
+
+                // move tooltipBackground
+                thisClass.references.tooltipBackground
+                    .attr("x", toolTipX - 0.5 * tooltipWidth)
+                    .attr("y", toolTipY - 0.4 * textHeight - 0.5 * tooltipHeight)
+                    .attr("width", tooltipWidth)
+                    .attr("height", tooltipHeight);
             })
             .on('mouseleave', function(this: SVGRectElement, d){
                 thisClass.references.tooltip
-                    .attr("x", -100)
-                    .attr("y", -100);
+                    .attr("x", -1000)
+                    .attr("y", -1000);
+                thisClass.references.tooltipBackground
+                    .attr("x", -1000)
+                    .attr("y", -1000);
             })
+    }
+
+    prepareForAnimation() {
+        this.references.rects
+            .style('fill', this.getColor(3))
+    }
+
+    animate() {
+        this.references.rects.transition()
+            .style('fill', "rgba(255, 255, 255, 0)")
+            .duration(500);
+
+        this.references.rects.transition()
+            .style('fill', (d) => this.getColor(this.scales.color(d.count)))
+            .delay((d) => 500 + this.scales.color(d.count) * 1000)
+            .duration(800)
     }
 
     main() {
@@ -295,6 +364,7 @@ class HeatMapD3 {
         this.styleRects();
         this.styleTooltip();
         this.addMouseEventToRects();
+        this.prepareForAnimation();
     }
 }
 

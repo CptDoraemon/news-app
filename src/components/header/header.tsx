@@ -79,7 +79,7 @@ const Header: React.FC<HeaderProps> = ({headers, category, goToSearch, goToAnaly
             </Toolbar>
         </AppBar>
         <StickyComponent
-            refObject={appBarRef}
+            anchorRef={appBarRef}
             zIndex={theme.zIndex.appBar}>
             <AppBar color="primary" position={'static'} className={classes.appBarBottomBoxShadow}>
                 <Tabs
