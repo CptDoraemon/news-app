@@ -8,11 +8,13 @@ export interface HeatMapData {
 class HeatMapD3 {
 
     readonly getColor = (index: number) => {
-        const colors = ['#003f5c', '#374c80', '#7a5195' ,'#bc5090' ,'#ef5675' ,'#ff764a' ,'#ffa600'];
+        const colors = ['#FFF3E0', '#FFE0B2', '#FFB74D', '#FB8C00', '#E65100'];
         return colors[index > colors.length - 1 ? 0 : index]
     };
     readonly dayOfWeekStrings = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    readonly MonthStrings = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    readonly monthStrings = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    readonly targetRectSize = 70;
+    readonly rectPadding = 0.1;
     id: string;
     params: {
         width: number,
@@ -30,11 +32,15 @@ class HeatMapD3 {
         xAxis: d3.Selection<SVGGElement, unknown, HTMLElement, any>,
         yAxis: d3.Selection<SVGGElement, unknown, HTMLElement, any>,
         rects: d3.Selection<SVGRectElement, {count: number, time: number}, SVGGElement, any>,
+        tooltip: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
+        tooltipText1: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
+        tooltipText2: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
     };
     data: {
         x: number[], // # of week
         y: number[], // # of day of week
         xScaleDomain: string[],
+        xScaleGuide: number[],
         yScaleDomain: string[],
         data: Array<{
             count: number,
@@ -54,26 +60,32 @@ class HeatMapD3 {
 
     constructor(id: string, data: HeatMapData, width: number) {
         this.id = id;
+        this.data = this.getData(data);
         this.params = this.getParams(width);
         this.svg = d3.select(`#${id}`).append("svg");
-        this.data = this.getData(data);
         this.references = this.createReferences();
         this.scales = this.getScales();
         this.axis = this.getAxis();
     }
 
     getParams(width: number) {
-        const height = width * 0.6;
-        const m = {t: 20, r: 30, b: 20, l: 30};
+        const m = {t: 50, r: 10, b: 10, l: 50};
+
+        const xBands = this.data.xScaleDomain.length;
+        const maxRectSize = Math.floor((width - m.l - m.r) / xBands);
+        const rectSize = Math.min(maxRectSize, this.targetRectSize);
+
         const chart = {
-            width: width - m.l - m.r,
-            height: height - m.t - m.b,
+            width: this.data.xScaleDomain.length * rectSize,
+            height: 7 * rectSize,
             x: m.l,
             y: m.t
         };
+        const _width = chart.width + m.l + m.r;
+        const height = chart.height + m.t + m.b;
 
         return {
-            width,
+            width: _width,
             height,
             m,
             chart
@@ -85,22 +97,36 @@ class HeatMapD3 {
             x: d3.scaleBand()
                 .domain(this.data.xScaleDomain)
                 .range([0, this.params.chart.width])
-                .padding(0.1),
+                .padding(this.rectPadding),
             y: d3.scaleBand()
                 .domain(this.data.yScaleDomain)
                 .range([0, this.params.chart.height])
-                .padding(0.1),
+                .padding(this.rectPadding),
             color: d3.scaleQuantize()
                 .domain([0, this.data.maxCount])
-                .range([0, 0.25, 0.5, 0.75, 1])
+                .range([0, 1, 2, 3, 4])
         }
     }
 
     getAxis() {
         return {
-            x: d3.axisBottom(this.scales.x),
+            x: d3.axisTop(this.scales.x)
+                .tickFormat((d, i) => {
+                    if (i === 0) {
+                        return this.monthStrings[(new Date(this.data.xScaleGuide[i]).getUTCMonth())]
+                    } else {
+                        const thisOne = this.monthStrings[(new Date(this.data.xScaleGuide[i]).getUTCMonth())];
+                        const lastOne = this.monthStrings[(new Date(this.data.xScaleGuide[i-1]).getUTCMonth())];
+                        return thisOne === lastOne ? '' : thisOne
+                    }
+                })
+                .tickSize(0)
+                .tickPadding(5),
             y: d3.axisLeft(this.scales.y)
                 .tickFormat((d) => this.dayOfWeekStrings[parseInt(d)])
+                .tickValues(['1', '3', '5'])
+                .tickSize(0)
+                .tickPadding(5)
         }
     }
 
@@ -137,8 +163,10 @@ class HeatMapD3 {
         const timeArray = _data.map(_=>_.time);
         const computedX = getX(timeArray);
         const xScaleDomain = [];
+        const xScaleGuide = [];
         for (let i=0; i<=computedX[computedX.length - 1]; i++) {
-            xScaleDomain.push(i.toString())
+            xScaleDomain.push(i.toString());
+            xScaleGuide.push(_data[i*7].time);
         }
         //
         const computedY = getY(timeArray);
@@ -148,11 +176,11 @@ class HeatMapD3 {
         }
         //
         const maxCount = Math.max.apply(Math, _data.map(_=>_.count));
-        console.log(computedX, computedY);
         return {
             x: computedX,
             y: computedY,
             xScaleDomain,
+            xScaleGuide,
             yScaleDomain,
             data: _data,
             maxCount
@@ -160,12 +188,21 @@ class HeatMapD3 {
     }
 
     createReferences() {
-        return {
-            xAxis: this.svg.append('g'),
-            yAxis: this.svg.append('g'),
-            rects: this.svg.append('g')
+        const xAxis = this.svg.append('g');
+        const yAxis = this.svg.append('g');
+        const rects = this.svg.append('g')
                 .selectAll('rect').data(this.data.data)
-                .enter().append('rect')
+                .enter().append('rect');
+        // tooltips has to be here to be rendered on top
+        const tooltip = this.svg.append('g').append('text');
+
+        return {
+            xAxis,
+            yAxis,
+            rects,
+            tooltip,
+            tooltipText1: tooltip.append('tspan'),
+            tooltipText2: tooltip.append('tspan'),
         }
     }
 
@@ -178,28 +215,77 @@ class HeatMapD3 {
     styleAxisX() {
         this.axis.x(this.references.xAxis);
 
+        this.references.xAxis.selectAll('.domain').remove();
+
         this.references.xAxis
-            .style('transform', `translate(${this.params.chart.x}px, ${this.params.chart.y + this.params.chart.height}px)`)
+            .style('transform', `translate(${this.params.chart.x}px, ${this.params.chart.y}px)`)
+            .style('font-size', '0.875rem')
+            .style('font-weight', '700');
+
+        this.references.xAxis.selectAll('text')
+            .style('fill', 'grey');
+
     }
 
     styleAxisY() {
         this.axis.y(this.references.yAxis);
 
+        this.references.yAxis.selectAll('.domain').remove();
+
         this.references.yAxis
             .style('transform', `translate(${this.params.chart.x}px, ${this.params.chart.y}px)`)
+            .style('font-size', '0.875rem')
+            .style('font-weight', '700');
+
+        this.references.yAxis.selectAll('text')
+            .style('fill', 'grey');
+            // .attr('text-anchor', 'start')
     }
 
     styleRects() {
         this.references.rects
-            .style('fill', this.getColor(0))
-            .style('opacity', (d) => this.scales.color(d.count))
+            .style('fill', (d) => this.getColor(this.scales.color(d.count)))
+            // .style('opacity', (d) => this.scales.color(d.count))
             .style('transform', `translate(${this.params.chart.x}px, ${this.params.chart.y}px)`)
             .attr('width', this.scales.x.bandwidth())
             .attr('height', this.scales.y.bandwidth())
             .attr('x', (d, i) => this.scales.x(this.data.x[i].toString()) || 0)
             .attr('y', (d, i) => this.scales.y(this.data.y[i].toString()) || 0);
+    }
 
-        console.log(this.scales.x.bandwidth(), this.scales.y.bandwidth())
+    styleTooltip() {
+        this.references.tooltip
+            .style('transform', `translate(${this.params.chart.x}px, ${this.params.chart.y}px)`)
+            .attr('text-anchor', 'middle');
+
+        this.references.tooltipText1
+            .style('font-weight', 700)
+    }
+
+    addMouseEventToRects() {
+        const thisClass = this;
+
+        this.references.rects
+            .on('mouseover', function(this: SVGRectElement, d) {
+                const x = parseInt(this.getAttribute("x") || '0');
+                const y = parseInt(this.getAttribute("y") || '0');
+                const width = parseInt(this.getAttribute("width") || '0');
+                const height = parseInt(this.getAttribute("height") || '0');
+
+                thisClass.references.tooltip
+                    .attr("x", x + 0.5 * width)
+                    .attr("y", y - 0.5 * height);
+
+                thisClass.references.tooltipText1.text(`${d.count} news archived on `);
+
+                const date = new Date(d.time);
+                thisClass.references.tooltipText2.text(`${thisClass.monthStrings[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}`)
+            })
+            .on('mouseleave', function(this: SVGRectElement, d){
+                thisClass.references.tooltip
+                    .attr("x", -100)
+                    .attr("y", -100);
+            })
     }
 
     main() {
@@ -207,6 +293,8 @@ class HeatMapD3 {
         this.styleAxisX();
         this.styleAxisY();
         this.styleRects();
+        this.styleTooltip();
+        this.addMouseEventToRects();
     }
 }
 
