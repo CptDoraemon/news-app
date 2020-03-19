@@ -3,7 +3,7 @@ import { useCountUp } from 'react-countup';
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {Typography} from "@material-ui/core";
 import Box from "@material-ui/core/Box";
-import useLazyLoad from "../../tools/use-lazy-load";
+import useLazyLoad from "../../../tools/use-lazy-load";
 
 const useStyles = makeStyles(theme => ({
 

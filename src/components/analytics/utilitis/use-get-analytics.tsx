@@ -10,11 +10,14 @@ export interface SummaryStatisticsData {
     totalDocuments: number,
     earliestDocumentDate: number,
     latestDocumentDate: number,
-    documentsCountByDay: any,
     documentsCountByCategory: Array<{
         count: number,
         category: string
-    }>
+    }>,
+    documentsCountByDay: {
+        count: number[],
+        time: number[]
+    },
 }
 
 const useGetAnalytics = () => {
@@ -29,7 +32,16 @@ const useGetAnalytics = () => {
                     console.log(json);
                     setStatus(AnalyticsPageStatus.error)
                 } else {
-                    setSummaryStatisticsData(json.summaryStatistics as SummaryStatisticsData);
+                    setSummaryStatisticsData({
+                        totalDocuments: json.summaryStatistics.totalDocuments,
+                        earliestDocumentDate: json.summaryStatistics.earliestDocumentDate,
+                        latestDocumentDate: json.summaryStatistics.latestDocumentDate,
+                        documentsCountByCategory: json.summaryStatistics.documentsCountByCategory,
+                        documentsCountByDay: {
+                            time: json.summaryStatistics.documentsCountByDay.bin.map((_:any) => _.ms),
+                            count: json.summaryStatistics.documentsCountByDay.frequency
+                        },
+                    } as SummaryStatisticsData);
                     setStatus(AnalyticsPageStatus.loaded)
                 }
             })

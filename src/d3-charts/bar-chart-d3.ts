@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 
-type BarChartData = ArcData[];
+export type BarChartData = ArcData[];
 
 type ArcData = {
     title: string,
