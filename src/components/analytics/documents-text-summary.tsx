@@ -15,7 +15,10 @@ const useStyles = makeStyles(theme => ({
         justifyContent: 'center',
     },
     section: {
-      margin: theme.spacing(5, 0)
+        margin: theme.spacing(5, 0),
+        [theme.breakpoints.down('sm')]: {
+            margin: theme.spacing(2, 0)
+        }
     },
     title: {
         ...content(theme)

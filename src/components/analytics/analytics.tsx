@@ -16,9 +16,9 @@ const useStyles = makeStyles(theme => ({
         alignItems: 'center',
         justifyContent: 'flex-start',
         transitions: theme.transitions.create('backgroundColor'),
-        paddingBottom: '150px',
+        paddingBottom: '200px',
         [theme.breakpoints.down('sm')]: {
-            paddingBottom: '200px',
+            paddingBottom: '250px',
         }
     },
     widthWrapper: {

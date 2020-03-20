@@ -70,7 +70,7 @@ class HeatMapD3 {
     }
 
     getParams(width: number) {
-        const m = {t: 50, r: 10, b: 10, l: 50};
+        const m = {t: 50, r: 20, b: 10, l: 50};
 
         const xBands = this.data.xScaleDomain.length;
         const maxRectSize = Math.floor((width - m.l - m.r) / xBands);
