@@ -7,7 +7,7 @@ export const pageRoot = (theme: Theme): CSSProperties => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    margin: theme.spacing(2, 0, 15, 0)
+    padding: theme.spacing(2, 0, 15, 0)
 });
 
 export const page1000WidthWrapper = (theme: Theme): CSSProperties => ({
@@ -17,7 +17,7 @@ export const page1000WidthWrapper = (theme: Theme): CSSProperties => ({
     alignItems: 'center',
     justifyContent: 'flex-start',
     padding: theme.spacing(2),
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('sm')]: {
         width: '100%'
     }
 });

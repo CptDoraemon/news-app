@@ -12,9 +12,9 @@ const useStyles = makeStyles(theme => ({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        margin: theme.spacing(4),
+        padding: theme.spacing(10, 2),
         [theme.breakpoints.down('sm')]: {
-            margin: theme.spacing(2),
+            padding: theme.spacing(2, 2),
         }
     }
 }));
@@ -30,7 +30,7 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({children}) => {
 
     return (
         <Fade in={isVisible} timeout={2000}>
-            <div className={classes.root} ref={containerRef} style={{height: `${Math.min(window.innerHeight * 0.8, 800)}px`}}>
+            <div className={classes.root} ref={containerRef}>
                 { children }
             </div>
         </Fade>

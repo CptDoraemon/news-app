@@ -16,9 +16,9 @@ const useStyles = makeStyles((theme) => ({
     root: {
         width: '100vw',
         maxWidth: '100%',
-        minHeight: '100vh',
-        overflowX: 'hidden',
-        paddingBottom: '10px',
+        // minHeight: '100vh',
+        // overflowX: 'hidden',
+        // paddingBottom: '10px',
         // overflowX is causing y-axis scroll problem, pb do the hack,
         position: 'relative'
     },
@@ -57,7 +57,7 @@ function InnerApp(props: InnerAppProps) {
     };
 
     return (
-        <Box className={classes.root}>
+        <Box className={classes.root} style={{minHeight: `${window.innerHeight}px`}}>
             <HeaderContainer/>
             {
                 main()

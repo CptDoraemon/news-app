@@ -1,23 +1,35 @@
-import React, {useEffect, useRef} from "react";
+import React, {useRef} from "react";
 import useGetAnalytics, {AnalyticsPageStatus} from "./utilitis/use-get-analytics";
 import makeStyles from "@material-ui/core/styles/makeStyles";
-import {page1000WidthWrapper, pageRoot} from "../../styles/styles";
 import {CircularProgress, Typography} from "@material-ui/core";
-import NumberSection from "./utilitis/number-section";
-import DateSection from "./utilitis/date-section";
-import BarChartD3 from "../../d3-charts/bar-chart-d3";
 import SectionWrapper from "./utilitis/section-wrapper";
 import Box from "@material-ui/core/Box";
 import DocumentsByCategoryBarChart from "./documents-by-category-bar-chart";
 import DocumentsHeatMap from "./documents-heat-map";
-import Status from "../articles/searched-articles/utilities/status";
+import DocumentsTextSummary from "./documents-text-summary";
 
 const useStyles = makeStyles(theme => ({
     root: {
-        ...pageRoot(theme),
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        transitions: theme.transitions.create('backgroundColor'),
+        paddingBottom: '150px',
+        [theme.breakpoints.down('sm')]: {
+            paddingBottom: '200px',
+        }
     },
     widthWrapper: {
-        ...page1000WidthWrapper(theme)
+        width: '1000px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        [theme.breakpoints.down('sm')]: {
+            width: '100%'
+        }
     },
 }));
 
@@ -46,11 +58,13 @@ const Analytics: React.FC<AnalyticsProps> = () => {
                     status === AnalyticsPageStatus.loaded &&
                     summaryStatisticsData &&
                     <>
-                        <SectionWrapper>
-                            <NumberSection text={'Total news achieved'} number={summaryStatisticsData.totalDocuments}/>
-                            <DateSection text={'First news achieved'} number={summaryStatisticsData.earliestDocumentDate}/>
-                            <DateSection text={'Most recent news'} number={summaryStatisticsData.latestDocumentDate}/>
-                        </SectionWrapper>
+
+                            <DocumentsTextSummary
+                                totalDocuments={summaryStatisticsData.totalDocuments}
+                                earliestDocumentDate={summaryStatisticsData.earliestDocumentDate}
+                                latestDocumentDate={summaryStatisticsData.latestDocumentDate}
+                            />
+
                         <SectionWrapper>
                             <DocumentsByCategoryBarChart
                                 isLoaded={isLoaded}

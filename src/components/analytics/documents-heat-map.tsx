@@ -4,6 +4,7 @@ import {Typography} from "@material-ui/core";
 import Box from "@material-ui/core/Box";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import HeatMapD3, {HeatMapData} from "../../d3-charts/heat-map-d3";
+import Title from "./utilitis/title";
 
 const useStyles = makeStyles(theme => ({
 
@@ -40,9 +41,7 @@ const DocumentsHeatMap: React.FC<DocumentsHeatMapProps> = ({isLoaded, data, widt
 
     return (
         <>
-            <Typography variant={'body2'} component={'h2'}>
-                <Box>Heat Map</Box>
-            </Typography>
+            <Title value={'News archived each day'} />
             <div id='analytics-documents-heat-map' ref={ref}/>
         </>
     )

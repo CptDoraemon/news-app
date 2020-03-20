@@ -1,10 +1,8 @@
 import React, {useEffect, useRef, useState} from "react";
-import {AnalyticsPageStatus, SummaryStatisticsData} from "./utilitis/use-get-analytics";
 import BarChartD3, {BarChartData} from "../../d3-charts/bar-chart-d3";
 import useLazyLoad from "../../tools/use-lazy-load";
-import {Typography} from "@material-ui/core";
-import Box from "@material-ui/core/Box";
 import makeStyles from "@material-ui/core/styles/makeStyles";
+import Title from "./utilitis/title";
 
 const useStyles = makeStyles(theme => ({
 
@@ -22,7 +20,7 @@ const DocumentsByCategoryBarChart: React.FC<DocumentsByCategoryBarChartProps> = 
     const [barChart, setBarChart] = useState<null | BarChartD3>(null);
 
     useEffect(() => {
-        if (isLoaded && data && width) {
+        if (isLoaded && data && width && barChart === null) {
             const barChart = new BarChartD3(
                 'analytics-documents-count-by-category',
                 data,
@@ -41,9 +39,7 @@ const DocumentsByCategoryBarChart: React.FC<DocumentsByCategoryBarChartProps> = 
 
     return (
         <>
-            <Typography variant={'body2'} component={'h2'}>
-                <Box>{'News achieved by category'}</Box>
-            </Typography>
+            <Title value={'News achieved by category'} />
             <div id='analytics-documents-count-by-category' ref={ref}/>
         </>
     )

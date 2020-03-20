@@ -27,13 +27,12 @@ import {State} from "../../redux/state";
 
 const useStyles = makeStyles((theme) => createStyles({
     wrapper: {
-        width: 'calc(100% - 40px)',
-        margin: '20px 20px 150px 20px',
+        width: '100%',
+        padding: '20px 20px 150px 20px',
     },
     [theme.breakpoints.down("sm")]: {
         wrapper: {
-            width: 'calc(100% - 16px)',
-            margin: '8px 8px 150px 8px'
+            padding: '8px 8px 150px 8px'
         },
     },
 }));
@@ -267,8 +266,7 @@ function Articles(props: ArticlesProps) {
     if (props.articles.isError) {
         content = (
             <div style={{
-                width: '100%',
-                minHeight: '100vh'
+                width: '100%'
             }}>
                 error
             </div>
