@@ -51,7 +51,7 @@ const Analytics: React.FC<AnalyticsProps> = () => {
     const [bgBlack, setBgBlack] = useState(false);
     const changeBgColor = () => {
         if (!bgColorChangeRef.current) return;
-        const target = bgColorChangeRef.current.getBoundingClientRect().top - 50;
+        const target = bgColorChangeRef.current.getBoundingClientRect().top - 100;
         if (target <= 0 && bgBlack) {
             setBgBlack(false)
         } else if (target > 0 && !bgBlack) {

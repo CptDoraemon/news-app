@@ -56,7 +56,7 @@ const DocumentsTextSummary = React.forwardRef<HTMLDivElement, DocumentsTextSumma
 
     return (
         <>
-            <div className={classes.root} style={{height: `${fullHeight}px`}}>
+            <div className={classes.root} style={{minHeight: `${fullHeight}px`}}>
                 <div className={classes.section}>
                     { title('Total news articles achieved') }
                     <p className={classes.number}>{total.countUp}</p>

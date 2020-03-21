@@ -31,7 +31,7 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({children}) => {
 
     return (
         <Fade in={isVisible} timeout={2000}>
-            <div className={classes.root} ref={containerRef} style={{height: `${fullHeight}px`}}>
+            <div className={classes.root} ref={containerRef} style={{minHeight: `${fullHeight}px`}}>
                 { children }
             </div>
         </Fade>
