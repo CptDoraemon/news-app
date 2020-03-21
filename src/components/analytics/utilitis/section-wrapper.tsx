@@ -12,10 +12,10 @@ const useStyles = makeStyles(theme => ({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: theme.spacing(10, 2),
-        [theme.breakpoints.down('sm')]: {
-            padding: theme.spacing(2, 2),
-        }
+        // padding: theme.spacing(10, 2),
+        // [theme.breakpoints.down('sm')]: {
+        //     padding: theme.spacing(2, 2),
+        // }
     }
 }));
 
@@ -26,11 +26,12 @@ interface SectionWrapperProps {
 const SectionWrapper: React.FC<SectionWrapperProps> = ({children}) => {
     const classes = useStyles();
     const containerRef = useRef<HTMLDivElement>(null);
-    const isVisible = useLazyLoad(containerRef);
+    const isVisible = useLazyLoad(containerRef, 0.8);
+    const [fullHeight, setFullHeight] = useState(window.innerHeight - 100);
 
     return (
         <Fade in={isVisible} timeout={2000}>
-            <div className={classes.root} ref={containerRef}>
+            <div className={classes.root} ref={containerRef} style={{height: `${fullHeight}px`}}>
                 { children }
             </div>
         </Fade>

@@ -11,12 +11,12 @@ const useStyles = makeStyles(theme => ({
 interface DocumentsByCategoryBarChartProps {
     isLoaded: boolean,
     data: BarChartData,
+    animate: boolean
     width?: number
 }
 
-const DocumentsByCategoryBarChart: React.FC<DocumentsByCategoryBarChartProps> = ({isLoaded, data, width}) => {
+const DocumentsByCategoryBarChart: React.FC<DocumentsByCategoryBarChartProps> = ({isLoaded, data, animate, width}) => {
     const ref = useRef<HTMLDivElement>(null);
-    const isVisible = useLazyLoad(ref, 0.5);
     const [barChart, setBarChart] = useState<null | BarChartD3>(null);
 
     useEffect(() => {
@@ -32,10 +32,10 @@ const DocumentsByCategoryBarChart: React.FC<DocumentsByCategoryBarChartProps> = 
     }, [isLoaded, data, width]);
 
     useEffect(() => {
-        if (barChart && isVisible) {
+        if (barChart && animate) {
             barChart.animate();
         }
-    }, [barChart, isVisible]);
+    }, [barChart, animate]);
 
     return (
         <>

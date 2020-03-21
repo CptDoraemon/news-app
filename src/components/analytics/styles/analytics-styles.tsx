@@ -14,12 +14,13 @@ export const bigNumber = (theme: Theme): CSSProperties => ({
 });
 
 export const header = (theme: Theme): CSSProperties => ({
-    textAlign: 'center',
-    width: '100%',
+    textAlign: 'start',
+    width: '70%',
     fontFamily: 'Open Sans,sans-serif',
+    textTransform: 'uppercase',
     fontSize: '2rem',
     fontWeight: 800,
-    margin: theme.spacing(2, 0),
+    margin: theme.spacing(0, 0),
     lineHeight: 1,
     [theme.breakpoints.down('sm')]: {
         fontSize: '1rem',

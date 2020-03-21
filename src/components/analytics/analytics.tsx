@@ -1,4 +1,4 @@
-import React, {useRef} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import useGetAnalytics, {AnalyticsPageStatus} from "./utilitis/use-get-analytics";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {CircularProgress, Typography} from "@material-ui/core";
@@ -7,6 +7,7 @@ import Box from "@material-ui/core/Box";
 import DocumentsByCategoryBarChart from "./documents-by-category-bar-chart";
 import DocumentsHeatMap from "./documents-heat-map";
 import DocumentsTextSummary from "./documents-text-summary";
+import useDebounce from "../../tools/use-debounce";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -15,8 +16,9 @@ const useStyles = makeStyles(theme => ({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'flex-start',
-        transitions: theme.transitions.create('backgroundColor'),
+        transition: 'background-color 2s',
         paddingBottom: '200px',
+        position: 'relative',
         [theme.breakpoints.down('sm')]: {
             paddingBottom: '250px',
         }
@@ -45,11 +47,30 @@ const Analytics: React.FC<AnalyticsProps> = () => {
         summaryStatisticsData
     } = useGetAnalytics();
 
+    const bgColorChangeRef = useRef<HTMLDivElement>(null);
+    const [bgBlack, setBgBlack] = useState(false);
+    const changeBgColor = () => {
+        if (!bgColorChangeRef.current) return;
+        const target = bgColorChangeRef.current.getBoundingClientRect().top - 50;
+        if (target <= 0 && bgBlack) {
+            setBgBlack(false)
+        } else if (target > 0 && !bgBlack) {
+            setBgBlack(true)
+        }
+    };
+    useEffect(() => {
+        changeBgColor();
+        document.addEventListener('scroll', changeBgColor);
+        return () => {
+            document.removeEventListener('scroll', changeBgColor);
+        }
+    }, [status, bgBlack]);
+
     const isLoaded = status === AnalyticsPageStatus.loaded;
     const width = wrapperRef?.current?.getBoundingClientRect().width;
 
     return (
-        <div className={classes.root}>
+        <div className={classes.root} style={{backgroundColor: bgBlack ? `rgba(0,0,0,1)` : `rgba(0,0,0,0)`}}>
             <div className={classes.widthWrapper} ref={wrapperRef}>
                 {
                     status === AnalyticsPageStatus.loading && <CircularProgress color={"secondary"}/>
@@ -59,11 +80,12 @@ const Analytics: React.FC<AnalyticsProps> = () => {
                     summaryStatisticsData &&
                     <>
 
-                            <DocumentsTextSummary
-                                totalDocuments={summaryStatisticsData.totalDocuments}
-                                earliestDocumentDate={summaryStatisticsData.earliestDocumentDate}
-                                latestDocumentDate={summaryStatisticsData.latestDocumentDate}
-                            />
+                        <DocumentsTextSummary
+                            totalDocuments={summaryStatisticsData.totalDocuments}
+                            earliestDocumentDate={summaryStatisticsData.earliestDocumentDate}
+                            latestDocumentDate={summaryStatisticsData.latestDocumentDate}
+                            ref={bgColorChangeRef}
+                        />
 
                         <SectionWrapper>
                             <DocumentsByCategoryBarChart
@@ -72,6 +94,7 @@ const Analytics: React.FC<AnalyticsProps> = () => {
                                     title: obj.category,
                                     value: obj.count
                                 }))}
+                                animate={!bgBlack}
                                 width={width}/>
                         </SectionWrapper>
                         <SectionWrapper>

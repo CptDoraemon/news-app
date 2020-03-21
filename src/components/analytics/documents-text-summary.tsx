@@ -1,9 +1,10 @@
-import React from "react";
+import React, {useState} from "react";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {useCountUp} from "react-countup";
 import {bigNumber, content} from "./styles/analytics-styles";
 
 const monthStrings = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const month = 1000 * 60 * 60 * 24 * 30;
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -13,6 +14,7 @@ const useStyles = makeStyles(theme => ({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
+        color: 'white'
     },
     section: {
         margin: theme.spacing(5, 0),
@@ -34,10 +36,11 @@ interface DocumentsTextSummaryProps {
     latestDocumentDate: number
 }
 
-const DocumentsTextSummary: React.FC<DocumentsTextSummaryProps> = ({totalDocuments, earliestDocumentDate, latestDocumentDate}) => {
+const DocumentsTextSummary = React.forwardRef<HTMLDivElement, DocumentsTextSummaryProps>(({totalDocuments, earliestDocumentDate, latestDocumentDate}, forwardedRef) => {
 
     const classes = useStyles();
-    const total = useCountUp({start: totalDocuments - 10, end: totalDocuments, duration: 5});
+    const [fullHeight, setFullHeight] = useState(window.innerHeight - 100);
+    const total = useCountUp({start: totalDocuments*0.9, end: totalDocuments, duration: 5});
     const earliest = useCountUp({start: earliestDocumentDate*0.9, end: earliestDocumentDate, duration: 5});
     const latest = useCountUp({start: latestDocumentDate*0.9, end: latestDocumentDate, duration: 5});
 
@@ -53,7 +56,7 @@ const DocumentsTextSummary: React.FC<DocumentsTextSummaryProps> = ({totalDocumen
 
     return (
         <>
-            <div className={classes.root} style={{height: `${window.innerHeight - 100}px`}}>
+            <div className={classes.root} style={{height: `${fullHeight}px`}}>
                 <div className={classes.section}>
                     { title('Total news articles achieved') }
                     <p className={classes.number}>{total.countUp}</p>
@@ -66,9 +69,10 @@ const DocumentsTextSummary: React.FC<DocumentsTextSummaryProps> = ({totalDocumen
                     { title('Most recent news article achieved') }
                     { date(+latest.countUp) }
                 </div>
+                <div ref={forwardedRef}> </div>
             </div>
         </>
     )
-};
+});
 
 export default DocumentsTextSummary

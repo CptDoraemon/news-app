@@ -13,6 +13,7 @@ class BarChartD3 {
         const colors = ['#003f5c', '#374c80', '#7a5195' ,'#bc5090' ,'#ef5675' ,'#ff764a' ,'#ffa600'];
         return colors[index > colors.length - 1 ? 0 : index]
     };
+    hasAnimated = false;
     id: string;
     params: {
         width: number,
@@ -249,7 +250,9 @@ class BarChartD3 {
     }
 
     animate() {
+        if (this.hasAnimated) return;
         this.pieTransition(this.params.rx, this.params.ry, this.params.h, this.params.ir, this.data.pieZero, this.data.pie);
+        this.hasAnimated = true;
     }
 
     main() {

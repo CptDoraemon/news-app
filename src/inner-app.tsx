@@ -1,5 +1,5 @@
 import {State} from "./redux/state";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {Box, makeStyles} from "@material-ui/core";
 import Header from "./components/header/header";
 import {categories, Category} from "./redux/actions/category";
@@ -36,6 +36,7 @@ interface InnerAppProps extends Pick<State, 'category' | 'articles'> {
 
 function InnerApp(props: InnerAppProps) {
     const classes = useStyles();
+    const [minHeight, setMinHeight] = useState(window.innerHeight);
     useEffect(() => {
         props.fetchArticlesAfterMount()
     }, []);
@@ -57,7 +58,7 @@ function InnerApp(props: InnerAppProps) {
     };
 
     return (
-        <Box className={classes.root} style={{minHeight: `${window.innerHeight}px`}}>
+        <Box className={classes.root} style={{minHeight: `${minHeight}px`}}>
             <HeaderContainer/>
             {
                 main()

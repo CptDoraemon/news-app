@@ -22,7 +22,7 @@ const DocumentsHeatMap: React.FC<DocumentsHeatMapProps> = ({isLoaded, data, widt
     const [heatMap, setHeatMap] = useState<null | HeatMapD3>(null);
 
     useEffect(() => {
-        if (isLoaded && data && width) {
+        if (isLoaded && data && width && heatMap === null) {
             const heatMap = new HeatMapD3(
                 'analytics-documents-heat-map',
                 data,

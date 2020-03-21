@@ -16,9 +16,15 @@ const Title: React.FC<TitleProps> = ({value}) => {
     const classes = useStyles();
 
     return (
-        <h2 className={classes.title}>
-            { value }
-        </h2>
+        <>
+        {
+            value.split(' ').map((str, i) =>
+                <h2 className={classes.title} key={i}>
+                    { str }
+                </h2>
+            )
+        }
+        </>
     )
 };
 
