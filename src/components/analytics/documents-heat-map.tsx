@@ -5,6 +5,7 @@ import Box from "@material-ui/core/Box";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import HeatMapD3, {HeatMapData} from "../../d3-charts/heat-map-d3";
 import Title from "./utilitis/title";
+import Content from "./utilitis/content";
 
 const useStyles = makeStyles(theme => ({
 
@@ -42,6 +43,7 @@ const DocumentsHeatMap: React.FC<DocumentsHeatMapProps> = ({isLoaded, data, widt
     return (
         <>
             <Title value={'News archived each day'} />
+            <Content value={`Glad to see that people enjoyed their weekends.`}/>
             <div id='analytics-documents-heat-map' ref={ref}/>
         </>
     )

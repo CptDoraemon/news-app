@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {useCountUp} from "react-countup";
-import {bigNumber, content} from "./styles/analytics-styles";
+import {bigNumber, bigNumberTitle} from "./styles/analytics-styles";
 
 const monthStrings = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const month = 1000 * 60 * 60 * 24 * 30;
@@ -23,7 +23,7 @@ const useStyles = makeStyles(theme => ({
         }
     },
     title: {
-        ...content(theme)
+        ...bigNumberTitle(theme)
     },
     number: {
         ...bigNumber(theme)

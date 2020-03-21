@@ -3,6 +3,7 @@ import BarChartD3, {BarChartData} from "../../d3-charts/bar-chart-d3";
 import useLazyLoad from "../../tools/use-lazy-load";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import Title from "./utilitis/title";
+import Content from "./utilitis/content";
 
 const useStyles = makeStyles(theme => ({
 
@@ -40,6 +41,7 @@ const DocumentsByCategoryBarChart: React.FC<DocumentsByCategoryBarChartProps> = 
     return (
         <>
             <Title value={'News achieved by category'} />
+            <Content value={`Overall I'd say the news are pretty balanced.`}/>
             <div id='analytics-documents-count-by-category' ref={ref}/>
         </>
     )

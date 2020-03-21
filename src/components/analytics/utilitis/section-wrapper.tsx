@@ -20,17 +20,17 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface SectionWrapperProps {
-
+    active: boolean
 }
 
-const SectionWrapper: React.FC<SectionWrapperProps> = ({children}) => {
+const SectionWrapper: React.FC<SectionWrapperProps> = ({children, active}) => {
     const classes = useStyles();
     const containerRef = useRef<HTMLDivElement>(null);
-    const isVisible = useLazyLoad(containerRef, 0.8);
+    // const isVisible = useLazyLoad(containerRef, 0.8);
     const [fullHeight, setFullHeight] = useState(window.innerHeight - 100);
 
     return (
-        <Fade in={isVisible} timeout={2000}>
+        <Fade in={active} timeout={2000}>
             <div className={classes.root} ref={containerRef} style={{minHeight: `${fullHeight}px`}}>
                 { children }
             </div>

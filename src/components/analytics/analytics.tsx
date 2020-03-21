@@ -87,7 +87,7 @@ const Analytics: React.FC<AnalyticsProps> = () => {
                             ref={bgColorChangeRef}
                         />
 
-                        <SectionWrapper>
+                        <SectionWrapper active={!bgBlack}>
                             <DocumentsByCategoryBarChart
                                 isLoaded={isLoaded}
                                 data={summaryStatisticsData.documentsCountByCategory.map(obj => ({
@@ -97,7 +97,7 @@ const Analytics: React.FC<AnalyticsProps> = () => {
                                 animate={!bgBlack}
                                 width={width}/>
                         </SectionWrapper>
-                        <SectionWrapper>
+                        <SectionWrapper active={!bgBlack}>
                             <DocumentsHeatMap isLoaded={isLoaded} data={summaryStatisticsData.documentsCountByDay} width={width}/>
                         </SectionWrapper>
                     </>
