@@ -48,21 +48,22 @@ const AnimationSlideIn: React.FC<AnimationSlideInProps> = ({children}) => {
     });
 
     const scrollHandler = () => {
-        const scrolled = window.scrollY + window.innerHeight;
-        if (scrolled >= target.start && scrolled <= target.end) {
-            const percentage = (scrolled - target.start) / (target.end - target.start);
+        const isBefore = window.scrollY + window.innerHeight < target.start;
+        const isAfter = window.scrollY + window.innerHeight * 0.5 > target.end; // center of the element aligns center of the viewport
+        if (!isBefore && !isAfter) {
+            const percentage = (window.scrollY - target.start + window.innerHeight) / (target.end - target.start + 0.5 * window.innerHeight); // window.scrollY subtract isBefore and isAfter
             setTranslate((prevTranslate) => ({
                 ...prevTranslate,
                 x: prevTranslate.xMax * easeInQuad(1 - percentage)
             }))
-        } else if (scrolled < target.start) {
+        } else if (isBefore) {
             if (translate.x !== translate.xMax) {
                 setTranslate((prevTranslate) => ({
                     ...prevTranslate,
                     x: prevTranslate.xMax
                 }))
             }
-        } else if (scrolled > target.end) {
+        } else if (isAfter) {
             if (translate.x !== 0) {
                 setTranslate((prevTranslate) => ({
                     ...prevTranslate,
@@ -82,12 +83,12 @@ const AnimationSlideIn: React.FC<AnimationSlideInProps> = ({children}) => {
 
     useEffect(() => {
         if (!containerRef.current || dimension.width === '0px' || target.start !== 0) return;
-        const el = containerRef.current;
+        const rect = containerRef.current.getBoundingClientRect();
         setTarget({
-            start: el.offsetTop,
-            end: el.offsetTop + el.offsetHeight
+            start: window.scrollY + rect.top,
+            end: window.scrollY + rect.top + rect.height * 0.5
         });
-        const xMax = -(el.getBoundingClientRect().left + el.getBoundingClientRect().width);
+        const xMax = -(rect.left + rect.width);
         setTranslate({
             xMax,
             x: xMax,
