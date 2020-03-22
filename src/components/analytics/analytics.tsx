@@ -71,6 +71,12 @@ const Analytics: React.FC<AnalyticsProps> = () => {
         }
     }, [status, bgBlack]);
 
+    useEffect(() => {
+        return () => {
+            document.body.style.backgroundColor = ''
+        };
+    }, []);
+
     const isLoaded = status === AnalyticsPageStatus.loaded;
     const width = wrapperRef?.current?.getBoundingClientRect().width;
 
