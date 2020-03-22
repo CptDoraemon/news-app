@@ -12,6 +12,8 @@ import Fade from "@material-ui/core/Fade";
 import AnimationSlideIn from "./utilitis/animation-slide-in";
 import useTheme from "@material-ui/core/styles/useTheme";
 import withAnimationSlideIn from "./utilitis/animation-slide-in";
+import WordCloud from "./documents-word-cloud";
+import AnimationFixed from "./utilitis/animation-fixed";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -118,6 +120,11 @@ const Analytics: React.FC<AnalyticsProps> = () => {
                                 <DocumentsHeatMap isLoaded={isLoaded} data={summaryStatisticsData.documentsCountByDay} width={width}/>
                             </SectionWrapper>
                         </AnimationSlideIn>
+                        <AnimationFixed>
+                            <SectionWrapper>
+                                <WordCloud isLoaded={isLoaded} data={summaryStatisticsData.wordCloud} width={width}/>
+                            </SectionWrapper>
+                        </AnimationFixed>
                     </>
                 }
                 {

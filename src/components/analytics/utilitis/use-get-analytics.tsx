@@ -18,10 +18,10 @@ export interface SummaryStatisticsData {
         count: number[],
         time: number[]
     },
-    wordCloud: {
+    wordCloud: Array<{
         count: number,
         word: string
-    }
+    }>
 }
 
 const useGetAnalytics = () => {
