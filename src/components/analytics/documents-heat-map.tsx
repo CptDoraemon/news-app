@@ -1,7 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
 import useLazyLoad from "../../tools/use-lazy-load";
-import {Typography} from "@material-ui/core";
-import Box from "@material-ui/core/Box";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import HeatMapD3, {HeatMapData} from "../../d3-charts/heat-map-d3";
 import Title from "./utilitis/title";

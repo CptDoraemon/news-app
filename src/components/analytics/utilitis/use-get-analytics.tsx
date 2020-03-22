@@ -18,6 +18,10 @@ export interface SummaryStatisticsData {
         count: number[],
         time: number[]
     },
+    wordCloud: {
+        count: number,
+        word: string
+    }
 }
 
 const useGetAnalytics = () => {
@@ -41,6 +45,7 @@ const useGetAnalytics = () => {
                             time: json.summaryStatistics.documentsCountByDay.bin.map((_:any) => _.ms),
                             count: json.summaryStatistics.documentsCountByDay.frequency
                         },
+                        wordCloud: json.summaryStatistics.wordCloud,
                     } as SummaryStatisticsData);
                     setStatus(AnalyticsPageStatus.loaded)
                 }

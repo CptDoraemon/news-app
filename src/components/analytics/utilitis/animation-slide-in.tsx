@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 
-
+const easeInQuad = (t: number) => t*t;
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -53,7 +53,7 @@ const AnimationSlideIn: React.FC<AnimationSlideInProps> = ({children}) => {
             const percentage = (scrolled - target.start) / (target.end - target.start);
             setTranslate((prevTranslate) => ({
                 ...prevTranslate,
-                x: prevTranslate.xMax * (1 - percentage)
+                x: prevTranslate.xMax * easeInQuad(1 - percentage)
             }))
         } else if (scrolled < target.start) {
             if (translate.x !== translate.xMax) {

@@ -84,7 +84,10 @@ const Analytics: React.FC<AnalyticsProps> = () => {
         <div className={classes.root}>
             <div className={classes.widthWrapper} ref={wrapperRef}>
                 {
-                    status === AnalyticsPageStatus.loading && <CircularProgress color={"secondary"}/>
+                    status === AnalyticsPageStatus.loading &&
+                    <SectionWrapper>
+                        <CircularProgress color={"secondary"}/>
+                    </SectionWrapper>
                 }
                 {
                     status === AnalyticsPageStatus.loaded &&
