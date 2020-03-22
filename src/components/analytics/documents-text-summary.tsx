@@ -4,7 +4,6 @@ import {useCountUp} from "react-countup";
 import {bigNumber, bigNumberTitle} from "./styles/analytics-styles";
 
 const monthStrings = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const month = 1000 * 60 * 60 * 24 * 30;
 
 const useStyles = makeStyles(theme => ({
     root: {

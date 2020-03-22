@@ -8,6 +8,10 @@ import DocumentsByCategoryBarChart from "./documents-by-category-bar-chart";
 import DocumentsHeatMap from "./documents-heat-map";
 import DocumentsTextSummary from "./documents-text-summary";
 import useDebounce from "../../tools/use-debounce";
+import Fade from "@material-ui/core/Fade";
+import AnimationSlideIn from "./utilitis/animation-slide-in";
+import useTheme from "@material-ui/core/styles/useTheme";
+import withAnimationSlideIn from "./utilitis/animation-slide-in";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -16,7 +20,6 @@ const useStyles = makeStyles(theme => ({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'flex-start',
-        transition: 'background-color 2s',
         paddingBottom: '200px',
         position: 'relative',
         [theme.breakpoints.down('sm')]: {
@@ -53,9 +56,11 @@ const Analytics: React.FC<AnalyticsProps> = () => {
         if (!bgColorChangeRef.current) return;
         const target = bgColorChangeRef.current.getBoundingClientRect().top - 100;
         if (target <= 0 && bgBlack) {
-            setBgBlack(false)
+            setBgBlack(false);
+            document.body.style.backgroundColor = '';
         } else if (target > 0 && !bgBlack) {
-            setBgBlack(true)
+            setBgBlack(true);
+            document.body.style.backgroundColor = 'black'
         }
     };
     useEffect(() => {
@@ -70,7 +75,7 @@ const Analytics: React.FC<AnalyticsProps> = () => {
     const width = wrapperRef?.current?.getBoundingClientRect().width;
 
     return (
-        <div className={classes.root} style={{backgroundColor: bgBlack ? `rgba(0,0,0,1)` : `rgba(0,0,0,0)`}}>
+        <div className={classes.root}>
             <div className={classes.widthWrapper} ref={wrapperRef}>
                 {
                     status === AnalyticsPageStatus.loading && <CircularProgress color={"secondary"}/>
@@ -87,19 +92,23 @@ const Analytics: React.FC<AnalyticsProps> = () => {
                             ref={bgColorChangeRef}
                         />
 
-                        <SectionWrapper active={!bgBlack}>
-                            <DocumentsByCategoryBarChart
-                                isLoaded={isLoaded}
-                                data={summaryStatisticsData.documentsCountByCategory.map(obj => ({
-                                    title: obj.category,
-                                    value: obj.count
-                                }))}
-                                animate={!bgBlack}
-                                width={width}/>
-                        </SectionWrapper>
-                        <SectionWrapper active={!bgBlack}>
-                            <DocumentsHeatMap isLoaded={isLoaded} data={summaryStatisticsData.documentsCountByDay} width={width}/>
-                        </SectionWrapper>
+                        <Fade in={!bgBlack} timeout={2000}>
+                            <SectionWrapper>
+                                <DocumentsByCategoryBarChart
+                                    isLoaded={isLoaded}
+                                    data={summaryStatisticsData.documentsCountByCategory.map(obj => ({
+                                        title: obj.category,
+                                        value: obj.count
+                                    }))}
+                                    animate={!bgBlack}
+                                    width={width}/>
+                            </SectionWrapper>
+                        </Fade>
+                        <AnimationSlideIn>
+                            <SectionWrapper>
+                                <DocumentsHeatMap isLoaded={isLoaded} data={summaryStatisticsData.documentsCountByDay} width={width}/>
+                            </SectionWrapper>
+                        </AnimationSlideIn>
                     </>
                 }
                 {
