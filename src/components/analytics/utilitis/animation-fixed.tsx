@@ -1,119 +1,133 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {CSSProperties, useEffect, useRef, useState} from "react";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 
 const useStyles = makeStyles(theme => ({
     root: {
         position: 'relative',
-        zIndex: 1,
         width: '100%',
-        overflow: 'hidden'
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    fixedWrapper: {
+        position: 'relative',
+        top: 0,
+        zIndex: 1,
+        overflow: 'hidden',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        // backgroundColor: 'rgba(255,0,0,0.5)'
     },
     children: {
-        position: 'absolute',
-        zIndex: -1,
-        top: 0,
-        left: 0,
-        willChange: 'transform',
         width: '100%',
+        position: 'absolute',
+        zIndex: 1,
+    },
+    childrenSize: {
+        width: '100%'
     },
     placeholder: {
         position: 'relative',
-        zIndex: -2,
     },
 }));
 
 interface AnimationFixedProps {
-
+    width: number
 }
 
-const AnimationFixed: React.FC<AnimationFixedProps> = ({children}) => {
+const AnimationFixed: React.FC<AnimationFixedProps> = ({children, width}) => {
     const classes = useStyles();
     const containerRef = useRef<HTMLDivElement>(null);
     const childrenRef = useRef<HTMLDivElement>(null);
     const placeholderRef = useRef<HTMLDivElement>(null);
+    const fixedWrapperRef = useRef<HTMLDivElement>(null);
 
     const [dimension, setDimension] = useState({
-        width: `0px`,
-        height: `0px`
+        isSet: false,
+        width: '0',
+        height: '0',
+        left: '0'
     });
     const [target, setTarget] = useState({
+        isSet: false,
         start: 0,
         end: 0
     });
-    const [translate, setTranslate] = useState({
-        yMax: 0,
-        x: 0,
-        y: 0
-    });
 
     const scrollHandler = () => {
-        const isBefore = window.scrollY + window.innerHeight < target.start;
-        const isAfter = window.scrollY > target.end;
-        if (!isBefore && !isAfter) {
-            const percentage = (window.scrollY - target.start + window.innerHeight) / (target.end - target.start + window.innerHeight); // window.scrollY subtract isBefore and isAfter
-            console.log(percentage);
-            setTranslate((prevTranslate) => ({
-                ...prevTranslate,
-                y: -(0.5 - percentage) * (window.innerHeight - 110)
-                // y: 0
-            }))
-        } else if (isBefore) {
-            if (translate.x !== translate.yMax) {
-                setTranslate((prevTranslate) => ({
-                    ...prevTranslate,
-                    y: prevTranslate.yMax
-                }))
-            }
-        } else if (isAfter) {
-            if (translate.x !== 0) {
-                setTranslate((prevTranslate) => ({
-                    ...prevTranslate,
-                    y: 0
-                }))
-            }
-        }
+        if (!fixedWrapperRef.current || !placeholderRef.current || !childrenRef.current) return;
+
+        // const isBefore = window.scrollY + window.innerHeight < target.start;
+        // const isAfter = window.scrollY > target.end;
+        childrenRef.current.style.transform = `translateY(${-placeholderRef.current.getBoundingClientRect().top+50}px)`;
+        fixedWrapperRef.current.style.transform = `translateY(${placeholderRef.current.getBoundingClientRect().top}px)`
+        // if (!isBefore && !isAfter) {
+        //     // const percentage = (window.scrollY - target.start + window.innerHeight) / (target.end - target.start + window.innerHeight); // window.scrollY subtract isBefore and isAfter
+        //     // childrenRef.current.style.transform = `translateY(${-(0.5 - percentage) * (window.innerHeight - 110)}px)`;
+        //     childrenRef.current.style.transform = `translateY(${-placeholderRef.current.getBoundingClientRect().top}px)`;
+        //     fixedWrapperRef.current.style.transform = `translateY(${placeholderRef.current.getBoundingClientRect().top}px)`
+        // } else if (isBefore) {
+        //     if (fixedWrapperRef.current.style.display === 'hidden') return;
+        //     fixedWrapperRef.current.style.display = `hidden`
+        // } else if (isAfter) {
+        //     if (fixedWrapperRef.current.style.display === 'hidden') return;
+        //     fixedWrapperRef.current.style.display = `hidden`
+        // }
     };
 
     useEffect(() => {
-        if (!childrenRef.current || !placeholderRef.current || dimension.width !== '0px') return;
+        // use the children dimension to set placeholder's dimension
+        if (!childrenRef.current || dimension.isSet) return;
         setDimension({
+            isSet: true,
             width: `${childrenRef.current.getBoundingClientRect().width}px`,
-            height: `${childrenRef.current.getBoundingClientRect().height}px`
+            height: `${childrenRef.current.getBoundingClientRect().height}px`,
+            left: `${childrenRef.current.getBoundingClientRect().left}px`
         });
+        scrollHandler();
     }, [dimension]);
 
     useEffect(() => {
-        if (!containerRef.current || dimension.width === '0px' || target.start !== 0) return;
-        const rect = containerRef.current.getBoundingClientRect();
+        // wait until dimension is set
+        // use placeholder's position to set scrolling targets
+        if (!placeholderRef.current || !dimension.isSet || target.isSet) return;
+        const rect = placeholderRef.current.getBoundingClientRect();
         setTarget({
+            isSet: true,
             start: window.scrollY + rect.top,
             end: window.scrollY + rect.top + rect.height
         });
-        const yMax = rect.height;
-        setTranslate({
-            yMax,
-            x: 0,
-            y: yMax
-        })
-    }, [dimension, target, translate]);
+    }, [dimension, target]);
 
     useEffect(() => {
         document.addEventListener('scroll', scrollHandler);
         return () => document.removeEventListener('scroll', scrollHandler);
-    }, [target, translate]);
+    }, [target]);
 
-
+    const fixedWrapperStyle: CSSProperties = {
+        left: dimension.left,
+        height: dimension.height,
+        width: dimension.width,
+        position: 'fixed',
+    };
 
     return (
         <div className={classes.root} ref={containerRef}>
-            <div className={classes.children} ref={childrenRef} style={{transform: `translate(${translate.x}px, ${translate.y}px)`}}>
-                { children }
+            <div className={classes.fixedWrapper} ref={fixedWrapperRef} style={dimension.isSet ? fixedWrapperStyle : {}}>
+                <div className={classes.children} ref={childrenRef}>
+                    { children }
+                </div>
             </div>
-            <div className={classes.placeholder} ref={placeholderRef} style={{...dimension}}>
+            <div className={classes.placeholder} ref={placeholderRef} style={{width: dimension.width, height: dimension.height}}>
 
             </div>
         </div>
     )
+
 };
 
 export default AnimationFixed

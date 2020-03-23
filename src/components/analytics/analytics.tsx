@@ -120,7 +120,7 @@ const Analytics: React.FC<AnalyticsProps> = () => {
                                 <DocumentsHeatMap isLoaded={isLoaded} data={summaryStatisticsData.documentsCountByDay} width={width}/>
                             </SectionWrapper>
                         </AnimationSlideIn>
-                        <AnimationFixed>
+                        <AnimationFixed width={width || 0}>
                             <SectionWrapper>
                                 <WordCloud isLoaded={isLoaded} data={summaryStatisticsData.wordCloud} width={width}/>
                             </SectionWrapper>

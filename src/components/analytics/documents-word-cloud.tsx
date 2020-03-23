@@ -20,7 +20,6 @@ const WordCloud: React.FC<WordCloudProps> = ({isLoaded, data, width}) => {
     const ref = useRef<HTMLDivElement>(null);
     const isVisible = useLazyLoad(ref, 0.5);
     const [wordCloud, setWordCloud] = useState<null | WordCloudD3>(null);
-    console.log(data);
 
     useEffect(() => {
         if (isLoaded && data && width && wordCloud === null) {
