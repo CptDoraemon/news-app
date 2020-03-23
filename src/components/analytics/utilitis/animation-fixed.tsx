@@ -59,26 +59,31 @@ const AnimationFixed: React.FC<AnimationFixedProps> = ({children}) => {
         start: 0,
         end: 0
     });
+    const [isFrozen, setIsFrozen] = useState(false);
 
     const scrollHandler = () => {
         if (!fixedWrapperRef.current || !placeholderRef.current || !childrenRef.current) return;
 
-        // const isBefore = window.scrollY + window.innerHeight < target.start;
-        // const isAfter = window.scrollY > target.end;
-        childrenRef.current.style.transform = `translateY(${placeholderRef.current.getBoundingClientRect().top*0.5}px)`;
-        fixedWrapperRef.current.style.transform = `translateY(${placeholderRef.current.getBoundingClientRect().top}px)`
-        // if (!isBefore && !isAfter) {
-        //     // const percentage = (window.scrollY - target.start + window.innerHeight) / (target.end - target.start + window.innerHeight); // window.scrollY subtract isBefore and isAfter
-        //     // childrenRef.current.style.transform = `translateY(${-(0.5 - percentage) * (window.innerHeight - 110)}px)`;
-        //     childrenRef.current.style.transform = `translateY(${-placeholderRef.current.getBoundingClientRect().top}px)`;
-        //     fixedWrapperRef.current.style.transform = `translateY(${placeholderRef.current.getBoundingClientRect().top}px)`
-        // } else if (isBefore) {
-        //     if (fixedWrapperRef.current.style.display === 'hidden') return;
-        //     fixedWrapperRef.current.style.display = `hidden`
-        // } else if (isAfter) {
-        //     if (fixedWrapperRef.current.style.display === 'hidden') return;
-        //     fixedWrapperRef.current.style.display = `hidden`
-        // }
+        const isBefore = window.scrollY + window.innerHeight < target.start;
+        const isAfter = window.scrollY > target.end;
+        if (!isBefore && !isAfter) {
+            // const percentage = (window.scrollY - target.start + window.innerHeight) / (target.end - target.start + window.innerHeight); // window.scrollY subtract isBefore and isAfter
+            // childrenRef.current.style.transform = `translateY(${-(0.5 - percentage) * (window.innerHeight - 110)}px)`;
+            const offset = placeholderRef.current.getBoundingClientRect().top;
+            childrenRef.current.style.transform = `translateY(${offset}px)`;
+            fixedWrapperRef.current.style.transform = `translateY(${offset}px)`;
+            if (isFrozen) {
+                setIsFrozen(false);
+            }
+        } else if (isBefore) {
+            if (!isFrozen) return;
+            fixedWrapperRef.current.style.transform = `translateY(${window.scrollY + placeholderRef.current.getBoundingClientRect().top}px)`;
+            setIsFrozen(true);
+        } else if (isAfter) {
+            if (!isFrozen) return;
+            fixedWrapperRef.current.style.transform = `translateY(${window.scrollY + placeholderRef.current.getBoundingClientRect().bottom}px)`;
+            setIsFrozen(true);
+        }
     };
 
     useEffect(() => {

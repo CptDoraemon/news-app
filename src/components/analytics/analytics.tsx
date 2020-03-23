@@ -125,7 +125,7 @@ const Analytics: React.FC<AnalyticsProps> = () => {
                                 <WordCloud isLoaded={isLoaded} data={summaryStatisticsData.wordCloud} width={width}/>
                             </SectionWrapper>
                         </AnimationFixed>
-                        {/*<div style={{width: 100, height: 3000}}> </div>*/}
+                        {/*<div style={{width: 100, height: 3000, backgroundColor: 'rgba(255,0,0,0.5)'}}> </div>*/}
                     </>
                 }
                 {

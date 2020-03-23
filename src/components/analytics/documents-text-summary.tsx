@@ -13,7 +13,7 @@ const useStyles = makeStyles(theme => ({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        color: 'white'
+        color: '#F2F2F2'
     },
     section: {
         margin: theme.spacing(5, 0),
