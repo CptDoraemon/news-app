@@ -41,8 +41,8 @@ const WordCloud: React.FC<WordCloudProps> = ({isLoaded, data, width}) => {
 
     return (
         <>
-            <Title value={'Word cloud'} />
-            <Content value={`Word cloud description.`}/>
+            <Title value={'Word it out'} />
+            <Content value={`The power of words.`}/>
             <div id='analytics-documents-word-cloud' ref={ref}/>
         </>
     )

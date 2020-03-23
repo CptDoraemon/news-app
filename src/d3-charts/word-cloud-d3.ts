@@ -45,7 +45,7 @@ class WordCloudD3 {
     getScale() {
         return d3.scaleLinear()
             .domain([0, this.data.maxCount])
-            .range([10,100]);
+            .range([10, this.params.width >= 1000 ? 100 : this.params.width >= 800 ? 70 : 36]);
     }
 
     draw() {

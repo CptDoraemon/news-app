@@ -8,7 +8,8 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        // backgroundColor: 'rgba(0,255,0,0.5)'
     },
     fixedWrapper: {
         position: 'relative',
@@ -26,6 +27,7 @@ const useStyles = makeStyles(theme => ({
         width: '100%',
         position: 'absolute',
         zIndex: 1,
+        minHeight: 800
     },
     childrenSize: {
         width: '100%'
@@ -36,10 +38,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface AnimationFixedProps {
-    width: number
+
 }
 
-const AnimationFixed: React.FC<AnimationFixedProps> = ({children, width}) => {
+const AnimationFixed: React.FC<AnimationFixedProps> = ({children}) => {
     const classes = useStyles();
     const containerRef = useRef<HTMLDivElement>(null);
     const childrenRef = useRef<HTMLDivElement>(null);
@@ -63,7 +65,7 @@ const AnimationFixed: React.FC<AnimationFixedProps> = ({children, width}) => {
 
         // const isBefore = window.scrollY + window.innerHeight < target.start;
         // const isAfter = window.scrollY > target.end;
-        childrenRef.current.style.transform = `translateY(${-placeholderRef.current.getBoundingClientRect().top+50}px)`;
+        childrenRef.current.style.transform = `translateY(${placeholderRef.current.getBoundingClientRect().top*0.5}px)`;
         fixedWrapperRef.current.style.transform = `translateY(${placeholderRef.current.getBoundingClientRect().top}px)`
         // if (!isBefore && !isAfter) {
         //     // const percentage = (window.scrollY - target.start + window.innerHeight) / (target.end - target.start + window.innerHeight); // window.scrollY subtract isBefore and isAfter
