@@ -4,7 +4,7 @@ import {
     categories,
     Category,
     goToAnalyticsPanel,
-    goToSearchPanel,
+    goToSearchPanel, goToTopicPanel,
     setCategoryIfNeeded
 } from "../redux/actions/category";
 import {setSearchKeyword} from "../redux/actions/search-keyword";
@@ -26,6 +26,9 @@ function mapDispatchToProps(dispatch: Dispatch) {
         },
         goToAnalytics: () => {
             dispatch(goToAnalyticsPanel())
+        },
+        goToTopic: () => {
+            dispatch(goToTopicPanel())
         },
         setCategory: (category: Category) => {
             // @ts-ignore

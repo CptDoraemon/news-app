@@ -11,6 +11,7 @@ import {connect} from "react-redux";
 import SearchedArticlesContainer from "./containers/searched-articles-container";
 import Analytics from "./components/analytics/analytics";
 import HeaderContainer from "./containers/header-container";
+import Topic from "./components/topic/topic";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -49,6 +50,9 @@ function InnerApp(props: InnerAppProps) {
                 break;
             case Category.SEARCH:
                 component = <SearchedArticlesContainer/>;
+                break;
+            case Category.TOPIC:
+                component = <Topic/>;
                 break;
             default:
                 component = <ArticlesContainer articles={props.articles} />;

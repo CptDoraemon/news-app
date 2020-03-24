@@ -12,7 +12,8 @@ export enum Category {
     SPORTS= `SPORTS`,
     TECHNOLOGY= `TECHNOLOGY`,
     SEARCH=`SEARCH`,
-    ANALYTICS='ANALYTICS'
+    ANALYTICS='ANALYTICS',
+    TOPIC='TOPIC'
 }
 
 export type Categories = Array<Category>;
@@ -48,6 +49,13 @@ export function goToAnalyticsPanel() {
     return {
         type: CategoryActionsType.SET_CATEGORY,
         category: Category.ANALYTICS
+    }
+}
+
+export function goToTopicPanel() {
+    return {
+        type: CategoryActionsType.SET_CATEGORY,
+        category: Category.TOPIC
     }
 }
 
