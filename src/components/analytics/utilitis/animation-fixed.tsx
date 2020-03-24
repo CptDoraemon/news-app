@@ -21,13 +21,15 @@ const useStyles = makeStyles(theme => ({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
+        willChange: 'transform',
         // backgroundColor: 'rgba(255,0,0,0.5)'
     },
     children: {
         width: '100%',
         position: 'absolute',
         zIndex: 1,
-        minHeight: 800
+        minHeight: 800,
+        willChange: 'transform'
     },
     childrenSize: {
         width: '100%'
@@ -70,18 +72,18 @@ const AnimationFixed: React.FC<AnimationFixedProps> = ({children}) => {
             // const percentage = (window.scrollY - target.start + window.innerHeight) / (target.end - target.start + window.innerHeight); // window.scrollY subtract isBefore and isAfter
             // childrenRef.current.style.transform = `translateY(${-(0.5 - percentage) * (window.innerHeight - 110)}px)`;
             const offset = placeholderRef.current.getBoundingClientRect().top;
-            childrenRef.current.style.top = `${offset}px`;
-            fixedWrapperRef.current.style.top = `${offset}px`;
+            childrenRef.current.style.transform = `translateY(${offset}px)`;
+            fixedWrapperRef.current.style.transform = `translateY(${offset}px)`;
             if (isFrozen) {
                 setIsFrozen(false);
             }
         } else if (isBefore) {
             if (!isFrozen) return;
-            fixedWrapperRef.current.style.top = `${window.scrollY + placeholderRef.current.getBoundingClientRect().top}px`;
+            fixedWrapperRef.current.style.transform = `translateY(${window.scrollY + placeholderRef.current.getBoundingClientRect().top}px)`;
             setIsFrozen(true);
         } else if (isAfter) {
             if (!isFrozen) return;
-            fixedWrapperRef.current.style.top = `${window.scrollY + placeholderRef.current.getBoundingClientRect().bottom}px`;
+            fixedWrapperRef.current.style.transform = `translateY(${window.scrollY + placeholderRef.current.getBoundingClientRect().bottom}px)`;
             setIsFrozen(true);
         }
     };
@@ -96,7 +98,7 @@ const AnimationFixed: React.FC<AnimationFixedProps> = ({children}) => {
             left: `${childrenRef.current.getBoundingClientRect().left}px`
         });
         scrollHandler();
-    }, [dimension, isFrozen]);
+    }, [dimension]);
 
     useEffect(() => {
         // wait until dimension is set
@@ -113,7 +115,7 @@ const AnimationFixed: React.FC<AnimationFixedProps> = ({children}) => {
     useEffect(() => {
         document.addEventListener('scroll', scrollHandler);
         return () => document.removeEventListener('scroll', scrollHandler);
-    }, [target]);
+    }, [target, isFrozen]);
 
     const fixedWrapperStyle: CSSProperties = {
         left: dimension.left,
