@@ -40,8 +40,8 @@ const DocumentsByCategoryBarChart: React.FC<DocumentsByCategoryBarChartProps> = 
 
     return (
         <>
-            <Title value={'News achieved by category'} />
-            <Content value={`Overall I'd say the news are pretty balanced.`}/>
+            <Title value={'News archived by category'} />
+            <Content value={`Overall I'd say the news are pretty well balanced.`}/>
             <div id='analytics-documents-count-by-category' ref={ref}/>
         </>
     )

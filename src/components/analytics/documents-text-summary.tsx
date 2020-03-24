@@ -57,15 +57,15 @@ const DocumentsTextSummary = React.forwardRef<HTMLDivElement, DocumentsTextSumma
         <>
             <div className={classes.root} style={{minHeight: `${fullHeight}px`}}>
                 <div className={classes.section}>
-                    { title('Total news articles achieved') }
+                    { title('Total news articles archived') }
                     <p className={classes.number}>{total.countUp}</p>
                 </div>
                 <div className={classes.section}>
-                    { title('First news article achieved') }
+                    { title('First news article archived') }
                     { date(+earliest.countUp) }
                 </div>
                 <div className={classes.section}>
-                    { title('Most recent news article achieved') }
+                    { title('Most recent news article archived') }
                     { date(+latest.countUp) }
                 </div>
                 <div ref={forwardedRef}> </div>
