@@ -70,18 +70,18 @@ const AnimationFixed: React.FC<AnimationFixedProps> = ({children}) => {
             // const percentage = (window.scrollY - target.start + window.innerHeight) / (target.end - target.start + window.innerHeight); // window.scrollY subtract isBefore and isAfter
             // childrenRef.current.style.transform = `translateY(${-(0.5 - percentage) * (window.innerHeight - 110)}px)`;
             const offset = placeholderRef.current.getBoundingClientRect().top;
-            childrenRef.current.style.transform = `translateY(${offset}px)`;
-            fixedWrapperRef.current.style.transform = `translateY(${offset}px)`;
+            childrenRef.current.style.top = `${offset}px`;
+            fixedWrapperRef.current.style.top = `${offset}px`;
             if (isFrozen) {
                 setIsFrozen(false);
             }
         } else if (isBefore) {
             if (!isFrozen) return;
-            fixedWrapperRef.current.style.transform = `translateY(${window.scrollY + placeholderRef.current.getBoundingClientRect().top}px)`;
+            fixedWrapperRef.current.style.top = `${window.scrollY + placeholderRef.current.getBoundingClientRect().top}px`;
             setIsFrozen(true);
         } else if (isAfter) {
             if (!isFrozen) return;
-            fixedWrapperRef.current.style.transform = `translateY(${window.scrollY + placeholderRef.current.getBoundingClientRect().bottom}px)`;
+            fixedWrapperRef.current.style.top = `${window.scrollY + placeholderRef.current.getBoundingClientRect().bottom}px`;
             setIsFrozen(true);
         }
     };
@@ -96,7 +96,7 @@ const AnimationFixed: React.FC<AnimationFixedProps> = ({children}) => {
             left: `${childrenRef.current.getBoundingClientRect().left}px`
         });
         scrollHandler();
-    }, [dimension]);
+    }, [dimension, isFrozen]);
 
     useEffect(() => {
         // wait until dimension is set
