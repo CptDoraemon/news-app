@@ -2,6 +2,7 @@ import React, {useEffect, useRef, useState} from "react";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import WorldMapD3 from "../../d3-charts/world-map-d3";
 import useTheme from "@material-ui/core/styles/useTheme";
+import {CovidCaseData} from "./topic-covid19-data";
 
 const id = 'topic-covid19-map';
 
@@ -30,9 +31,11 @@ const TopicCovid19Map: React.FC<TopicCovid19MapProps> = () => {
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (!containerRef.current) return;
-        const map = new WorldMapD3(id, containerRef.current.getBoundingClientRect().width, theme.palette.secondary.main);
-        map.main();
+        import('./topic-covid19-data').then((module) => {
+            if (!containerRef.current) return;
+            const map = new WorldMapD3(id, containerRef.current.getBoundingClientRect().width, theme.palette.secondary.main, module.default);
+            map.main();
+        });
     }, []);
 
     return (
