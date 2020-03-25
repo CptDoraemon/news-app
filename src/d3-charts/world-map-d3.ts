@@ -52,7 +52,19 @@ class WorldMapD3 {
     references: {
         svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null,
         mapPaths: d3.Selection<SVGPathElement, d3.ExtendedFeature<d3.GeoGeometryObjects, FeatureProperties>, SVGGElement, any> | null,
-        dateText: d3.Selection<SVGTextElement, unknown, HTMLElement, any> | null
+        dateText: d3.Selection<SVGTextElement, unknown, HTMLElement, any> | null,
+        tooltip: {
+            bg: d3.Selection<SVGRectElement, unknown, HTMLElement, any>,
+            tooltip: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
+            tspanCountry: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
+            tspanDate: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
+            tspanCaseAccumulative: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
+            tspanDeathAccumulative: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
+            tspanRecoveredAccumulative: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
+            tspanCaseNew: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
+            tspanDeathNew: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
+            tspanRecoveredNew: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
+        } | null
     };
     state: {
         time: number,
@@ -71,7 +83,8 @@ class WorldMapD3 {
         this.references = {
             svg: null,
             mapPaths: null,
-            dateText: null
+            dateText: null,
+            tooltip: null
         };
         this.state = {
             time: 0,
@@ -145,6 +158,126 @@ class WorldMapD3 {
         // .style('background-color', 'rgba(255,0,0,0.5');
     }
 
+    initTooltip() {
+        if (!this.references.svg) return;
+        const tooltipG = this.references.svg.append('g');
+        const bg = tooltipG.append('rect');
+        const tooltip = tooltipG.append('text');
+        const tspanCountry = tooltip.append('tspan');
+        const tspanDate = tooltip.append('tspan');
+        const tspanCaseAccumulative = tooltip.append('tspan');
+        const tspanCaseNew = tooltip.append('tspan');
+        const tspanDeathAccumulative = tooltip.append('tspan');
+        const tspanDeathNew = tooltip.append('tspan');
+        const tspanRecoveredAccumulative = tooltip.append('tspan');
+        const tspanRecoveredNew = tooltip.append('tspan');
+
+        tooltip
+            .style('font-weight', 700)
+            .style('font-size', '0.875rem')
+            .style('fill', '#fff')
+            .attr("text-anchor", "middle")
+        // tspanCountry
+        // tspanDate
+        // tspanCaseAccumulative
+        // tspanDeathAccumulative
+        // tspanRecoveredAccumulative
+        tspanCaseNew
+            .style('fill', '#ffa726')
+        tspanDeathNew
+            .style('fill', '#ef5350')
+        tspanRecoveredNew
+            .style('fill', '#66bb6a')
+
+        bg
+            .style('fill', 'rgba(0,0,0,0.8)')
+            .attr('rx', '5px');
+
+        this.references.tooltip = {
+            bg,
+            tooltip,
+            tspanCountry,
+            tspanDate,
+            tspanCaseAccumulative,
+            tspanDeathAccumulative,
+            tspanRecoveredAccumulative,
+            tspanCaseNew,
+            tspanDeathNew,
+            tspanRecoveredNew
+        };
+
+        this.updateTooltip(200, 200, {
+            country: 'country',
+            date: 'date',
+            caseAccumulative: 1,
+            deathAccumulative: 2,
+            recoveredAccumulative: 3,
+            caseNew: 11,
+            deathNew: 22,
+            recoveredNew: 33
+        })
+
+    }
+
+    updateTooltip(
+        inputX: number,
+        inputY: number,
+        data: {
+            country: string,
+            date: string,
+            caseAccumulative: number,
+            deathAccumulative: number,
+            recoveredAccumulative: number,
+            caseNew: number,
+            deathNew: number,
+            recoveredNew: number
+        }
+    ) {
+        if (!this.references.tooltip) return;
+
+        this.references.tooltip.tspanCountry.text(data.country);
+        this.references.tooltip.tspanDate.text(data.date);
+        this.references.tooltip.tspanCaseAccumulative.text(`Confirmed: ${data.caseAccumulative}`);
+        this.references.tooltip.tspanCaseNew.text(data.caseNew >= 0 ? ` (+${data.caseNew})` : ` (${data.caseNew})`);
+        this.references.tooltip.tspanDeathAccumulative.text(`Death: ${data.deathAccumulative}`);
+        this.references.tooltip.tspanDeathNew.text(data.deathNew >= 0 ? ` (+${data.deathNew})` : ` (${data.deathNew})`);
+        this.references.tooltip.tspanRecoveredAccumulative.text(`Recovered: ${data.recoveredAccumulative}`);
+        this.references.tooltip.tspanRecoveredNew.text(data.recoveredNew >= 0 ? ` (+${data.recoveredNew})` : ` (${data.recoveredNew})`);
+
+        const bBox = this.references.tooltip.tooltip.node()?.getBBox();
+        if (!bBox) return;
+        const p = 0.2;
+        const x = inputX - bBox.width*0.5*(1+0.5*p);
+        const y = inputY;
+
+        this.references.tooltip.tooltip
+            .attr('x', x)
+            .attr('y', y)
+        this.references.tooltip.tspanCountry
+            .attr('x', x)
+            .attr('dy', 0)
+        this.references.tooltip.tspanDate
+            .attr('x', x)
+            .attr('dy', '1rem')
+        this.references.tooltip.tspanCaseAccumulative
+            .attr('x', x)
+            .attr('dy', '1rem')
+
+        this.references.tooltip.tspanDeathAccumulative
+            .attr('x', x)
+            .attr('dy', '1rem')
+
+        this.references.tooltip.tspanRecoveredAccumulative
+            .attr('x', x)
+            .attr('dy', '1rem')
+
+        this.references.tooltip.bg
+            .attr('x', x - bBox.width*(1+p)*0.5)
+            .attr('y', inputY - p*bBox.height)
+            .attr('width', bBox.width * (1+p))
+            .attr('height', bBox.height * (1+p))
+    }
+
     initMap() {
         if (!this.data.aggregate || !this.references.svg) return;
 
@@ -181,7 +314,7 @@ class WorldMapD3 {
     }
 
     startTimeLapse() {
-        const gap = 1000;
+        const gap = 500;
         const caseMaxLog = Math.log(this.data.caseMax);
         const emptyColor = this.color.getMapColor(0);
 
@@ -222,11 +355,47 @@ class WorldMapD3 {
         updateState();
     }
 
+    appendMouseEvent() {
+        if (!this.references.mapPaths) return;
+        const thisClass = this;
+        this.references.mapPaths.on('mouseover', function(d) {
+            const bBox = this.getBBox();
+            const x = bBox.x;
+            const y = bBox.y;
+            const time = thisClass.state.time;
+            const date = new Date(thisClass.data.case.series[thisClass.state.time]);
+            thisClass.updateTooltip(x, y, {
+                country: d.properties.name,
+                date: `${date.getDate()} ${thisClass.monthStrings[date.getMonth()]}, ${date.getFullYear()}`,
+                caseAccumulative: d.properties.case ? d.properties.case.cases[time] : 0,
+                deathAccumulative: d.properties.case ? d.properties.case.deaths[time] : 0,
+                recoveredAccumulative: d.properties.case ? d.properties.case.recovered[time] : 0,
+                caseNew: !d.properties.case ? 0 : time === 0 ? 0 : d.properties.case.cases[time] - d.properties.case.cases[time-1],
+                deathNew: !d.properties.case ? 0 : time === 0 ? 0 : d.properties.case.deaths[time] - d.properties.case.deaths[time-1],
+                recoveredNew: !d.properties.case ? 0 : time === 0 ? 0 : d.properties.case.recovered[time] - d.properties.case.recovered[time-1],
+            })
+        })
+            .on('mouseleave', function(d) {
+                thisClass.updateTooltip(-1000, -1000, {
+                    country: '',
+                    date: ``,
+                    caseAccumulative: 0,
+                    deathAccumulative: 0,
+                    recoveredAccumulative: 0,
+                    caseNew: 0,
+                    deathNew: 0,
+                    recoveredNew: 0,
+                })
+            })
+    }
+
     async main() {
         try {
             await this.getData();
             this.initSvg();
             this.initMap();
+            this.initTooltip();
+            this.appendMouseEvent();
             setTimeout(() => this.startTimeLapse(), 4000);
         } catch (e) {
             console.log(e);
