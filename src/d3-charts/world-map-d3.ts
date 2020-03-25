@@ -1,15 +1,19 @@
 import * as d3 from "d3";
-import {WorldMapData} from "./world-map-data";
 
 class WorldMapD3 {
     id: string;
     dimension: {
-        width: number,
-        height: number
+        svgWidth: number,
+        svgHeight: number,
+        m: {t: number, r: number, b: number, l: number},
+        mapX: number,
+        mapY: number
+        mapWidth: number,
+        mapHeight: number
     };
     themeColor: string;
     data: {
-        map: WorldMapData | null
+        map: d3.ExtendedFeatureCollection | null
     };
 
     constructor(id: string, width: number, themeColor: string) {
@@ -22,15 +26,21 @@ class WorldMapD3 {
     }
 
     getDimension(width: number) {
+        const svgWidth = width;
+        const svgHeight = Math.min(width / 2, window.innerHeight * 0.7);
+        const m = {t: 0, r: 10, b: 0, l: 10};
         return {
-            width: width,
-            height: width / 2
+            svgWidth,
+            svgHeight,
+            m,
+            mapX: m.l,
+            mapY: m.t,
+            mapWidth: svgWidth - m.l - m.r,
+            mapHeight: svgHeight - m.t - m.b
         }
     }
 
     getData() {
-        console.log('called');
-        // @ts-ignore
         import('./world-map-data')
             .then((module) => {
                 const data = module.default;
@@ -41,19 +51,18 @@ class WorldMapD3 {
 
                 const svg = d3.select(`#${this.id}`)
                     .append('svg')
-                    .attr('width', this.dimension.width)
-                    .attr('height', this.dimension.height);
+                    .attr('width', this.dimension.svgWidth)
+                    .attr('height', this.dimension.svgHeight)
+                    // .style('background-color', 'rgba(255,0,0,0.5');
 
                 const projection = d3.geoNaturalEarth1()
-                    // .scale(width / 1.3 / Math.PI)
-                    // .translate([width / 2, height / 2]);
+                    .fitExtent([[this.dimension.mapX, this.dimension.mapY], [this.dimension.mapWidth, this.dimension.mapHeight]], data);
 
                 svg.append("g")
                     .selectAll("path")
                     .data(data.features)
                     .enter().append("path")
                     .attr("fill", this.themeColor)
-                    // @ts-ignore
                     .attr("d", d3.geoPath()
                         .projection(projection)
                     )

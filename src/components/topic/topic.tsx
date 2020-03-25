@@ -33,8 +33,9 @@ const Topic: React.FC<TopicProps> = () => {
 
     return (
         <div className={classes.root}>
+            <TopicCovid19Map/>
+
             <div className={classes.widthWrapper}>
-                <TopicCovid19Map/>
             </div>
         </div>
     )
