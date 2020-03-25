@@ -19,14 +19,20 @@ export interface CovidCaseData {
 
 interface FeatureProperties {
     name: string,
-    case?: {
+    case: {
         cases: number[],
         deaths: number[],
         recovered: number[],
-    }
+    } | null
 }
 
 class WorldMapD3 {
+    color = {
+        red: '#ef5350',
+        getMapColor: (percentage: number) => `rgba(255, 166, 0, ${percentage.toFixed(1)})`,
+        grey: "#eee"
+    };
+    monthStrings = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     id: string;
     dimension: {
         svgWidth: number,
@@ -39,12 +45,18 @@ class WorldMapD3 {
     };
     themeColor: string;
     data: {
-        map: d3.ExtendedFeatureCollection | null,
-        case: CovidCaseData
+        aggregate: d3.ExtendedFeatureCollection<d3.ExtendedFeature<d3.GeoGeometryObjects, FeatureProperties>> | null,
+        case: CovidCaseData,
+        caseMax: number
     };
     references: {
         svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null,
-        mapPaths: d3.Selection<SVGPathElement, d3.ExtendedFeature, SVGGElement, any> | null,
+        mapPaths: d3.Selection<SVGPathElement, d3.ExtendedFeature<d3.GeoGeometryObjects, FeatureProperties>, SVGGElement, any> | null,
+        dateText: d3.Selection<SVGTextElement, unknown, HTMLElement, any> | null
+    };
+    state: {
+        time: number,
+        timeMax: number
     };
 
     constructor(id: string, width: number, themeColor: string, caseData: CovidCaseData) {
@@ -52,12 +64,18 @@ class WorldMapD3 {
         this.dimension = this.getDimension(width);
         this.themeColor = themeColor;
         this.data = {
-            map: null,
-            case: caseData
+            aggregate: null,
+            case: caseData,
+            caseMax: 0
         };
         this.references = {
             svg: null,
-            mapPaths: null
+            mapPaths: null,
+            dateText: null
+        };
+        this.state = {
+            time: 0,
+            timeMax: 0
         }
     }
 
@@ -79,13 +97,21 @@ class WorldMapD3 {
     async getData() {
         try {
             const module = await import('./world-map-data');
-            const mapData = module.default;
-            mapData.features.forEach(obj => {
+            let caseMax = 0;
+            const mapData: any = module.default;
+            mapData.features.forEach((obj: any) => {
                 if (!obj.properties) return;
-                obj.properties.case = Object.assign({}, this.data.case.countries[obj.properties.name])
+                obj.properties.case = this.data.case.countries[obj.properties.name] ?
+                    Object.assign({}, this.data.case.countries[obj.properties.name]) :
+                    null;
+
+                this.data.case.countries[obj.properties.name]?.cases.forEach(num => {
+                    if (num > caseMax) caseMax = num
+                })
             });
-            this.data.map = mapData;
-            console.log(mapData);
+            this.data.aggregate = mapData;
+            this.data.caseMax = caseMax;
+            this.state.timeMax = this.data.case.series.length - 1;
 
             // const casesCountries = Object.keys(this.data.case.countries).sort((a, b) => a.localeCompare(b));
             // const mapCountries = this.data.map.features.map(obj=>obj.properties!.name).sort((a, b) => a.localeCompare(b));
@@ -120,20 +146,21 @@ class WorldMapD3 {
     }
 
     initMap() {
-        if (!this.data.map) return;
+        if (!this.data.aggregate || !this.references.svg) return;
 
         const projection = d3.geoNaturalEarth1()
-            .fitExtent([[this.dimension.mapX, this.dimension.mapY], [this.dimension.mapWidth, this.dimension.mapHeight]], this.data.map);
+            .fitExtent([[this.dimension.mapX, this.dimension.mapY], [this.dimension.mapWidth, this.dimension.mapHeight]], this.data.aggregate);
 
-        this.references.mapPaths = this.references.svg!.append("g")
+        this.references.mapPaths = this.references.svg.append("g")
             .selectAll("path")
-            .data(this.data.map.features)
+            .data(this.data.aggregate.features)
             .enter().append("path")
-            .attr("fill", "#eee")
+            .attr("fill", this.color.grey)
             .attr("d", d3.geoPath()
                 .projection(projection)
             )
             .style("stroke", "#222")
+            .style("stroke-width", this.dimension.svgWidth >= 1000 ? 1 : 0.5)
             .style('opacity', 0)
             .style('transform', 'scale(5)')
             .style('transform-origin', '50% 50%');
@@ -143,6 +170,56 @@ class WorldMapD3 {
             .duration(1000)
             .style('opacity', 1)
             .style('transform', 'scale(1)');
+
+        this.references.dateText = this.references.svg.append("g").append("text")
+            .attr('x', this.dimension.svgWidth * 0.5)
+            .attr('y', this.dimension.svgWidth >= 1000 ? this.dimension.svgHeight - 30 : this.dimension.svgHeight - 15)
+            .attr('font-size', this.dimension.svgWidth >= 1000 ? '2rem' : '0.875rem')
+            .attr('font-weight', 700)
+            .attr('text-anchor', 'middle')
+        ;
+    }
+
+    startTimeLapse() {
+        const gap = 1000;
+        const caseMaxLog = Math.log(this.data.caseMax);
+        const emptyColor = this.color.getMapColor(0);
+
+        const updateMap = () => {
+            if (!this.references.mapPaths) return;
+            this.references.mapPaths
+                .style('fill', (d) => {
+                    if (!d.properties.case) {
+                        // no data
+                        return emptyColor
+                    } else {
+                        const currentCases = d.properties.case.cases[this.state.time];
+                        if (currentCases < 1) {
+                            return emptyColor
+                        } else {
+                            return this.color.getMapColor(Math.log(currentCases) / caseMaxLog)
+                        }
+                    }
+                })
+        };
+
+        const updateDateText = () => {
+            const date = new Date(this.data.case.series[this.state.time]);
+            this.references.dateText?.text(`${date.getDate()} ${this.monthStrings[date.getMonth()]}, ${date.getFullYear()}`)
+        };
+
+        const updateState = () => {
+            if (this.state.time <= this.state.timeMax) {
+                updateMap();
+                updateDateText();
+                if (this.state.time < this.state.timeMax) {
+                    this.state.time++;
+                    setTimeout(updateState, gap)
+                }
+            }
+        };
+
+        updateState();
     }
 
     async main() {
@@ -150,6 +227,7 @@ class WorldMapD3 {
             await this.getData();
             this.initSvg();
             this.initMap();
+            setTimeout(() => this.startTimeLapse(), 4000);
         } catch (e) {
             console.log(e);
         }
