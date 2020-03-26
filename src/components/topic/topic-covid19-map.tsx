@@ -29,17 +29,18 @@ const TopicCovid19Map: React.FC<TopicCovid19MapProps> = () => {
     const classes = useStyles();
     const theme = useTheme();
     const containerRef = useRef<HTMLDivElement>(null);
+    const height = window.innerHeight - 300;
 
     useEffect(() => {
-        import('./topic-covid19-data').then((module) => {
+        import('./topic-covid19-data').then((dataFile) => {
             if (!containerRef.current) return;
-            const map = new WorldMapD3(id, containerRef.current.getBoundingClientRect().width, theme.palette.secondary.main, module.default);
+            const map = new WorldMapD3(id, containerRef.current.getBoundingClientRect().width, containerRef.current.getBoundingClientRect().height, theme.palette.secondary.main, dataFile.default);
             map.main();
         });
     }, []);
 
     return (
-        <div className={classes.root} ref={containerRef}>
+        <div className={classes.root} ref={containerRef} style={{height: `${height}px`}}>
             <div id={id}> </div>
         </div>
     )

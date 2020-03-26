@@ -127,9 +127,9 @@ class WorldMapD3 {
         timeoutID: number | null
     };
 
-    constructor(id: string, width: number, themeColor: string, caseData: CovidCaseData) {
+    constructor(id: string, width: number, height: number, themeColor: string, caseData: CovidCaseData) {
         this.id = id;
-        this.dimension = this.getDimension(width);
+        this.dimension = this.getDimension(width, height);
         this.themeColor = themeColor;
         this.data = {
             aggregate: null,
@@ -165,9 +165,9 @@ class WorldMapD3 {
         }
     }
 
-    getDimension(width: number) {
+    getDimension(width: number, height: number) {
         const svgWidth = width;
-        const svgHeight = window.innerHeight - 300;
+        const svgHeight = height;
         const m = {t: 0, r: 10, b: 100, l: 10};
         return {
             svgWidth,
