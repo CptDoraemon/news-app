@@ -23,6 +23,13 @@ const useStyles = makeStyles(theme => ({
             width: '100%'
         }
     },
+    heading: {
+        fontFamily: 'Open Sans,sans-serif',
+        fontSize: '1.25rem',
+        textTransform: 'capitalize',
+        color: theme.palette.primary.main,
+        margin: theme.spacing(0,0,2,0)
+    }
 }));
 
 interface TopicProps {
@@ -36,9 +43,7 @@ const Topic: React.FC<TopicProps> = () => {
     return (
         <div className={classes.root}>
             <div className={classes.widthWrapper}>
-                <Typography variant={'h5'} component={'h1'}>
-                    <Box fontWeight={700} pb={2}>The spread of COVID-19</Box>
-                </Typography>
+                <h1 className={classes.heading}>The spread of COVID-19</h1>
             </div>
             <TopicCovid19Map/>
             <div className={classes.widthWrapper}>

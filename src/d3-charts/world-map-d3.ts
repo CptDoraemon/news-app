@@ -29,29 +29,33 @@ interface FeatureProperties {
 class WorldMapD3 {
     color = {
         red: '#ef5350',
-        getMapColor: (percentage: number) => `rgba(255, 166, 0, ${percentage.toFixed(1)})`,
+        transparent: 'rgba(0,0,0,0)',
+        getMapColor: (percentage: number) => `rgba(55, 76, 128, ${percentage.toFixed(1)})`,
         grey: "#eee",
         mapStrokeNormal: '#aaa',
         mapStrokeHoverHighlight: '#222',
-        mapStrokeHoverDim: 'rgba(0,0,0,0)',
         case: '#ffa726',
         death: '#ef5350',
-        recovered: '#66bb6a'
+        recovered: '#66bb6a',
+        timeBarHighlight: '#7a5195',
+        timeBarNormal: 'rgba(122, 81, 149, 0.6)',
+        timeBarLight: 'rgba(122, 81, 149, 0.2)'
     };
     monthStrings = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     getStrokeWidth = () => this.dimension.svgWidth >= 1000 ? 1 : 0.5;
     animations = {
-      zoomIn: {
+        zoomIn: {
           delay: 0,
           duration: 3000,
-      },
-      changeMapColor: {
+        },
+        changeMapColor: {
           delay: 3000,
           duration: 1000,
-      },
-      timeLapse: {
+        },
+        timeLapse: {
           delay: 4000,
-      }
+        },
+        timeLapseGap: 500
     };
     id: string;
     dimension: {
@@ -72,7 +76,6 @@ class WorldMapD3 {
     references: {
         svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null,
         mapPaths: d3.Selection<SVGPathElement, d3.ExtendedFeature<d3.GeoGeometryObjects, FeatureProperties>, SVGGElement, any> | null,
-        dateText: d3.Selection<SVGTextElement, unknown, HTMLElement, any> | null,
         tooltip: {
             bg: d3.Selection<SVGRectElement, unknown, HTMLElement, any>,
             tooltipGroup: d3.Selection<SVGGElement, unknown, HTMLElement, any>
@@ -88,7 +91,15 @@ class WorldMapD3 {
             caseLineChart: d3.Selection<SVGPathElement, unknown | [number, number][], HTMLElement, any>,
             deathLineChart: d3.Selection<SVGPathElement, unknown | [number, number][], HTMLElement, any>,
             recoveredLineChart: d3.Selection<SVGPathElement, unknown | [number, number][], HTMLElement, any>,
+        } | null,
+        timeControl: {
+            group: d3.Selection<SVGGElement, unknown, HTMLElement, any>,
+            dateText: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
+            timeBar: d3.Selection<SVGRectElement, string, SVGGElement, any>,
         } | null
+    };
+    scales: {
+        timeBarXScale: d3.ScaleBand<string>
     };
     state: {
         time: number,
@@ -108,6 +119,10 @@ class WorldMapD3 {
             }
         }
     };
+    timeLapse: {
+        isAutoPlaying: boolean,
+        timeoutID: number | null
+    };
 
     constructor(id: string, width: number, themeColor: string, caseData: CovidCaseData) {
         this.id = id;
@@ -121,8 +136,11 @@ class WorldMapD3 {
         this.references = {
             svg: null,
             mapPaths: null,
-            dateText: null,
-            tooltip: null
+            tooltip: null,
+            timeControl: null
+        };
+        this.scales = {
+            timeBarXScale: d3.scaleBand()
         };
         this.state = {
             time: 0,
@@ -137,13 +155,17 @@ class WorldMapD3 {
                     case: undefined
                 }
             }
+        };
+        this.timeLapse = {
+            isAutoPlaying: true,
+            timeoutID: null
         }
     }
 
     getDimension(width: number) {
         const svgWidth = width;
-        const svgHeight = Math.min(width / 2, window.innerHeight - 300);
-        const m = {t: 0, r: 10, b: 0, l: 10};
+        const svgHeight = window.innerHeight - 300;
+        const m = {t: 0, r: 10, b: 100, l: 10};
         return {
             svgWidth,
             svgHeight,
@@ -456,61 +478,125 @@ class WorldMapD3 {
             .style('fill', this.color.getMapColor(0))
     }
 
-    initDateText() {
+    initTimeControl() {
         if (!this.references.svg) return;
-        this.references.dateText = this.references.svg.append("g").append("text")
-            .attr('x', this.dimension.svgWidth * 0.5)
-            .attr('y', this.dimension.svgWidth >= 1000 ? this.dimension.svgHeight - 30 : this.dimension.svgHeight - 15)
-            .attr('font-size', this.dimension.svgWidth >= 1000 ? '1.5rem' : '0.875rem')
+        const dateArray = this.data.case.series;
+        this.scales.timeBarXScale = d3.scaleBand()
+            .domain(dateArray)
+            .range([0.2*this.dimension.svgWidth, 0.8*this.dimension.svgWidth]);
+
+        const group = this.references.svg.append("g");
+        const dateText = group.append("text")
+            .attr('x', 0.2*this.dimension.svgWidth)
+            .attr('y', this.dimension.svgHeight - this.dimension.m.b + 16)
+            .attr('font-size', '16px')
             .attr('font-weight', 700)
-            .attr('text-anchor', 'middle')
-        ;
+            .style('fill', this.color.timeBarHighlight);
+        const timeBar = group
+            .selectAll('rect')
+            .data(dateArray)
+            .enter()
+            .append('rect')
+            .style('fill', this.color.timeBarLight)
+            .style('cursor', 'pointer')
+            // .style('stroke', this.color.timeBarLight)
+            // .style('stroke-width', 1)
+            .attr('y', this.dimension.svgHeight - this.dimension.m.b + 20)
+            .attr('x', (d) => `${this.scales.timeBarXScale(d)}`)
+            .attr('width', this.scales.timeBarXScale.bandwidth())
+            .attr('height', 10)
+            .style('opacity', 0);
+        timeBar.transition()
+            .delay(2000)
+            .duration(1000)
+            .style('opacity', 1);
+
+        this.references.timeControl = {
+            group,
+            dateText,
+            timeBar
+        };
     }
 
-    startTimeLapse() {
-        const gap = 500;
+    updateTimeControl() {
+        if (!this.references.timeControl) return;
+
+        const currentT = this.state.time;
+        const date = new Date(this.data.case.series[currentT]);
+        this.references.timeControl.dateText.text(`${date.getDate()} ${this.monthStrings[date.getMonth()]}, ${date.getFullYear()}`)
+
+        this.references.timeControl.timeBar
+            .style('fill', (d, i) => i <= this.state.time ? this.color.timeBarNormal : this.color.timeBarLight)
+            // .style('stroke', this.color.transparent)
+        this.references.timeControl.timeBar.filter((d, i) => i === this.state.time)
+            .transition()
+            .duration(this.animations.timeLapseGap)
+            .attrTween('width', (d) => (t: number) => `${t*this.scales.timeBarXScale.bandwidth()}px`)
+            .ease(d3.easeLinear)
+    }
+
+    updateMap() {
         const caseMaxLog = Math.log(this.data.caseMax);
         const emptyColor = this.color.getMapColor(0);
 
-        const updateMap = () => {
-            if (!this.references.mapPaths) return;
-            this.references.mapPaths
-                .style('fill', (d) => {
-                    if (!d.properties.case) {
-                        // no data
+        if (!this.references.mapPaths) return;
+        this.references.mapPaths
+            .style('fill', (d) => {
+                if (!d.properties.case) {
+                    // no data
+                    return emptyColor
+                } else {
+                    const currentCases = d.properties.case.cases[this.state.time];
+                    if (currentCases < 1) {
                         return emptyColor
                     } else {
-                        const currentCases = d.properties.case.cases[this.state.time];
-                        if (currentCases < 1) {
-                            return emptyColor
-                        } else {
-                            return this.color.getMapColor(Math.log(currentCases) / caseMaxLog)
-                        }
+                        return this.color.getMapColor(Math.log(currentCases) / caseMaxLog)
                     }
-                })
-        };
-
-        const updateDateText = () => {
-            const date = new Date(this.data.case.series[this.state.time]);
-            this.references.dateText?.text(`${date.getDate()} ${this.monthStrings[date.getMonth()]}, ${date.getFullYear()}`)
-        };
-
-        const updateState = () => {
-            if (this.state.time <= this.state.timeMax) {
-                updateMap();
-                updateDateText();
-                this.updateTooltip();
-                if (this.state.time < this.state.timeMax) {
-                    this.state.time++;
-                    setTimeout(updateState, gap)
                 }
+            })
+    }
+
+    setTimeState(time: number) {
+        this.state.time = time;
+        this.updateMap();
+        this.updateTimeControl();
+        this.updateTooltip();
+    }
+
+    startTimeLapse() {
+        const tick = () => {
+            if (!this.timeLapse.isAutoPlaying) return;
+            if (this.state.time < this.state.timeMax) {
+                this.setTimeState(this.state.time+1);
+                this.timeLapse.timeoutID = window.setTimeout(tick, this.animations.timeLapseGap)
             }
         };
 
-        updateState();
+        tick();
     }
 
-    appendMouseEvent() {
+    appendTimeBarMouseEvent() {
+        if (!this.references.timeControl) return;
+
+        const thisClass = this;
+        this.references.timeControl.timeBar
+            .on('mouseover', function() {
+            d3.select(this).style('fill', thisClass.color.timeBarHighlight)
+            })
+            .on('mouseleave', function(d, i) {
+                d3.select(this).style('fill', i <= thisClass.state.time ? thisClass.color.timeBarNormal : thisClass.color.timeBarLight)
+            })
+            .on('click', function(d, i) {
+                thisClass.timeLapse.isAutoPlaying = false;
+                if (thisClass.timeLapse.timeoutID) {
+                    clearTimeout(thisClass.timeLapse.timeoutID);
+                    thisClass.timeLapse.timeoutID = null;
+                }
+                thisClass.setTimeState(i)
+            })
+    }
+
+    appendMapPathMouseEvent() {
         if (!this.references.mapPaths) return;
         const thisClass = this;
         this.references.mapPaths.on('mouseover', function(d) {
@@ -603,10 +689,11 @@ class WorldMapD3 {
             await this.getData();
             this.initSvg();
             this.initMap();
-            this.initDateText();
+            this.initTimeControl();
             this.initTooltip();
             this.mapZoomIn();
-            this.appendMouseEvent();
+            this.appendMapPathMouseEvent();
+            this.appendTimeBarMouseEvent();
             setTimeout(
                 () => {
                     this.startTimeLapse()
