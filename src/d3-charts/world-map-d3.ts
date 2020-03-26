@@ -34,6 +34,9 @@ class WorldMapD3 {
         mapStrokeNormal: '#aaa',
         mapStrokeHoverHighlight: '#222',
         mapStrokeHoverDim: 'rgba(0,0,0,0)',
+        case: '#ffa726',
+        death: '#ef5350',
+        recovered: '#66bb6a'
     };
     monthStrings = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     getStrokeWidth = () => this.dimension.svgWidth >= 1000 ? 1 : 0.5;
@@ -72,6 +75,7 @@ class WorldMapD3 {
         dateText: d3.Selection<SVGTextElement, unknown, HTMLElement, any> | null,
         tooltip: {
             bg: d3.Selection<SVGRectElement, unknown, HTMLElement, any>,
+            tooltipGroup: d3.Selection<SVGGElement, unknown, HTMLElement, any>
             tooltip: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
             tspanCountry: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
             tspanDate: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
@@ -81,6 +85,9 @@ class WorldMapD3 {
             tspanCaseNew: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
             tspanDeathNew: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
             tspanRecoveredNew: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
+            caseLineChart: d3.Selection<SVGPathElement, unknown | [number, number][], HTMLElement, any>,
+            deathLineChart: d3.Selection<SVGPathElement, unknown | [number, number][], HTMLElement, any>,
+            recoveredLineChart: d3.Selection<SVGPathElement, unknown | [number, number][], HTMLElement, any>,
         } | null
     };
     state: {
@@ -135,7 +142,7 @@ class WorldMapD3 {
 
     getDimension(width: number) {
         const svgWidth = width;
-        const svgHeight = Math.min(width / 2, window.innerHeight * 0.7);
+        const svgHeight = Math.min(width / 2, window.innerHeight - 300);
         const m = {t: 0, r: 10, b: 0, l: 10};
         return {
             svgWidth,
@@ -201,9 +208,9 @@ class WorldMapD3 {
 
     initTooltip() {
         if (!this.references.svg) return;
-        const tooltipG = this.references.svg.append('g');
-        const bg = tooltipG.append('rect');
-        const tooltip = tooltipG.append('text');
+        const tooltipGroup = this.references.svg.append('g');
+        const bg = tooltipGroup.append('rect');
+        const tooltip = tooltipGroup.append('text');
         const tspanCountry = tooltip.append('tspan');
         const tspanDate = tooltip.append('tspan');
         const tspanCaseAccumulative = tooltip.append('tspan');
@@ -212,6 +219,9 @@ class WorldMapD3 {
         const tspanDeathNew = tooltip.append('tspan');
         const tspanRecoveredAccumulative = tooltip.append('tspan');
         const tspanRecoveredNew = tooltip.append('tspan');
+        const caseLineChart = tooltipGroup.append('path');
+        const deathLineChart = tooltipGroup.append('path');
+        const recoveredLineChart = tooltipGroup.append('path');
 
         tooltip
             .style('font-weight', 700)
@@ -225,18 +235,29 @@ class WorldMapD3 {
         // tspanDeathAccumulative
         // tspanRecoveredAccumulative
         tspanCaseNew
-            .style('fill', '#ffa726')
+            .style('fill', this.color.case);
         tspanDeathNew
-            .style('fill', '#ef5350')
+            .style('fill', this.color.death)
         tspanRecoveredNew
-            .style('fill', '#66bb6a')
+            .style('fill', this.color.recovered)
 
         bg
             .style('fill', 'rgba(0,0,0,0.8)')
             .attr('rx', '5px');
 
+        [caseLineChart, deathLineChart, recoveredLineChart].forEach(_ => {
+            _
+                .style('stroke-width', 2)
+                .style('fill', 'none')
+        });
+        caseLineChart.style('stroke', this.color.case);
+        deathLineChart.style('stroke', this.color.death);
+        recoveredLineChart.style('stroke', this.color.recovered);
+
+
         this.references.tooltip = {
             bg,
+            tooltipGroup,
             tooltip,
             tspanCountry,
             tspanDate,
@@ -245,7 +266,10 @@ class WorldMapD3 {
             tspanRecoveredAccumulative,
             tspanCaseNew,
             tspanDeathNew,
-            tspanRecoveredNew
+            tspanRecoveredNew,
+            caseLineChart,
+            deathLineChart,
+            recoveredLineChart
         };
 
         this.updateTooltip()
@@ -272,6 +296,8 @@ class WorldMapD3 {
         const dateText = `${date.getDate()} ${this.monthStrings[date.getMonth()]}, ${date.getFullYear()}`;
         const noData = 'Unknown';
 
+        // Update texts
+
         this.references.tooltip.tspanCountry.text(data.country);
         this.references.tooltip.tspanDate.text(dateText);
         if (!data.case) {
@@ -291,12 +317,16 @@ class WorldMapD3 {
             this.references.tooltip.tspanRecoveredNew.text(currentT === 0 ? getNew(0) : getNew(data.case.recovered[currentT] - data.case.recovered[currentT - 1]));
         }
 
+        // Update dimension and position
         const bBox = this.references.tooltip.tooltip.node()?.getBBox();
         if (!bBox) return;
         const p = 0.2;
         const shift = 5;
-        const tooltipWidth = (1+p)*bBox.width;
-        const tooltipHeight = (1+p)*bBox.height;
+        const textWidth = bBox.width;
+        const textHeight = bBox.height;
+        const lineChartHeight = 20;
+        const tooltipWidth = (1+p)*textWidth;
+        const tooltipHeight = (1+p)*(textHeight + lineChartHeight * 3);
 
         const xBg = inputX - tooltipWidth - shift;
         const xBgFloored = Math.max(this.dimension.m.l, xBg);
@@ -320,32 +350,74 @@ class WorldMapD3 {
         }
 
         y = Math.min(y, this.dimension.svgHeight - tooltipHeight);
+        const toolTipStartY = y - p/2*bBox.height;
+        const lineChartStartY = toolTipStartY+0.5*p*tooltipHeight+textHeight;
         this.references.tooltip.tooltip
             .attr('x', textX)
-            .attr('y', y)
+            .attr('y', y);
         this.references.tooltip.tspanCountry
             .attr('x', textX)
-            .attr('dy', '0.875em')
+            .attr('dy', '0.875em');
         this.references.tooltip.tspanDate
             .attr('x', textX)
-            .attr('dy', '1em')
+            .attr('dy', '1em');
         this.references.tooltip.tspanCaseAccumulative
             .attr('x', textX)
-            .attr('dy', '1em')
+            .attr('dy', '1em');
 
         this.references.tooltip.tspanDeathAccumulative
             .attr('x', textX)
-            .attr('dy', '1em')
+            .attr('dy', '1em');
 
         this.references.tooltip.tspanRecoveredAccumulative
             .attr('x', textX)
-            .attr('dy', '1em')
+            .attr('dy', '1em');
 
         this.references.tooltip.bg
             .attr('x', tooltipX)
-            .attr('y', y - p/2*bBox.height)
+            .attr('y', toolTipStartY)
             .attr('width', tooltipWidth)
-            .attr('height', tooltipHeight)
+            .attr('height', tooltipHeight);
+
+        //
+        // Update line charts
+        const updateLineCharts = (
+            dataArray: number[],
+            reference: d3.Selection<SVGPathElement, unknown | [number, number][], HTMLElement, any>,
+            yMax: number,
+            x: number,
+            y: number
+        ) => {
+            const data: [number, number][] = dataArray.map((num, i) => [i, num]);
+            const scaleX = d3.scaleLinear()
+                .domain([0, this.data.case.series.length-1])
+                .range([0, 100]);
+            const scaleY = d3.scaleLinear()
+                .domain([0, yMax])
+                .range([20, 0]);
+
+            reference
+                .datum(data)
+                .attr('d', d3.line()
+                    .x((d) => scaleX(d[0]))
+                    .y((d) => scaleY(d[1]))
+                    .defined((d, i) => i <= this.state.time)
+                )
+                .style('transform', `translate(${x}px, ${y}px)`)
+        };
+
+        if (this.state.tooltipData.data.case) {
+            const lineChartYMax = Math.max.apply(Math, this.state.tooltipData.data.case.cases);
+            updateLineCharts(this.state.tooltipData.data.case.cases, this.references.tooltip.caseLineChart, lineChartYMax, textX - 50, lineChartStartY);
+            updateLineCharts(this.state.tooltipData.data.case.deaths, this.references.tooltip.deathLineChart, lineChartYMax, textX - 50, lineChartStartY + lineChartHeight);
+            updateLineCharts(this.state.tooltipData.data.case.recovered, this.references.tooltip.recoveredLineChart, lineChartYMax, textX - 50, lineChartStartY + lineChartHeight*2);
+        } else {
+            // either no data or mouse is leaving, need to move line chart out
+            const nullData: number[] = [];
+            updateLineCharts(nullData, this.references.tooltip.caseLineChart, 0, textX - 50, lineChartStartY);
+            updateLineCharts(nullData, this.references.tooltip.deathLineChart, 0, textX - 50, lineChartStartY + lineChartHeight);
+            updateLineCharts(nullData, this.references.tooltip.recoveredLineChart, 0, textX - 50, lineChartStartY + lineChartHeight*2);
+        }
     }
 
     initMap() {

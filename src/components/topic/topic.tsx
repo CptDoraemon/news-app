@@ -1,6 +1,8 @@
 import React, {useEffect, useRef, useState} from "react";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import TopicCovid19Map from "./topic-covid19-map";
+import {Typography} from "@material-ui/core";
+import Box from "@material-ui/core/Box";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -33,8 +35,12 @@ const Topic: React.FC<TopicProps> = () => {
 
     return (
         <div className={classes.root}>
+            <div className={classes.widthWrapper}>
+                <Typography variant={'h5'} component={'h1'}>
+                    <Box fontWeight={700} pb={2}>The spread of COVID-19</Box>
+                </Typography>
+            </div>
             <TopicCovid19Map/>
-
             <div className={classes.widthWrapper}>
             </div>
         </div>
