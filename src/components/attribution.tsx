@@ -3,7 +3,7 @@ import {Avatar, Box, Chip, Grid, Link} from "@material-ui/core";
 
 function Attribution() {
     return (
-        <Box mt={10} mb={2} mx={2}>
+        <Box m={2}>
             <Grid container direction={'row'} spacing={2}>
                 <Grid item>
                     <Link href={'https://www.xiaoxihome.com/'} target={'_blank'} rel="noopener" underline={"none"}>
