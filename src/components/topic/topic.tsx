@@ -1,8 +1,8 @@
 import React, {useEffect, useRef, useState} from "react";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import TopicCovid19Map from "./topic-covid19-map";
-import {Typography} from "@material-ui/core";
-import Box from "@material-ui/core/Box";
+import Link from '@material-ui/core/Link';
+import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -11,7 +11,7 @@ const useStyles = makeStyles(theme => ({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'flex-start',
-        margin: theme.spacing(5, 0)
+        margin: theme.spacing(2, 0, 10, 0)
     },
     widthWrapper: {
         width: '1000px',
@@ -47,6 +47,17 @@ const Topic: React.FC<TopicProps> = () => {
             </div>
             <TopicCovid19Map/>
             <div className={classes.widthWrapper}>
+                <div>
+                    <p>
+                        <span>Data retrieved from </span>
+                        <span>
+                            <Link href='https://graphics.reuters.com/CHINA-HEALTH-MAP/0100B59S39E/index.html' target='_blank' rel="noopener noreferrer" style={{color: '#f35c19'}}>
+                                Reuters.com
+                            </Link>
+                        </span>
+                        <span>, not updated in realtime.</span>
+                    </p>
+                </div>
             </div>
         </div>
     )

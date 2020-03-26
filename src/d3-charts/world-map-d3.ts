@@ -35,8 +35,8 @@ class WorldMapD3 {
         mapStrokeNormal: '#aaa',
         mapStrokeHoverHighlight: '#222',
         case: '#ffa726',
-        death: '#ef5350',
-        recovered: '#66bb6a',
+        death: '#f16a67',
+        recovered: '#78c37b',
         timeBarHighlight: '#7a5195',
         timeBarNormal: 'rgba(122, 81, 149, 0.6)',
         timeBarLight: 'rgba(122, 81, 149, 0.2)'
@@ -91,6 +91,9 @@ class WorldMapD3 {
             caseLineChart: d3.Selection<SVGPathElement, unknown | [number, number][], HTMLElement, any>,
             deathLineChart: d3.Selection<SVGPathElement, unknown | [number, number][], HTMLElement, any>,
             recoveredLineChart: d3.Selection<SVGPathElement, unknown | [number, number][], HTMLElement, any>,
+            stackBarChartCase: d3.Selection<SVGRectElement, unknown, HTMLElement, any>,
+            stackBarChartDeath: d3.Selection<SVGRectElement, unknown, HTMLElement, any>,
+            stackBarChartRecovered: d3.Selection<SVGRectElement, unknown, HTMLElement, any>,
         } | null,
         timeControl: {
             group: d3.Selection<SVGGElement, unknown, HTMLElement, any>,
@@ -115,7 +118,7 @@ class WorldMapD3 {
                     cases: number[],
                     deaths: number[],
                     recovered: number[],
-                } | undefined
+                } | undefined | null
             }
         }
     };
@@ -244,7 +247,10 @@ class WorldMapD3 {
         const caseLineChart = tooltipGroup.append('path');
         const deathLineChart = tooltipGroup.append('path');
         const recoveredLineChart = tooltipGroup.append('path');
-
+        const stackBarChartGroup = tooltipGroup.append('g');
+        const stackBarChartCase = stackBarChartGroup.append('rect');
+        const stackBarChartDeath = stackBarChartGroup.append('rect');
+        const stackBarChartRecovered = stackBarChartGroup.append('rect');
         tooltip
             .style('font-weight', 700)
             .style('font-size', '0.875rem')
@@ -275,6 +281,10 @@ class WorldMapD3 {
         caseLineChart.style('stroke', this.color.case);
         deathLineChart.style('stroke', this.color.death);
         recoveredLineChart.style('stroke', this.color.recovered);
+        //
+        stackBarChartCase.style('fill', this.color.case);
+        stackBarChartDeath.style('fill', this.color.death);
+        stackBarChartRecovered.style('fill', this.color.recovered);
 
 
         this.references.tooltip = {
@@ -291,9 +301,11 @@ class WorldMapD3 {
             tspanRecoveredNew,
             caseLineChart,
             deathLineChart,
-            recoveredLineChart
+            recoveredLineChart,
+            stackBarChartCase,
+            stackBarChartDeath,
+            stackBarChartRecovered
         };
-
         this.updateTooltip()
 
     }
@@ -342,13 +354,16 @@ class WorldMapD3 {
         // Update dimension and position
         const bBox = this.references.tooltip.tooltip.node()?.getBBox();
         if (!bBox) return;
-        const p = 0.2;
+        const p = 0.3;
         const shift = 5;
         const textWidth = bBox.width;
         const textHeight = bBox.height;
         const lineChartHeight = 20;
-        const tooltipWidth = (1+p)*textWidth;
-        const tooltipHeight = (1+p)*(textHeight + lineChartHeight * 3);
+        const stackBarChartMarginTop = 10;
+        const stackBarChartHeight = 15;
+        const chartWidth = 150;
+        const tooltipWidth = (1+p)*Math.max(chartWidth, textWidth);
+        const tooltipHeight = (1+p)*(textHeight + lineChartHeight * 3 + stackBarChartHeight + stackBarChartMarginTop);
 
         const xBg = inputX - tooltipWidth - shift;
         const xBgFloored = Math.max(this.dimension.m.l, xBg);
@@ -374,6 +389,7 @@ class WorldMapD3 {
         y = Math.min(y, this.dimension.svgHeight - tooltipHeight);
         const toolTipStartY = y - p/2*bBox.height;
         const lineChartStartY = toolTipStartY+0.5*p*tooltipHeight+textHeight;
+        const stackBarChartY = lineChartStartY + 3 * lineChartHeight + stackBarChartMarginTop;
         this.references.tooltip.tooltip
             .attr('x', textX)
             .attr('y', y);
@@ -413,7 +429,7 @@ class WorldMapD3 {
             const data: [number, number][] = dataArray.map((num, i) => [i, num]);
             const scaleX = d3.scaleLinear()
                 .domain([0, this.data.case.series.length-1])
-                .range([0, 100]);
+                .range([0, chartWidth]);
             const scaleY = d3.scaleLinear()
                 .domain([0, yMax])
                 .range([20, 0]);
@@ -428,17 +444,58 @@ class WorldMapD3 {
                 .style('transform', `translate(${x}px, ${y}px)`)
         };
 
+        const chartX = textX - chartWidth/2;
         if (this.state.tooltipData.data.case) {
+            // has data
             const lineChartYMax = Math.max.apply(Math, this.state.tooltipData.data.case.cases);
-            updateLineCharts(this.state.tooltipData.data.case.cases, this.references.tooltip.caseLineChart, lineChartYMax, textX - 50, lineChartStartY);
-            updateLineCharts(this.state.tooltipData.data.case.deaths, this.references.tooltip.deathLineChart, lineChartYMax, textX - 50, lineChartStartY + lineChartHeight);
-            updateLineCharts(this.state.tooltipData.data.case.recovered, this.references.tooltip.recoveredLineChart, lineChartYMax, textX - 50, lineChartStartY + lineChartHeight*2);
+            updateLineCharts(this.state.tooltipData.data.case.cases, this.references.tooltip.caseLineChart, lineChartYMax, chartX, lineChartStartY);
+            updateLineCharts(this.state.tooltipData.data.case.deaths, this.references.tooltip.deathLineChart, lineChartYMax, chartX, lineChartStartY + lineChartHeight);
+            updateLineCharts(this.state.tooltipData.data.case.recovered, this.references.tooltip.recoveredLineChart, lineChartYMax, chartX, lineChartStartY + lineChartHeight*2);
         } else {
             // either no data or mouse is leaving, need to move line chart out
             const nullData: number[] = [];
-            updateLineCharts(nullData, this.references.tooltip.caseLineChart, 0, textX - 50, lineChartStartY);
-            updateLineCharts(nullData, this.references.tooltip.deathLineChart, 0, textX - 50, lineChartStartY + lineChartHeight);
-            updateLineCharts(nullData, this.references.tooltip.recoveredLineChart, 0, textX - 50, lineChartStartY + lineChartHeight*2);
+            updateLineCharts(nullData, this.references.tooltip.caseLineChart, 0, chartX, lineChartStartY);
+            updateLineCharts(nullData, this.references.tooltip.deathLineChart, 0, chartX, lineChartStartY + lineChartHeight);
+            updateLineCharts(nullData, this.references.tooltip.recoveredLineChart, 0, chartX, lineChartStartY + lineChartHeight*2);
+        }
+
+        // update stack bar chart
+        const stackBarScale = d3.scaleLinear()
+            .domain([0, this.data.case.series.length-1])
+            .range([0, 100]);
+        if (this.state.tooltipData.data.case) {
+            // has data
+            const currentCase = this.state.tooltipData.data.case.cases[currentT];
+            const currentDeath = this.state.tooltipData.data.case.deaths[currentT];
+            const currentRecovered = this.state.tooltipData.data.case.recovered[currentT];
+            const deathWidth = currentCase === 0 ? 0 : (currentDeath / currentCase) * chartWidth;
+            const recoveredWidth = currentCase === 0 ? 0 : (currentRecovered / currentCase) * chartWidth;
+            this.references.tooltip.stackBarChartCase
+                .attr('x', chartX)
+                .attr('width', () => currentCase === 0 ? 0 : chartWidth)
+                .attr('height', stackBarChartHeight)
+                .attr('y', stackBarChartY);
+            this.references.tooltip.stackBarChartDeath
+                .attr('x', chartX + chartWidth - deathWidth)
+                .attr('width', deathWidth)
+                .attr('height', stackBarChartHeight)
+                .attr('y', stackBarChartY);
+            this.references.tooltip.stackBarChartRecovered
+                .attr('x', chartX)
+                .attr('width', recoveredWidth)
+                .attr('height', stackBarChartHeight)
+                .attr('y', stackBarChartY)
+        } else {
+            // either no data or mouse is leaving, need to move line chart out
+            this.references.tooltip.stackBarChartCase
+                .attr('x', chartX)
+                .attr('y', stackBarChartY);
+            this.references.tooltip.stackBarChartDeath
+                .attr('x', chartX)
+                .attr('y', stackBarChartY);
+            this.references.tooltip.stackBarChartRecovered
+                .attr('x', chartX)
+                .attr('y', stackBarChartY)
         }
     }
 
@@ -563,6 +620,28 @@ class WorldMapD3 {
         this.updateTooltip();
     }
 
+    setToolTipDataState(
+        x: number,
+        xSecondary: number,
+        y : number,
+        ySecondary: number,
+        country: string,
+        newCase: typeof WorldMapD3.prototype.state.tooltipData.data.case
+    ) {
+        this.state.tooltipData = Object.assign(
+            this.state.tooltipData,
+            {
+                inputX: x,
+                inputXSecondary: xSecondary,
+                inputY: y,
+                inputYSecondary: ySecondary,
+                data: {
+                    country: country,
+                    case: newCase
+                }
+            })
+    }
+
     startTimeLapse() {
         const tick = () => {
             if (!this.timeLapse.isAutoPlaying) return;
@@ -609,42 +688,9 @@ class WorldMapD3 {
             // tooltip
             if (!d.properties.case) {
                 // no data for this country
-                thisClass.state.tooltipData = Object.assign(
-                    thisClass.state.tooltipData,
-                    {
-                        inputX: x,
-                        inputXSecondary: xSecondary,
-                        inputY: y,
-                        inputYSecondary: ySecondary,
-                        data: {
-                            country: d.properties.name,
-                            case: null
-                        }
-                })
+                thisClass.setToolTipDataState(x, xSecondary, y, ySecondary, d.properties.name, null);
             } else {
-                thisClass.state.tooltipData = Object.assign(
-                    thisClass.state.tooltipData,
-                    {
-                        inputX: x,
-                        inputXSecondary: xSecondary,
-                        inputY: y,
-                        inputYSecondary: ySecondary,
-                        data: {
-                            country: d.properties.name,
-                            case: {...d.properties.case}
-                        }
-                    }
-                );
-                //     thisClass.updateTooltip(x, xSecondary, y, ySecondary, {
-                //     country: d.properties.name,
-                //     date: `${date.getDate()} ${thisClass.monthStrings[date.getMonth()]}, ${date.getFullYear()}`,
-                //     caseAccumulative: d.properties.case.cases[time],
-                //     deathAccumulative: d.properties.case.deaths[time],
-                //     recoveredAccumulative: d.properties.case.recovered[time],
-                //     caseNew: time === 0 ? 0 : d.properties.case.cases[time] - d.properties.case.cases[time-1],
-                //     deathNew: time === 0 ? 0 : d.properties.case.deaths[time] - d.properties.case.deaths[time-1],
-                //     recoveredNew: time === 0 ? 0 : d.properties.case.recovered[time] - d.properties.case.recovered[time-1],
-                // })
+                thisClass.setToolTipDataState(x, xSecondary, y, ySecondary, d.properties.name, {...d.properties.case});
             }
             thisClass.updateTooltip();
 
@@ -661,21 +707,8 @@ class WorldMapD3 {
 
         })
             .on('mouseleave', function(d) {
-                thisClass.state.tooltipData = Object.assign(
-                    thisClass.state.tooltipData,
-                    {
-                        inputX: -1000,
-                        inputXSecondary: -1000,
-                        inputY: -1000,
-                        inputYSecondary: -1000,
-                        data: {
-                            country: '',
-                            case: null
-                        }
-                    }
-                );
+                thisClass.setToolTipDataState(-1000, -1000, -1000, -1000, '', null);
                 thisClass.updateTooltip();
-
 
                 // country path
                 // d3.select(this).style('stroke', thisClass.color.mapStrokeNormal)
