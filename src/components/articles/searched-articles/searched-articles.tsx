@@ -107,7 +107,7 @@ const SearchedArticles: React.FC<SearchedArticlesProps> = ({keyword}) => {
     const showChartAndFilters = useShowChartAndFilters(data, frequencyData, keyword);
 
     return (
-        <div className={classes.root} key={keyword}>
+        <div className={classes.root}>
             <div className={classes.widthWrapper}>
                 { showChartAndFilters && frequencyData && <KeywordFrequency bin={frequencyData.bin} frequency={frequencyData.frequency} setDate={setPendingDateFilter}/>}
                 { showChartAndFilters && <Filters sortType={sortType} toggleSort={toggleSort} pendingDateFilter={pendingDateFilter} dateFilter={dateFilter} setDateFilter={setDateFilter}/> }

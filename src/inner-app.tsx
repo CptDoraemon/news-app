@@ -1,17 +1,16 @@
 import {State} from "./redux/state";
 import React, {useEffect, useState} from "react";
 import {Box, makeStyles} from "@material-ui/core";
-import Header from "./components/header/header";
 import {categories, Category} from "./redux/actions/category";
 import ArticlesContainer from "./containers/articles-container";
 import Attribution from "./components/attribution";
 import CopyLinkSnackBarContainer from "./containers/copy-link-snackbar-container";
 import {fetchArticles} from "./redux/actions/articles";
 import {connect} from "react-redux";
-import SearchedArticlesContainer from "./containers/searched-articles-container";
 import Analytics from "./components/analytics/analytics";
 import HeaderContainer from "./containers/header-container";
 import Topic from "./components/topic/topic";
+import SearchedArticles from "./components/articles/searched-articles/searched-articles";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -33,6 +32,7 @@ const useStyles = makeStyles((theme) => ({
 
 interface InnerAppProps extends Pick<State, 'category' | 'articles'> {
     fetchArticlesAfterMount: () => void,
+    keyword: string
 }
 
 function InnerApp(props: InnerAppProps) {
@@ -49,7 +49,7 @@ function InnerApp(props: InnerAppProps) {
                 component = <Analytics />;
                 break;
             case Category.SEARCH:
-                component = <SearchedArticlesContainer/>;
+                component = <SearchedArticles keyword={props.keyword} key={props.keyword}/>;
                 break;
             case Category.TOPIC:
                 component = <Topic/>;
@@ -78,6 +78,7 @@ function mapStateToProps(state: State) {
     return {
         category: state.category,
         articles: state.articles,
+        keyword: state.searchKeyword
     }
 }
 function mapDispatchToProps(dispatch: any) {
