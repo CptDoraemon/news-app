@@ -38,8 +38,8 @@ class WorldMapD3 {
         death: '#f16a67',
         recovered: '#78c37b',
         timeBarHighlight: '#7a5195',
-        timeBarNormal: 'rgba(122, 81, 149, 0.6)',
-        timeBarLight: 'rgba(122, 81, 149, 0.2)'
+        timeBarNormal: '#af96bf',
+        timeBarLight: '#e4dbe8'
     };
     monthStrings = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     getStrokeWidth = () => this.dimension.svgWidth >= 1000 ? 1 : 0.5;
@@ -98,7 +98,10 @@ class WorldMapD3 {
         timeControl: {
             group: d3.Selection<SVGGElement, unknown, HTMLElement, any>,
             dateText: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
+            timeBarBg: d3.Selection<SVGRectElement, string, SVGGElement, any>,
             timeBar: d3.Selection<SVGRectElement, string, SVGGElement, any>,
+            playButton: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
+            startOverButton: d3.Selection<SVGTextElement, unknown, HTMLElement, any>,
         } | null
     };
     scales: {
@@ -123,7 +126,6 @@ class WorldMapD3 {
         }
     };
     timeLapse: {
-        isAutoPlaying: boolean,
         timeoutID: number | null
     };
 
@@ -160,7 +162,6 @@ class WorldMapD3 {
             }
         };
         this.timeLapse = {
-            isAutoPlaying: true,
             timeoutID: null
         }
     }
@@ -537,41 +538,85 @@ class WorldMapD3 {
 
     initTimeControl() {
         if (!this.references.svg) return;
+        // dimensions
+        const margin = 4;
+        const timeControlStartY = this.dimension.svgHeight - this.dimension.m.b;
+        const timeControlStartX = 0.2*this.dimension.svgWidth;
+        const dateTextHeight = 16;
+        const timeBarStartY = timeControlStartY + dateTextHeight + margin;
+        const timeBarHeight = 10;
+        const buttonStartY = timeBarStartY + timeBarHeight + margin;
+        const buttonHeight = 16;
+        //
         const dateArray = this.data.case.series;
         this.scales.timeBarXScale = d3.scaleBand()
             .domain(dateArray)
-            .range([0.2*this.dimension.svgWidth, 0.8*this.dimension.svgWidth]);
+            .range([timeControlStartX, 0.8*this.dimension.svgWidth]);
 
         const group = this.references.svg.append("g");
         const dateText = group.append("text")
-            .attr('x', 0.2*this.dimension.svgWidth)
-            .attr('y', this.dimension.svgHeight - this.dimension.m.b + 16)
-            .attr('font-size', '16px')
+            .attr('x', timeControlStartX)
+            .attr('y', timeControlStartY + dateTextHeight)
+            .attr('font-size', `${dateTextHeight}px`)
             .attr('font-weight', 700)
             .style('fill', this.color.timeBarHighlight);
-        const timeBar = group
-            .selectAll('rect')
-            .data(dateArray)
-            .enter()
-            .append('rect')
+        const [timeBarBg, timeBar] = [0, 1].map(_=>{
+            const selection = group.append('g')
+                .selectAll('rect')
+                .data(dateArray)
+                .enter()
+                .append('rect')
+                .style('cursor', 'pointer')
+                .attr('y', timeBarStartY)
+                .attr('x', (d) => `${this.scales.timeBarXScale(d)}`)
+                .attr('width', this.scales.timeBarXScale.bandwidth())
+                .attr('height', timeBarHeight)
+                .style('opacity', 0);
+            selection
+                .transition()
+                .delay(2000)
+                .duration(1000)
+                .style('opacity', 1);
+            return selection
+        });
+        timeBarBg
             .style('fill', this.color.timeBarLight)
-            .style('cursor', 'pointer')
-            // .style('stroke', this.color.timeBarLight)
-            // .style('stroke-width', 1)
-            .attr('y', this.dimension.svgHeight - this.dimension.m.b + 20)
-            .attr('x', (d) => `${this.scales.timeBarXScale(d)}`)
-            .attr('width', this.scales.timeBarXScale.bandwidth())
-            .attr('height', 10)
-            .style('opacity', 0);
-        timeBar.transition()
-            .delay(2000)
-            .duration(1000)
-            .style('opacity', 1);
+            .style('stroke', `#fff`)
+            .style('stroke-width', 1);
+        timeBar
+            .style('fill', this.color.transparent);
 
+        const buttonGroup = group.append('g');
+        const [playButton, startOverButton] = [
+            {
+                y: buttonStartY + buttonHeight,
+                text: 'Pause'
+            },
+            {
+                y: buttonStartY + buttonHeight * 2,
+                text: 'Start Over'
+            }
+        ].map(_=>{
+            const selection = buttonGroup
+                .append('text')
+                .style('cursor', 'pointer')
+                .style('opacity', '0')
+                .attr('x', timeControlStartX)
+                .attr('y', _.y)
+                .text(_.text);
+            selection.transition()
+                .delay(this.animations.timeLapse.delay)
+                .duration(1000)
+                .style('opacity', 1);
+            return selection
+        });
         this.references.timeControl = {
             group,
             dateText,
-            timeBar
+            timeBarBg,
+            timeBar,
+            playButton,
+            startOverButton
         };
     }
 
@@ -583,7 +628,7 @@ class WorldMapD3 {
         this.references.timeControl.dateText.text(`${date.getDate()} ${this.monthStrings[date.getMonth()]}, ${date.getFullYear()}`)
 
         this.references.timeControl.timeBar
-            .style('fill', (d, i) => i <= this.state.time ? this.color.timeBarNormal : this.color.timeBarLight)
+            .style('fill', (d, i) => i <= this.state.time ? this.color.timeBarNormal : this.color.transparent)
             // .style('stroke', this.color.transparent)
         this.references.timeControl.timeBar.filter((d, i) => i === this.state.time)
             .transition()
@@ -644,14 +689,25 @@ class WorldMapD3 {
 
     startTimeLapse() {
         const tick = () => {
-            if (!this.timeLapse.isAutoPlaying) return;
             if (this.state.time < this.state.timeMax) {
                 this.setTimeState(this.state.time+1);
                 this.timeLapse.timeoutID = window.setTimeout(tick, this.animations.timeLapseGap)
+            } else {
+                this.stopTimeLapse()
             }
         };
 
+        this.references.timeControl?.playButton.text('Pause');
         tick();
+    }
+
+    stopTimeLapse() {
+        this.references.timeControl?.playButton.text('Start');
+
+        if (this.timeLapse.timeoutID !== null) {
+            window.clearTimeout(this.timeLapse.timeoutID);
+            this.timeLapse.timeoutID = null;
+        }
     }
 
     appendTimeBarMouseEvent() {
@@ -663,16 +719,30 @@ class WorldMapD3 {
             d3.select(this).style('fill', thisClass.color.timeBarHighlight)
             })
             .on('mouseleave', function(d, i) {
-                d3.select(this).style('fill', i <= thisClass.state.time ? thisClass.color.timeBarNormal : thisClass.color.timeBarLight)
+                d3.select(this).style('fill', i <= thisClass.state.time ? thisClass.color.timeBarNormal : thisClass.color.transparent)
             })
             .on('click', function(d, i) {
-                thisClass.timeLapse.isAutoPlaying = false;
-                if (thisClass.timeLapse.timeoutID) {
-                    clearTimeout(thisClass.timeLapse.timeoutID);
-                    thisClass.timeLapse.timeoutID = null;
-                }
+                thisClass.stopTimeLapse();
                 thisClass.setTimeState(i)
             })
+    }
+
+    appendTimeControlButtonEvent() {
+        if (!this.references.timeControl) return;
+
+        this.references.timeControl.playButton.on('click', () => {
+            if (this.timeLapse.timeoutID !== null) {
+                this.stopTimeLapse();
+            } else {
+                this.startTimeLapse();
+            }
+        });
+
+        this.references.timeControl.startOverButton.on('click', () => {
+            this.stopTimeLapse();
+            this.setTimeState(0);
+            this.startTimeLapse();
+        });
     }
 
     appendMapPathMouseEvent() {
@@ -729,7 +799,8 @@ class WorldMapD3 {
             this.appendTimeBarMouseEvent();
             setTimeout(
                 () => {
-                    this.startTimeLapse()
+                    this.startTimeLapse();
+                    this.appendTimeControlButtonEvent();
                 }, this.animations.timeLapse.delay);
         } catch (e) {
             console.log(e);
