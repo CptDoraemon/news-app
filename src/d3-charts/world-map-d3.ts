@@ -687,7 +687,7 @@ class WorldMapD3 {
             })
     }
 
-    startTimeLapse() {
+    startTimeLapse(isWaitFirstTick?: boolean) {
         const tick = () => {
             if (this.state.time < this.state.timeMax) {
                 this.setTimeState(this.state.time+1);
@@ -698,7 +698,11 @@ class WorldMapD3 {
         };
 
         this.references.timeControl?.playButton.text('Pause');
-        tick();
+        if (isWaitFirstTick) {
+            this.timeLapse.timeoutID = window.setTimeout(() => tick(), this.animations.timeLapseGap)
+        } else {
+            tick();
+        }
     }
 
     stopTimeLapse() {
@@ -741,7 +745,7 @@ class WorldMapD3 {
         this.references.timeControl.startOverButton.on('click', () => {
             this.stopTimeLapse();
             this.setTimeState(0);
-            this.startTimeLapse();
+            this.startTimeLapse(true);
         });
     }
 
