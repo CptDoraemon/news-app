@@ -32,7 +32,7 @@ class WorldMapD3 {
         transparent: 'rgba(0,0,0,0)',
         getMapColor: (percentage: number) => `rgba(55, 76, 128, ${percentage.toFixed(1)})`,
         grey: "#eee",
-        mapStrokeNormal: '#aaa',
+        mapStrokeNormal: '#ccc',
         mapStrokeHoverHighlight: '#222',
         case: '#ffa726',
         death: '#f16a67',
@@ -75,7 +75,11 @@ class WorldMapD3 {
     };
     references: {
         svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null,
-        mapPaths: d3.Selection<SVGPathElement, d3.ExtendedFeature<d3.GeoGeometryObjects, FeatureProperties>, SVGGElement, any> | null,
+        map: {
+            paths: d3.Selection<SVGPathElement, d3.ExtendedFeature<d3.GeoGeometryObjects, FeatureProperties>, SVGGElement, any> | null,
+            pathHighlightGroup: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null,
+            pathHighlight: d3.Selection<SVGPathElement | null, unknown, HTMLElement, any> | null,
+        }
         tooltip: {
             bg: d3.Selection<SVGRectElement, unknown, HTMLElement, any>,
             tooltipGroup: d3.Selection<SVGGElement, unknown, HTMLElement, any>
@@ -140,7 +144,11 @@ class WorldMapD3 {
         };
         this.references = {
             svg: null,
-            mapPaths: null,
+            map: {
+                paths: null,
+                pathHighlightGroup: null,
+                pathHighlight: null
+            },
             tooltip: null,
             timeControl: null
         };
@@ -506,7 +514,7 @@ class WorldMapD3 {
         const projection = d3.geoNaturalEarth1()
             .fitExtent([[this.dimension.mapX, this.dimension.mapY], [this.dimension.mapWidth, this.dimension.mapHeight]], this.data.aggregate);
 
-        this.references.mapPaths = this.references.svg.append("g")
+        this.references.map.paths = this.references.svg.append("g")
             .selectAll("path")
             .data(this.data.aggregate.features)
             .enter().append("path")
@@ -519,18 +527,20 @@ class WorldMapD3 {
             .style('opacity', 0)
             .style('transform', 'scale(5)')
             .style('transform-origin', '50% 50%');
+
+        this.references.map.pathHighlightGroup = this.references.svg.append("g");
     }
 
     mapZoomIn() {
-        if (!this.references.mapPaths) return;
-        this.references.mapPaths.transition()
+        if (!this.references.map.paths) return;
+        this.references.map.paths.transition()
             .delay((d, i) => (i % 10) * 200)
             .duration(1000)
             .style('opacity', 1)
             .style('transform', 'scale(1)');
 
         // change map color from grey to white
-        this.references.mapPaths.transition()
+        this.references.map.paths.transition()
             .delay(this.animations.changeMapColor.delay)
             .duration(this.animations.changeMapColor.duration)
             .style('fill', this.color.getMapColor(0))
@@ -641,8 +651,8 @@ class WorldMapD3 {
         const caseMaxLog = Math.log(this.data.caseMax);
         const emptyColor = this.color.getMapColor(0);
 
-        if (!this.references.mapPaths) return;
-        this.references.mapPaths
+        if (!this.references.map.paths) return;
+        this.references.map.paths
             .style('fill', (d) => {
                 if (!d.properties.case) {
                     // no data
@@ -750,9 +760,29 @@ class WorldMapD3 {
     }
 
     appendMapPathMouseEvent() {
-        if (!this.references.mapPaths) return;
+        // when mouse enter a country:
+        // 1. use d3.selection.clone() to clone the country path, the cloned path will be append right after the original path.
+        // 2. remove this path and append it into the pathHighlightGroup using d3.selection.append(() => clonedNode.node())
+        // 3. the cloned the path will be on the top of all the paths therefore the stroke on it will be totally visible.
+        // 4. however this cloned path is on the top of is origin too, therefore will trigger it's origin's mouseleave listener
+        // 5. remove the clone in the clone's mouseleave listener
+        // 6. sometimes the mouseover listener will be triggered before clone's mouseleave listener, therefore always remove the clone at the beginning of mouseover listener
+
+        // TODO: Known bug: on smaller screen, the tooltips may overlaps current mouse position, therefore the mouse is never gonna enter the cloned map path,
+        //  so the mouseleave will never be triggered and tooltips won't be repositioned.
+
+        if (!this.references.map.paths) return;
         const thisClass = this;
-        this.references.mapPaths.on('mouseover', function(d) {
+
+        const removeHighlightAndMoveTooltip = () => {
+            thisClass.setToolTipDataState(-1000, -1000, -1000, -1000, '', null);
+            thisClass.updateTooltip();
+            thisClass.references.map.pathHighlight?.remove();
+        };
+
+        this.references.map.paths.on('mouseover', function(d) {
+            removeHighlightAndMoveTooltip();
+
             const bBox = this.getBBox();
             const x = bBox.x;
             const y = bBox.y;
@@ -769,26 +799,20 @@ class WorldMapD3 {
             thisClass.updateTooltip();
 
             // country path
-            const thisCountryName = d.properties.name;
-            // thisClass.references.mapPaths
-            //     ?.style('stroke-width', (_) => {
-            //         return _.properties.name === thisCountryName ? 5 : thisClass.dimension.svgWidth >= 1000 ? 1 : 0.5
-            //     })
-            // d3.select(this)
-            //     .style('stroke', thisClass.color.mapStrokeHoverHighlight)
-            d3.select(this)
-                .style('stroke-width', 5)
-
+            const clonedNode = d3.select(this).clone().remove();
+            if (thisClass.references.map.pathHighlightGroup) {
+                const movedClonedNode = thisClass.references.map.pathHighlightGroup.append(() => clonedNode.node());
+                if (movedClonedNode) {
+                    thisClass.references.map.pathHighlight = movedClonedNode;
+                    movedClonedNode
+                        .style('stroke', thisClass.color.mapStrokeHoverHighlight)
+                        .style('fill', thisClass.color.transparent);
+                    movedClonedNode.on('mouseleave', function() {
+                        removeHighlightAndMoveTooltip()
+                    })
+                }
+            }
         })
-            .on('mouseleave', function(d) {
-                thisClass.setToolTipDataState(-1000, -1000, -1000, -1000, '', null);
-                thisClass.updateTooltip();
-
-                // country path
-                // d3.select(this).style('stroke', thisClass.color.mapStrokeNormal)
-                // const thisCountryName = d.properties.name;
-                thisClass.references.mapPaths?.style("stroke-width", thisClass.getStrokeWidth())
-            })
     }
 
     async main() {
