@@ -1,21 +1,4 @@
-export interface CovidCaseData {
-    countries: {
-        [key: string]: {
-            cases: number[],
-            deaths: number[],
-            recovered: number[],
-        }
-    }
-    series: string[],
-    totals: {
-        cases: number[],
-        deaths: number[],
-        recovered: number[],
-    },
-    lastUpdated: string
-}
-
-const covidCaseData: CovidCaseData = {
+const covidCaseData = {
     "countries": {
     "China": {
         "cases": [
