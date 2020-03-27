@@ -806,6 +806,7 @@ class WorldMapD3 {
                     thisClass.references.map.pathHighlight = movedClonedNode;
                     movedClonedNode
                         .style('stroke', thisClass.color.mapStrokeHoverHighlight)
+                        .style('stroke-width', thisClass.getStrokeWidth()*2)
                         .style('fill', thisClass.color.transparent);
                     movedClonedNode.on('mouseleave', function() {
                         removeHighlightAndMoveTooltip()
