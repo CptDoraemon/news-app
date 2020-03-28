@@ -177,7 +177,7 @@ class WorldMapD3 {
     getDimension(width: number, height: number) {
         const svgWidth = width;
         const svgHeight = height;
-        const m = {t: 0, r: 10, b: 100, l: 10};
+        const m = {t: 0, r: 10, b: 75, l: 10};
         return {
             svgWidth,
             svgHeight,

@@ -28,7 +28,7 @@ const TopicCovid19Map: React.FC<TopicCovid19MapProps> = () => {
     const classes = useStyles();
     const theme = useTheme();
     const containerRef = useRef<HTMLDivElement>(null);
-    const height = window.innerHeight - 300;
+    const height = window.innerHeight - 240;
 
     useEffect(() => {
         import('./data/topic-covid19-data').then((dataFile) => {
