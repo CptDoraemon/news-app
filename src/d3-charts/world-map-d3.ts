@@ -34,7 +34,7 @@ class WorldMapD3 {
         grey: "#eee",
         mapStrokeNormal: '#ccc',
         mapStrokeHoverHighlight: '#222',
-        case: '#ffa726',
+        case: '#ffb140',
         death: '#f16a67',
         recovered: '#78c37b',
         timeBarHighlight: '#7a5195',
