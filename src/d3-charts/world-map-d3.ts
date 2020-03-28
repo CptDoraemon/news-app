@@ -611,6 +611,8 @@ class WorldMapD3 {
                 .append('text')
                 .style('cursor', 'pointer')
                 .style('opacity', '0')
+                .style('fill', this.color.timeBarNormal)
+                .attr('font-weight', 700)
                 .attr('x', timeControlStartX)
                 .attr('y', _.y)
                 .text(_.text);
@@ -618,6 +620,13 @@ class WorldMapD3 {
                 .delay(this.animations.timeLapse.delay)
                 .duration(1000)
                 .style('opacity', 1);
+            selection
+                .on('mouseenter', () => {
+                selection.style('fill', this.color.timeBarHighlight)
+                })
+                .on('mouseleave', () => {
+                selection.style('fill', this.color.timeBarNormal)
+                });
             return selection
         });
         this.references.timeControl = {
@@ -729,7 +738,7 @@ class WorldMapD3 {
 
         const thisClass = this;
         this.references.timeControl.timeBar
-            .on('mouseover', function() {
+            .on('mouseenter', function() {
             d3.select(this).style('fill', thisClass.color.timeBarHighlight)
             })
             .on('mouseleave', function(d, i) {
@@ -780,7 +789,7 @@ class WorldMapD3 {
             thisClass.references.map.pathHighlight?.remove();
         };
 
-        this.references.map.paths.on('mouseover', function(d) {
+        this.references.map.paths.on('mouseenter', function(d) {
             removeHighlightAndMoveTooltip();
 
             const bBox = this.getBBox();
