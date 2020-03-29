@@ -166,11 +166,7 @@ class StackedLineChartD3 {
             .data(this.shapes.stack(this.data.stackData))
             .enter()
             .append('path')
-            .attr('d',
-                // @ts-ignore
-                // TODO: fix later? need type narrowing
-                (d) => this.shapes.getArea(0)(d)
-            )
+            .attr('d', (d) => this.shapes.getArea(0)(d))
             .attr('fill', (d, i) => this.getColor(i))
     }
 
@@ -180,11 +176,9 @@ class StackedLineChartD3 {
         this.references.paths.transition()
             .delay((d, i) => i * 200)
             .duration(1000)
-            // @ts-ignore
             .attrTween('d', (d) => {
                 return (t: number) => {
-                    // @ts-ignore
-                    return this.shapes.getArea(t)(d)
+                    return this.shapes.getArea(t)(d) || ''
                 }
             })
             .ease(d3.easeExpIn)

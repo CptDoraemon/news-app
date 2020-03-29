@@ -24,7 +24,7 @@ const DocumentsCountStackedLineChart: React.FC<DocumentsHeatMapProps> = ({isLoad
     const [stackedBarChart, setStackedBarChart] = useState<null | StackedLineChartD3>(null);
 
     useEffect(() => {
-        if (isLoaded && data && width && stackedBarChart === null) {
+        if (isLoaded && data && stackedBarChart === null) {
             const stackedBarChart = new StackedLineChartD3(
                 id,
                 data,
@@ -34,7 +34,7 @@ const DocumentsCountStackedLineChart: React.FC<DocumentsHeatMapProps> = ({isLoad
             stackedBarChart.main();
             setStackedBarChart(stackedBarChart);
         }
-    }, [isLoaded, data, width]);
+    }, [isLoaded, data]);
 
     useEffect(() => {
         if (stackedBarChart && isVisible) {
@@ -44,8 +44,8 @@ const DocumentsCountStackedLineChart: React.FC<DocumentsHeatMapProps> = ({isLoad
 
     return (
         <>
-            <Title value={'News archived each day'} />
-            <Content value={`Stacked bar chart grouped by category`}/>
+            <Title value={['News', 'archived', 'by', 'day & category']} />
+            <Content value={`Art made of data.`}/>
             <div id={id} ref={ref}/>
         </>
     )

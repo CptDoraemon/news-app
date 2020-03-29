@@ -79,7 +79,7 @@ const Analytics: React.FC<AnalyticsProps> = () => {
     }, []);
 
     const isLoaded = status === AnalyticsPageStatus.loaded;
-    const width = wrapperRef?.current?.getBoundingClientRect().width;
+    const width = wrapperRef?.current?.getBoundingClientRect().width || 100;
 
     return (
         <div className={classes.root}>
@@ -128,8 +128,8 @@ const Analytics: React.FC<AnalyticsProps> = () => {
                                         series: summaryStatisticsData.documentsCountByDayAndCategory.series,
                                         order: summaryStatisticsData.documentsCountByDayAndCategory.category
                                     }}
-                                    width={width || 100}
-                                    height={600}
+                                    width={width}
+                                    height={width >= 1000 ? 600 : width / 2}
                                 />
                             </SectionWrapper>
                         </AnimationSlideIn>

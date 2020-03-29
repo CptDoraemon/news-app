@@ -74,7 +74,7 @@ class PieChartD3 {
     getPieData(data: PieChartData) {
         const _data =d3.pie<ArcData>()
             .value((d) => d.value)
-            .sort((a, b) => a.value - b.value)
+            .sort((a, b) => - a.value + b.value)
             .startAngle(this.params.startAngle)
             .endAngle(this.params.endAngle)
             (data);

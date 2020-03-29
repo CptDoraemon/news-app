@@ -12,7 +12,7 @@ const useStyles = makeStyles(theme => ({
 interface DocumentsHeatMapProps {
     isLoaded: Boolean,
     data: HeatMapData,
-    width?: number
+    width: number
 }
 
 const DocumentsHeatMap: React.FC<DocumentsHeatMapProps> = ({isLoaded, data, width}) => {
@@ -21,7 +21,7 @@ const DocumentsHeatMap: React.FC<DocumentsHeatMapProps> = ({isLoaded, data, widt
     const [heatMap, setHeatMap] = useState<null | HeatMapD3>(null);
 
     useEffect(() => {
-        if (isLoaded && data && width && heatMap === null) {
+        if (isLoaded && data && heatMap === null) {
             const heatMap = new HeatMapD3(
                 'analytics-documents-heat-map',
                 data,
@@ -30,7 +30,7 @@ const DocumentsHeatMap: React.FC<DocumentsHeatMapProps> = ({isLoaded, data, widt
             heatMap.main();
             setHeatMap(heatMap);
         }
-    }, [isLoaded, data, width]);
+    }, [isLoaded, data]);
 
     useEffect(() => {
         if (heatMap && isVisible) {
