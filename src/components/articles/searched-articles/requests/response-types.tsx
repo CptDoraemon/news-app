@@ -7,7 +7,8 @@ export interface IResponse {
     status: string,
     totalCount: number,
     data: ISearchedArticle[],
-    frequency: IFrequencyData
+    frequency: number[],
+    series: string[]
 }
 
 export interface ISearchedArticle{

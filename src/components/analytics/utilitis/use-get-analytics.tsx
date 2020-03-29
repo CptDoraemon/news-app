@@ -47,11 +47,15 @@ const useGetAnalytics = () => {
                         latestDocumentDate: json.summaryStatistics.latestDocumentDate,
                         documentsCountByCategory: json.summaryStatistics.documentsCountByCategory,
                         documentsCountByDay: {
-                            time: json.summaryStatistics.documentsCountByDay.bin.map((_: string) => (new Date(_).getTime())),
-                            count: json.summaryStatistics.documentsCountByDay.frequency
+                            time: json.summaryStatistics.series.map((_: string) => (new Date(_).getTime())),
+                            count: json.summaryStatistics.documentsCountByDay
                         },
                         wordCloud: json.summaryStatistics.wordCloud,
-                        documentsCountByDayAndCategory: json.summaryStatistics.documentsCountByDayAndCategory
+                        documentsCountByDayAndCategory: {
+                            documentCount: json.summaryStatistics.documentsCountByDayAndCategory.documentCount,
+                            series: json.summaryStatistics.series,
+                            category: json.summaryStatistics.documentsCountByDayAndCategory.category
+                        }
                     } as SummaryStatisticsData);
                     setStatus(AnalyticsPageStatus.loaded)
                 }

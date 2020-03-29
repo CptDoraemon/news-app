@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import requestSearchNews from "./request-search-news";
 import Status from "../utilities/status";
 import SortTypes from "../filters/sort-types";
-import {IFrequencyData, ISearchedArticle, IResponse} from "./response-types";
+import {ISearchedArticle, IResponse, IFrequencyData} from "./response-types";
 
 const useSearchNews = (keyword: string) => {
 
@@ -27,7 +27,10 @@ const useSearchNews = (keyword: string) => {
             setStatus(Status.LOADING);
             const json: IResponse = await requestSearchNews(keyword, 0, true);
             setData(json.data);
-            setFrequencyData(json.frequency);
+            setFrequencyData({
+                bin: json.series.slice(),
+                frequency: json.frequency.slice()
+            });
             setTotalCount(json.totalCount);
             setLoadedStatus(json.data.length, json.totalCount);
         } catch (e) {

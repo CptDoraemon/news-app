@@ -2,7 +2,7 @@ import React, {Dispatch, SetStateAction, useEffect, useMemo, useRef} from "react
 import {makeStyles} from "@material-ui/core";
 import { useTheme } from '@material-ui/core/styles';
 import FrequencyChartD3 from "../../../../d3-charts/frequency-chart-d3";
-import {IFrequencyData} from "../requests/response-types";
+import {IResponse} from "../requests/response-types";
 
 const id = 'keyword-frequency-chart';
 
@@ -13,8 +13,8 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface KeywordFrequencyProps {
-    bin: IFrequencyData['bin'],
-    frequency: IFrequencyData['frequency'],
+    bin: IResponse['series'],
+    frequency: IResponse['frequency'],
     setDate: (date: number) => void,
 }
 
