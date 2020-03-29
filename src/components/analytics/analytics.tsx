@@ -7,17 +7,15 @@ import Box from "@material-ui/core/Box";
 import DocumentsByCategoryBarChart from "./documents-by-category-bar-chart";
 import DocumentsHeatMap from "./documents-heat-map";
 import DocumentsTextSummary from "./documents-text-summary";
-import useDebounce from "../../tools/use-debounce";
 import Fade from "@material-ui/core/Fade";
-import AnimationSlideIn from "./utilitis/animation-slide-in";
-import useTheme from "@material-ui/core/styles/useTheme";
-import withAnimationSlideIn from "./utilitis/animation-slide-in";
+import AnimationSlideIn, {AnimationSlideInDirection} from "./utilitis/animation-slide-in";
 import WordCloud from "./documents-word-cloud";
 import AnimationFixed from "./utilitis/animation-fixed";
-import DocumentsCountStackedBarChart from "./documents-count-stacked-bar-chart";
+import DocumentsCountStackedLineChart from "./documents-count-stacked-line-chart";
 
 const useStyles = makeStyles(theme => ({
     root: {
+        overflowX: 'hidden',
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
@@ -116,14 +114,23 @@ const Analytics: React.FC<AnalyticsProps> = () => {
                                     width={width}/>
                             </SectionWrapper>
                         </Fade>
-                        <AnimationSlideIn>
+                        <AnimationSlideIn direction={AnimationSlideInDirection.left}>
                             <SectionWrapper>
                                 <DocumentsHeatMap isLoaded={isLoaded} data={summaryStatisticsData.documentsCountByDay} width={width}/>
                             </SectionWrapper>
                         </AnimationSlideIn>
-                        <AnimationSlideIn>
+                        <AnimationSlideIn direction={AnimationSlideInDirection.right}>
                             <SectionWrapper>
-                                <DocumentsCountStackedBarChart isLoaded={isLoaded} data={summaryStatisticsData.documentsCountByDay} width={width}/>
+                                <DocumentsCountStackedLineChart
+                                    isLoaded={isLoaded}
+                                    data={{
+                                        quantity: summaryStatisticsData.documentsCountByDayAndCategory.documentCount,
+                                        series: summaryStatisticsData.documentsCountByDayAndCategory.series,
+                                        order: summaryStatisticsData.documentsCountByDayAndCategory.category
+                                    }}
+                                    width={width || 100}
+                                    height={600}
+                                />
                             </SectionWrapper>
                         </AnimationSlideIn>
                         <AnimationFixed>

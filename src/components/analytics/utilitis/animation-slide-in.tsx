@@ -3,11 +3,16 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 
 const easeInQuad = (t: number) => t*t;
 
+export enum AnimationSlideInDirection {
+    left= 'left',
+    right='right'
+}
+
 const useStyles = makeStyles(theme => ({
     root: {
         position: 'relative',
         zIndex: 1,
-        width: '100%'
+        width: '100%',
     },
     children: {
         position: 'absolute',
@@ -24,10 +29,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface AnimationSlideInProps {
-
+    direction: AnimationSlideInDirection
 }
 
-const AnimationSlideIn: React.FC<AnimationSlideInProps> = ({children}) => {
+const AnimationSlideIn: React.FC<AnimationSlideInProps> = ({children, direction}) => {
     const classes = useStyles();
     const containerRef = useRef<HTMLDivElement>(null);
     const childrenRef = useRef<HTMLDivElement>(null);
@@ -88,7 +93,7 @@ const AnimationSlideIn: React.FC<AnimationSlideInProps> = ({children}) => {
             start: window.scrollY + rect.top,
             end: window.scrollY + rect.top + rect.height * 0.5
         });
-        const xMax = -(rect.left + rect.width);
+        const xMax = direction === AnimationSlideInDirection.left ? -(rect.left + rect.width) : rect.right + rect.width;
         setTranslate({
             xMax,
             x: xMax,

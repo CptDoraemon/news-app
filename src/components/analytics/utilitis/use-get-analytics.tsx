@@ -51,6 +51,7 @@ const useGetAnalytics = () => {
                             count: json.summaryStatistics.documentsCountByDay.frequency
                         },
                         wordCloud: json.summaryStatistics.wordCloud,
+                        documentsCountByDayAndCategory: json.summaryStatistics.documentsCountByDayAndCategory
                     } as SummaryStatisticsData);
                     setStatus(AnalyticsPageStatus.loaded)
                 }

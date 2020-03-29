@@ -10,7 +10,8 @@ type ArcData = {
 class PieChartD3 {
 
     readonly getColor = (index: number) => {
-        const colors = ['#003f5c', '#374c80', '#7a5195' ,'#bc5090' ,'#ef5675' ,'#ff764a' ,'#ffa600'];
+        // const colors = ['#003f5c', '#374c80', '#7a5195' ,'#bc5090' ,'#ef5675' ,'#ff764a' ,'#ffa600'];
+        const colors = ['#ffa600', '#ff764a', '#ef5675' ,'#bc5090' ,'#7a5195' ,'#374c80' ,'#003f5c'];
         return colors[index > colors.length - 1 ? 0 : index]
     };
     hasAnimated = false;
