@@ -21,7 +21,12 @@ export interface SummaryStatisticsData {
     wordCloud: Array<{
         count: number,
         word: string
-    }>
+    }>,
+    documentsCountByDayAndCategory: {
+        documentCount: number[][],
+        series: string[],
+        category: string[]
+    }
 }
 
 const useGetAnalytics = () => {

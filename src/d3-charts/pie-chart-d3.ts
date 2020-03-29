@@ -1,13 +1,13 @@
 import * as d3 from "d3";
 
-export type BarChartData = ArcData[];
+export type PieChartData = ArcData[];
 
 type ArcData = {
     title: string,
     value: number
 }
 
-class BarChartD3 {
+class PieChartD3 {
 
     readonly getColor = (index: number) => {
         const colors = ['#003f5c', '#374c80', '#7a5195' ,'#bc5090' ,'#ef5675' ,'#ff764a' ,'#ffa600'];
@@ -41,7 +41,7 @@ class BarChartD3 {
         totalValue: number
     };
 
-    constructor(id: string, data: BarChartData, width: number) {
+    constructor(id: string, data: PieChartData, width: number) {
         this.id = id;
         this.params = this.getParams(width);
         this.svg = d3.select(`#${id}`).append("svg");
@@ -70,7 +70,7 @@ class BarChartD3 {
         }
     };
 
-    getPieData(data: BarChartData) {
+    getPieData(data: PieChartData) {
         const _data =d3.pie<ArcData>()
             .value((d) => d.value)
             .sort((a, b) => a.value - b.value)
@@ -261,4 +261,4 @@ class BarChartD3 {
     }
 }
 
-export default BarChartD3
+export default PieChartD3

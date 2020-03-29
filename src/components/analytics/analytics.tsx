@@ -14,6 +14,7 @@ import useTheme from "@material-ui/core/styles/useTheme";
 import withAnimationSlideIn from "./utilitis/animation-slide-in";
 import WordCloud from "./documents-word-cloud";
 import AnimationFixed from "./utilitis/animation-fixed";
+import DocumentsCountStackedBarChart from "./documents-count-stacked-bar-chart";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -118,6 +119,11 @@ const Analytics: React.FC<AnalyticsProps> = () => {
                         <AnimationSlideIn>
                             <SectionWrapper>
                                 <DocumentsHeatMap isLoaded={isLoaded} data={summaryStatisticsData.documentsCountByDay} width={width}/>
+                            </SectionWrapper>
+                        </AnimationSlideIn>
+                        <AnimationSlideIn>
+                            <SectionWrapper>
+                                <DocumentsCountStackedBarChart isLoaded={isLoaded} data={summaryStatisticsData.documentsCountByDay} width={width}/>
                             </SectionWrapper>
                         </AnimationSlideIn>
                         <AnimationFixed>
