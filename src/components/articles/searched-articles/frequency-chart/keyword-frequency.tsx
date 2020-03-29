@@ -29,7 +29,7 @@ const KeywordFrequency: React.FC<KeywordFrequencyProps> = ({bin, frequency, setD
 
         const chart = new FrequencyChartD3(
             theme,
-            bin.map(obj => obj.ms),
+            bin.map(ISOString => (new Date(ISOString)).getTime()),
             frequency.slice(),
             wrapperRef.current.getBoundingClientRect().width,
             id

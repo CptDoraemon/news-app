@@ -64,8 +64,9 @@ class StackedLineChartD3 {
         // curve can be more readable in this way
         if (convertToPercentage) {
             const percentage = data.quantity.map(arr => {
+                const arrayLength = arr.length;
                 const sum = arr.reduce((a, b) => a + b);
-                return arr.map(num => sum === 0 ? 0 : (num / sum))
+                return arr.map(num => sum === 0 ? (1 / arrayLength) : (num / sum))
             });
             data = Object.assign({}, data, {quantity: percentage});
             maxQuantity = 1;

@@ -1,9 +1,5 @@
 export interface IFrequencyData {
-    bin: Array<{
-        year: number,
-        dayOfYear: number,
-        ms: number
-    }>,
+    bin: string[],
     frequency: number[]
 }
 

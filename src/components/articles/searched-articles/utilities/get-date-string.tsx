@@ -1,4 +1,4 @@
 export default function getDateString(num: number) {
     const date = new Date(num);
-    return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`
+    return `${date.getUTCFullYear()}/${date.getUTCMonth() + 1}/${date.getUTCDate()}`
 }

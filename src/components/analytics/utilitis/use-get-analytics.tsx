@@ -8,8 +8,8 @@ export enum AnalyticsPageStatus {
 
 export interface SummaryStatisticsData {
     totalDocuments: number,
-    earliestDocumentDate: number,
-    latestDocumentDate: number,
+    earliestDocumentDate: string,
+    latestDocumentDate: string,
     documentsCountByCategory: Array<{
         count: number,
         category: string
@@ -47,7 +47,7 @@ const useGetAnalytics = () => {
                         latestDocumentDate: json.summaryStatistics.latestDocumentDate,
                         documentsCountByCategory: json.summaryStatistics.documentsCountByCategory,
                         documentsCountByDay: {
-                            time: json.summaryStatistics.documentsCountByDay.bin.map((_:any) => _.ms),
+                            time: json.summaryStatistics.documentsCountByDay.bin.map((_: string) => (new Date(_).getTime())),
                             count: json.summaryStatistics.documentsCountByDay.frequency
                         },
                         wordCloud: json.summaryStatistics.wordCloud,

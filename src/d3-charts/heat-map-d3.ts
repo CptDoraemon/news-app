@@ -142,19 +142,17 @@ class HeatMapD3 {
         let compensation = firstActualData.getUTCDay();
         let time = _data[0].time;
         while (compensation > 0) {
+            compensation--;
+            time -= aDay
             _data.unshift({
                 count: 0,
                 time
             });
-            compensation--;
-            time -= aDay
         }
-
         //
         const getY = (time: number[]) => {
             // day of week
-            const firstDataDay = new Date(time[0]).getUTCDay();
-            return time.map(_ => (new Date(_).getUTCDay() - firstDataDay) % 7)
+            return time.map(_ => (new Date(_)).getUTCDay())
         };
 
         const getX = (time: number[]) => {

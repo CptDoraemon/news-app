@@ -31,8 +31,8 @@ const useStyles = makeStyles(theme => ({
 
 interface DocumentsTextSummaryProps {
     totalDocuments: number,
-    earliestDocumentDate: number,
-    latestDocumentDate: number
+    earliestDocumentDate: string,
+    latestDocumentDate: string
 }
 
 const DocumentsTextSummary = React.forwardRef<HTMLDivElement, DocumentsTextSummaryProps>(({totalDocuments, earliestDocumentDate, latestDocumentDate}, forwardedRef) => {
@@ -40,8 +40,11 @@ const DocumentsTextSummary = React.forwardRef<HTMLDivElement, DocumentsTextSumma
     const classes = useStyles();
     const [fullHeight, setFullHeight] = useState(window.innerHeight - 100);
     const total = useCountUp({start: totalDocuments*0.9, end: totalDocuments, duration: 5});
-    const earliest = useCountUp({start: earliestDocumentDate*0.9, end: earliestDocumentDate, duration: 5});
-    const latest = useCountUp({start: latestDocumentDate*0.9, end: latestDocumentDate, duration: 5});
+
+    const earliestMs = (new Date(earliestDocumentDate)).getTime();
+    const latestMs = (new Date(latestDocumentDate)).getTime();
+    const earliest = useCountUp({start: earliestMs*0.9, end: earliestMs, duration: 5});
+    const latest = useCountUp({start: latestMs*0.9, end: latestMs, duration: 5});
 
     const title = (value: string) => (
         <h2 className={classes.title}>{value}</h2>
