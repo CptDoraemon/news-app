@@ -1,5 +1,28 @@
 import * as d3 from "d3";
 
+const getAccumulativeSum = (array: number[]) => {
+    // TODO O(n^2)
+    const result: number[] = [];
+    const sumHash: {[key: string]: number} = {};
+    array.forEach((num, index, arr) => {
+        let i = index - 1;
+        let sum = 0;
+        while (i >= 0) {
+            if (sumHash[i] !== undefined) {
+                sum += sumHash[i];
+                break
+            } else {
+                sum += arr[i];
+                i--
+            }
+        }
+        sumHash[index - 1] = sum;
+        result.push(sum)
+    });
+
+    return result
+};
+
 export interface StackedLineChartD3Data {
     quantity: number[][],
     series: string[],
@@ -8,10 +31,13 @@ export interface StackedLineChartD3Data {
 
 class StackedLineChartD3 {
     readonly monthStrings = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    readonly getColor = (index: number) => {
-        const colors = ['#003f5c', '#374c80', '#7a5195' ,'#bc5090' ,'#ef5675' ,'#ff764a' ,'#ffa600'];
-        // const colors = ['#ffa600', '#ff764a', '#ef5675' ,'#bc5090' ,'#7a5195' ,'#374c80' ,'#003f5c'];
-        return colors[index > colors.length - 1 ? 0 : index]
+    colors = {
+        getAreaColor: (index: number) => {
+            const colors = ['#003f5c', '#374c80', '#7a5195' ,'#bc5090' ,'#ef5675' ,'#ff764a' ,'#ffa600'];
+            // const colors = ['#ffa600', '#ff764a', '#ef5675' ,'#bc5090' ,'#7a5195' ,'#374c80' ,'#003f5c'];
+            return colors[index > colors.length - 1 ? 0 : index]
+        },
+        textColor: '#555'
     };
     svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>;
     dimensions: {
@@ -27,11 +53,13 @@ class StackedLineChartD3 {
     };
     axes: {
         y: d3.Axis<number | {valueOf(): number}>,
-        x: d3.Axis<number | {valueOf(): number}>
+        x: d3.Axis<number | {valueOf(): number}>,
+        yAreaTitle: d3.Axis<number | {valueOf(): number}>
     };
     references: {
         axisX: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null,
         axisY: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null,
+        axisYAreaTitle: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null,
         paths: d3.Selection<SVGPathElement, d3.Series<{ [key: string]: number; }, string>, SVGGElement, any> | null,
     };
     data: {
@@ -49,13 +77,14 @@ class StackedLineChartD3 {
         this.data = this.getData(data, true);
         this.dimensions = this.getDimension(width, height);
         this.scales = this.getScales();
-        this.axes = this.getAxes();
         this.references = {
             axisX: null,
             axisY: null,
+            axisYAreaTitle: null,
             paths: null,
         };
         this.shapes = this.getShapes();
+        this.axes = this.getAxes();
     }
 
     getData(data: StackedLineChartD3Data, convertToPercentage: boolean) {
@@ -89,7 +118,7 @@ class StackedLineChartD3 {
     }
 
     getDimension(width: number, height: number) {
-        const m = {t: 10, r: 50, b: 10, l: 50};
+        const m = {t: 10, r: 150, b: 50, l: 50};
         const chartWidth = width - m.l - m.r;
         const chartHeight = height - m.t - m.b;
         return {
@@ -116,18 +145,64 @@ class StackedLineChartD3 {
 
     getAxes() {
         const x = d3.axisBottom(this.scales.x)
+            .tickValues([0, Math.floor(this.data.series.length * 0.25), Math.floor(this.data.series.length * 0.5), Math.floor(this.data.series.length * 0.75), this.data.series.length - 1])
             .tickFormat((d, i) => {
-                const isoString = this.data.series[i];
+                const isoString = this.data.series[parseInt(`${d}`)];
                 const date = new Date(isoString);
-                return `${date.getDate()} ${this.monthStrings[date.getMonth()]}, ${date.getFullYear()}`
+                return `${date.getUTCDate()} ${this.monthStrings[date.getUTCMonth()]}, ${date.getUTCFullYear()}`
             });
-        const y = d3.axisLeft(this.scales.y);
+        const y = d3.axisLeft(this.scales.y)
+            .tickValues([0, this.data.maxQuantity])
+            .tickFormat((i) => ['0%', '100%'][parseInt(`${i}`)]);
+
+        const lastDayQuantities = this.data.quantity[this.data.quantity.length - 1].slice();
+        const yAreaTitleTickValues = getAccumulativeSum(lastDayQuantities);
+        yAreaTitleTickValues.forEach((num, i , arr) => arr[i] = num + 0.5 * lastDayQuantities[i]);
+        const yAreaTitle = d3.axisRight(this.scales.y)
+            .tickValues(yAreaTitleTickValues)
+            .tickFormat((d, i) => this.data.order[parseInt(`${i}`)]);
+
+        [x, y, yAreaTitle].forEach(_=>{
+            _
+                .tickSize(0)
+                .tickPadding(10)
+        });
         
         return {
             x,
-            y
+            y,
+            yAreaTitle
         }
+    }
 
+    initAxes() {
+        this.references.axisX = this.svg.append('g');
+        this.references.axisY = this.svg.append('g');
+        this.references.axisYAreaTitle = this.svg.append('g');
+        this.axes.x(this.references.axisX);
+        this.axes.y(this.references.axisY);
+        this.axes.yAreaTitle(this.references.axisYAreaTitle);
+
+        this.references.axisX.style('transform', `translate(0px, ${this.dimensions.m.t + this.dimensions.chartHeight}px)`);
+        this.references.axisY.style('transform', `translate(${this.dimensions.m.l}px, 0px)`);
+        this.references.axisYAreaTitle.style('transform', `translate(${this.dimensions.m.l + this.dimensions.chartWidth}px, 0px)`);
+
+        const allAxes = [this.references.axisX, this.references.axisY, this.references.axisYAreaTitle];
+        allAxes.forEach(_ => {
+            _
+                .selectAll('text')
+                .style('font-size', '0.875rem')
+                .style('font-weight', 700)
+                .style('fill', this.colors.textColor)
+        });
+        allAxes.forEach(_ => {
+            _.style('opacity', 0)
+        });
+
+        this.references.axisYAreaTitle
+            .selectAll('text')
+            .style('fill', (d, i) => this.colors.getAreaColor(i))
+            .style('text-transform', 'uppercase')
     }
 
     getShapes() {
@@ -168,7 +243,7 @@ class StackedLineChartD3 {
             .enter()
             .append('path')
             .attr('d', (d) => this.shapes.getArea(0)(d))
-            .attr('fill', (d, i) => this.getColor(i))
+            .attr('fill', (d, i) => this.colors.getAreaColor(i))
     }
 
     animate() {
@@ -182,11 +257,40 @@ class StackedLineChartD3 {
                     return this.shapes.getArea(t)(d) || ''
                 }
             })
-            .ease(d3.easeExpIn)
+            .ease(d3.easeExpIn);
+
+        setTimeout(() => {
+            this.appendMouseEventToSvg();
+            this.toggleAllAxes(true)
+        }, this.data.order.length * 200 + 1000 + 200)
+    }
+
+    toggleAllAxes(on: boolean) {
+        const opacity = on ? 1 : 0;
+        [
+            this.references.axisYAreaTitle,
+            this.references.axisX,
+            this.references.axisY
+        ].forEach(_ => {
+            _?.transition()
+                .duration(500)
+                .style('opacity', opacity)
+        })
+    }
+
+    appendMouseEventToSvg() {
+        this.svg
+            .on('mouseover', () => {
+                this.toggleAllAxes(true)
+            })
+            .on('mouseleave', () => {
+                this.toggleAllAxes(false)
+            })
     }
 
     main() {
         this.initSvg();
+        this.initAxes();
         this.initLineChart();
     }
 }
