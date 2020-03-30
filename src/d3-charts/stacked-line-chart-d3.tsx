@@ -37,7 +37,8 @@ class StackedLineChartD3 {
             // const colors = ['#ffa600', '#ff764a', '#ef5675' ,'#bc5090' ,'#7a5195' ,'#374c80' ,'#003f5c'];
             return colors[index > colors.length - 1 ? 0 : index]
         },
-        textColor: '#555'
+        textColor: '#555',
+        domainColor: 'red'
     };
     svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>;
     dimensions: {
@@ -49,18 +50,24 @@ class StackedLineChartD3 {
     };
     scales: {
         y: d3.ScaleLinear<number, number>,
-        x: d3.ScaleLinear<number, number>
+        x: d3.ScaleLinear<number, number>,
+        xBand: d3.ScaleBand<string>
     };
     axes: {
         y: d3.Axis<number | {valueOf(): number}>,
         x: d3.Axis<number | {valueOf(): number}>,
-        yAreaTitle: d3.Axis<number | {valueOf(): number}>
+        yAreaTitle: d3.Axis<number | {valueOf(): number}>,
+        xHover: d3.Axis<number | {valueOf(): number}>,
+        yHover: d3.Axis<number | {valueOf(): number}>,
     };
     references: {
         axisX: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null,
         axisY: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null,
         axisYAreaTitle: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null,
+        axisXHover: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null,
+        axisYHover: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null,
         paths: d3.Selection<SVGPathElement, d3.Series<{ [key: string]: number; }, string>, SVGGElement, any> | null,
+        detectionRects: d3.Selection<SVGRectElement, number[], SVGGElement, any> | null,
     };
     data: {
         stackData: {[key: string]: number}[],
@@ -81,7 +88,10 @@ class StackedLineChartD3 {
             axisX: null,
             axisY: null,
             axisYAreaTitle: null,
+            axisXHover: null,
+            axisYHover: null,
             paths: null,
+            detectionRects: null
         };
         this.shapes = this.getShapes();
         this.axes = this.getAxes();
@@ -131,15 +141,21 @@ class StackedLineChartD3 {
     }
 
     getScales() {
+        const xRange = [this.dimensions.m.l, this.dimensions.m.l + this.dimensions.chartWidth];
         const x = d3.scaleLinear()
             .domain([0, this.data.series.length - 1])
-            .range([this.dimensions.m.l, this.dimensions.m.l + this.dimensions.chartWidth]);
+            .range(xRange);
         const y = d3.scaleLinear()
             .domain([0, this.data.maxQuantity])
             .range([this.dimensions.chartHeight + this.dimensions.m.t, this.dimensions.m.t]);
+        const xBand = d3.scaleBand()
+            .domain(this.data.quantity.map((_, i) => `${i}`))
+            // @ts-ignore
+            .range(xRange);
         return {
             x,
-            y
+            y,
+            xBand
         }
     }
 
@@ -167,11 +183,21 @@ class StackedLineChartD3 {
                 .tickSize(0)
                 .tickPadding(10)
         });
+
+        const xHover = d3.axisBottom(this.scales.x)
+            .ticks(20);
+        const yHover = d3.axisLeft(this.scales.y)
+            .ticks(20);
+        const yHoverMoving = d3.axisLeft(this.scales.y)
+            .ticks(0);
         
         return {
             x,
             y,
-            yAreaTitle
+            yAreaTitle,
+            xHover,
+            yHover,
+            yHoverMoving
         }
     }
 
@@ -179,15 +205,22 @@ class StackedLineChartD3 {
         this.references.axisX = this.svg.append('g');
         this.references.axisY = this.svg.append('g');
         this.references.axisYAreaTitle = this.svg.append('g');
+        this.references.axisXHover = this.svg.append('g');
+        this.references.axisYHover = this.svg.append('g');
+
         this.axes.x(this.references.axisX);
         this.axes.y(this.references.axisY);
         this.axes.yAreaTitle(this.references.axisYAreaTitle);
+        this.axes.xHover(this.references.axisXHover);
+        this.axes.yHover(this.references.axisYHover);
 
         this.references.axisX.style('transform', `translate(0px, ${this.dimensions.m.t + this.dimensions.chartHeight}px)`);
         this.references.axisY.style('transform', `translate(${this.dimensions.m.l}px, 0px)`);
         this.references.axisYAreaTitle.style('transform', `translate(${this.dimensions.m.l + this.dimensions.chartWidth}px, 0px)`);
+        this.references.axisXHover.style('transform', `translate(0px, ${this.dimensions.m.t + this.dimensions.chartHeight}px)`);
 
-        const allAxes = [this.references.axisX, this.references.axisY, this.references.axisYAreaTitle];
+        const allAxes = [this.references.axisX, this.references.axisY, this.references.axisYAreaTitle, this.references.axisXHover, this.references.axisYHover];
+
         allAxes.forEach(_ => {
             _
                 .selectAll('text')
@@ -196,7 +229,13 @@ class StackedLineChartD3 {
                 .style('fill', this.colors.textColor)
         });
         allAxes.forEach(_ => {
-            _.style('opacity', 0)
+            _
+                .selectAll('.domain')
+                .style('stroke', this.colors.domainColor)
+                .attr('stroke-width', 5)
+        });
+        allAxes.forEach(_ => {
+            _.style('opacity', 1)
         });
 
         this.references.axisYAreaTitle
@@ -246,6 +285,22 @@ class StackedLineChartD3 {
             .attr('fill', (d, i) => this.colors.getAreaColor(i))
     }
 
+    initDetectionRects() {
+        this.references.detectionRects = this.svg.append('g')
+            .selectAll('rect')
+            .data(this.data.quantity)
+            .enter()
+            .append('rect')
+            .attr('x', (d, i) => {
+                return this.scales.xBand(i.toString()) || '0'
+            })
+            .attr('y', this.dimensions.m.t)
+            .attr('width', this.scales.xBand.bandwidth)
+            .attr('height', this.dimensions.chartHeight)
+            .style('fill', '#fff')
+            .style('opacity', 0)
+    }
+
     animate() {
         if (!this.references.paths) return;
 
@@ -260,7 +315,7 @@ class StackedLineChartD3 {
             .ease(d3.easeExpIn);
 
         setTimeout(() => {
-            this.appendMouseEventToSvg();
+            // this.appendMouseEventToSvg();
             this.toggleAllAxes(true)
         }, this.data.order.length * 200 + 1000 + 200)
     }
@@ -288,10 +343,22 @@ class StackedLineChartD3 {
             })
     }
 
+    appendMouseEventToDetectionRects() {
+        this.references.detectionRects
+            ?.on('mouseover', function(d, i) {
+                d3.select(this).style('opacity', 0.3)
+             })
+            .on('mouseleave', function(d, i) {
+                d3.select(this).style('opacity', 0)
+            })
+    }
+
     main() {
         this.initSvg();
-        this.initAxes();
         this.initLineChart();
+        this.initAxes();
+        this.initDetectionRects();
+        this.appendMouseEventToDetectionRects();
     }
 }
 
