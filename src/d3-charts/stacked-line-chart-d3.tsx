@@ -169,8 +169,11 @@ class StackedLineChartD3 {
     }
 
     getAxes() {
+        const xTickValues = this.dimensions.chartWidth >= 300 ?
+            [0, Math.floor(this.data.series.length * 0.25), Math.floor(this.data.series.length * 0.5), Math.floor(this.data.series.length * 0.75), this.data.series.length - 1].map(_=>`${_}`) :
+            [0, this.data.series.length - 1].map(_=>`${_}`);
         const x = d3.axisBottom(this.scales.xBand)
-            .tickValues([0, Math.floor(this.data.series.length * 0.25), Math.floor(this.data.series.length * 0.5), Math.floor(this.data.series.length * 0.75), this.data.series.length - 1].map(_=>`${_}`))
+            .tickValues(xTickValues)
             .tickFormat((d, i) => {
                 const isoString = this.data.series[parseInt(`${d}`)];
                 const date = new Date(isoString);
