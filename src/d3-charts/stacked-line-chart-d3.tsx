@@ -51,21 +51,24 @@ class StackedLineChartD3 {
     scales: {
         y: d3.ScaleLinear<number, number>,
         x: d3.ScaleLinear<number, number>,
-        xBand: d3.ScaleBand<string>
+        xBand: d3.ScaleBand<string>,
+        xPoint: d3.ScalePoint<string>
     };
     axes: {
         y: d3.Axis<number | {valueOf(): number}>,
-        x: d3.Axis<number | {valueOf(): number}>,
+        x: d3.Axis<string>,
         yAreaTitle: d3.Axis<number | {valueOf(): number}>,
-        xHover: d3.Axis<number | {valueOf(): number}>,
-        yHover: d3.Axis<number | {valueOf(): number}>,
+        xHover: d3.Axis<string>,
+        yHoverText: d3.Axis<number | {valueOf(): number}>,
+        yHoverLines: d3.Axis<number | {valueOf(): number}>,
     };
     references: {
         axisX: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null,
         axisY: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null,
         axisYAreaTitle: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null,
         axisXHover: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null,
-        axisYHover: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null,
+        axisYHoverText: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null,
+        axisYHoverLines: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null,
         paths: d3.Selection<SVGPathElement, d3.Series<{ [key: string]: number; }, string>, SVGGElement, any> | null,
         detectionRects: d3.Selection<SVGRectElement, number[], SVGGElement, any> | null,
     };
@@ -89,7 +92,8 @@ class StackedLineChartD3 {
             axisY: null,
             axisYAreaTitle: null,
             axisXHover: null,
-            axisYHover: null,
+            axisYHoverText: null,
+            axisYHoverLines: null,
             paths: null,
             detectionRects: null
         };
@@ -128,7 +132,7 @@ class StackedLineChartD3 {
     }
 
     getDimension(width: number, height: number) {
-        const m = {t: 10, r: 150, b: 50, l: 50};
+        const m = {t: 10, r: 150, b: 50, l: 60};
         const chartWidth = width - m.l - m.r;
         const chartHeight = height - m.t - m.b;
         return {
@@ -152,16 +156,21 @@ class StackedLineChartD3 {
             .domain(this.data.quantity.map((_, i) => `${i}`))
             // @ts-ignore
             .range(xRange);
+        const xPoint = d3.scalePoint()
+            .domain(this.data.quantity.map((_, i) => `${i}`))
+            // @ts-ignore
+            .range(xRange);
         return {
             x,
             y,
-            xBand
+            xBand,
+            xPoint
         }
     }
 
     getAxes() {
-        const x = d3.axisBottom(this.scales.x)
-            .tickValues([0, Math.floor(this.data.series.length * 0.25), Math.floor(this.data.series.length * 0.5), Math.floor(this.data.series.length * 0.75), this.data.series.length - 1])
+        const x = d3.axisBottom(this.scales.xBand)
+            .tickValues([0, Math.floor(this.data.series.length * 0.25), Math.floor(this.data.series.length * 0.5), Math.floor(this.data.series.length * 0.75), this.data.series.length - 1].map(_=>`${_}`))
             .tickFormat((d, i) => {
                 const isoString = this.data.series[parseInt(`${d}`)];
                 const date = new Date(isoString);
@@ -178,26 +187,33 @@ class StackedLineChartD3 {
             .tickValues(yAreaTitleTickValues)
             .tickFormat((d, i) => this.data.order[parseInt(`${i}`)]);
 
-        [x, y, yAreaTitle].forEach(_=>{
+        const xHover = d3.axisBottom(this.scales.xPoint)
+            .tickValues([])
+            .tickFormat((d, i) => {
+                const isoString = this.data.series[parseInt(`${d}`)];
+                const date = new Date(isoString);
+                return `${date.getUTCDate()} ${this.monthStrings[date.getUTCMonth()]}, ${date.getUTCFullYear()}`
+            });
+
+        [x, y, yAreaTitle, xHover].forEach((_)=>{
             _
                 .tickSize(0)
-                .tickPadding(10)
+                // @ts-ignore
+                .tickPadding(10);
         });
 
-        const xHover = d3.axisBottom(this.scales.x)
-            .ticks(20);
-        const yHover = d3.axisLeft(this.scales.y)
-            .ticks(20);
-        const yHoverMoving = d3.axisLeft(this.scales.y)
-            .ticks(0);
+        const yHoverText = d3.axisLeft(this.scales.y)
+            .tickValues([]);
+        const yHoverLines = d3.axisLeft(this.scales.y)
+            .tickValues([]);
         
         return {
             x,
             y,
             yAreaTitle,
             xHover,
-            yHover,
-            yHoverMoving
+            yHoverText,
+            yHoverLines
         }
     }
 
@@ -206,20 +222,24 @@ class StackedLineChartD3 {
         this.references.axisY = this.svg.append('g');
         this.references.axisYAreaTitle = this.svg.append('g');
         this.references.axisXHover = this.svg.append('g');
-        this.references.axisYHover = this.svg.append('g');
+        this.references.axisYHoverText = this.svg.append('g');
+        this.references.axisYHoverLines = this.svg.append('g');
 
         this.axes.x(this.references.axisX);
         this.axes.y(this.references.axisY);
         this.axes.yAreaTitle(this.references.axisYAreaTitle);
         this.axes.xHover(this.references.axisXHover);
-        this.axes.yHover(this.references.axisYHover);
+        this.axes.yHoverText(this.references.axisYHoverText);
+        this.axes.yHoverLines(this.references.axisYHoverLines);
 
         this.references.axisX.style('transform', `translate(0px, ${this.dimensions.m.t + this.dimensions.chartHeight}px)`);
         this.references.axisY.style('transform', `translate(${this.dimensions.m.l}px, 0px)`);
         this.references.axisYAreaTitle.style('transform', `translate(${this.dimensions.m.l + this.dimensions.chartWidth}px, 0px)`);
         this.references.axisXHover.style('transform', `translate(0px, ${this.dimensions.m.t + this.dimensions.chartHeight}px)`);
+        this.references.axisYHoverText.style('transform', `translate(${this.dimensions.m.l}px, 0px)`);
+        this.references.axisYHoverLines.style('transform', `translate(${this.dimensions.m.l}px, 0px)`);
 
-        const allAxes = [this.references.axisX, this.references.axisY, this.references.axisYAreaTitle, this.references.axisXHover, this.references.axisYHover];
+        const allAxes = [this.references.axisX, this.references.axisY, this.references.axisYAreaTitle, this.references.axisXHover, this.references.axisYHoverText, this.references.axisYHoverLines];
 
         allAxes.forEach(_ => {
             _
@@ -231,8 +251,7 @@ class StackedLineChartD3 {
         allAxes.forEach(_ => {
             _
                 .selectAll('.domain')
-                .style('stroke', this.colors.domainColor)
-                .attr('stroke-width', 5)
+                .remove()
         });
         allAxes.forEach(_ => {
             _.style('opacity', 1)
@@ -254,7 +273,7 @@ class StackedLineChartD3 {
         const getArea = (t: number) => {
             return d3.area()
                 .x((d, i) => {
-                    return this.scales.x(i)
+                    return this.scales.xPoint(`${i}`) || 0
                 })
                 .y0((d) => {
                     return this.scales.y(d[0] + (this.data.maxQuantity) * (1 - t))
@@ -283,6 +302,7 @@ class StackedLineChartD3 {
             .append('path')
             .attr('d', (d) => this.shapes.getArea(0)(d))
             .attr('fill', (d, i) => this.colors.getAreaColor(i))
+            .style('transform', `translateX(${this.scales.xBand.bandwidth()})`)
     }
 
     initDetectionRects() {
@@ -292,7 +312,7 @@ class StackedLineChartD3 {
             .enter()
             .append('rect')
             .attr('x', (d, i) => {
-                return this.scales.xBand(i.toString()) || '0'
+                return (this.scales.xPoint(i.toString()) || 0) - this.scales.xBand.bandwidth() * 0.5
             })
             .attr('y', this.dimensions.m.t)
             .attr('width', this.scales.xBand.bandwidth)
@@ -344,12 +364,87 @@ class StackedLineChartD3 {
     }
 
     appendMouseEventToDetectionRects() {
+        const thisClass = this;
+
+        const updateHoverAxes = (percentages?: number[], seriesIndex?: number) => {
+            if (percentages !== undefined && seriesIndex !== undefined) {
+                const accumulativeSum = getAccumulativeSum(percentages);
+                const areaMidPosition = accumulativeSum.map((num, i) => num + 0.5 * percentages[i]);
+                this.axes.yHoverText
+                    .tickValues(areaMidPosition)
+                    .tickFormat((_d, _i) => `${(percentages[_i] * 100).toFixed(2)}%`)
+
+                this.axes.yHoverLines
+                    .tickValues(accumulativeSum.slice(1))
+                    .tickFormat(() => '')
+                    .tickSizeInner(-thisClass.dimensions.chartWidth)
+
+                this.axes.xHover
+                    .tickValues([`${seriesIndex}`])
+                if (this.references.axisXHover && this.references.axisYHoverText && this.references.axisYHoverLines) {
+                    this.axes.xHover(this.references.axisXHover);
+                    this.axes.yHoverText(this.references.axisYHoverText);
+                    this.axes.yHoverLines(this.references.axisYHoverLines);
+
+                    this.references.axisYHoverLines
+                        .selectAll('line')
+                        .style('stroke', 'rgba(255,255,255,0.6)')
+                        .style('stroke-width', 2);
+
+                    this.references.axisYHoverText
+                        .selectAll('text')
+                        .style('font-size', '0.875rem')
+                        .style('font-weight', '700')
+                        .style('fill', (d, i) => this.colors.getAreaColor(i));
+                    this.references.axisYHoverText.select('.domain').remove();
+                    this.references.axisYHoverText.selectAll('line')
+                        .style('stroke', (d, i) => this.colors.getAreaColor(i))
+                        .style('stroke-width', 5);
+
+                    this.references.axisXHover
+                        .selectAll('text')
+                        .style('font-size', '0.875rem')
+                        .style('font-weight', '700')
+                        .style('fill', this.colors.textColor);
+                    // const bBox = this.references.axisXHover.select<SVGTextElement>('text').node()?.getBBox();
+                    // console.log(bBox);
+                    // if (bBox) {
+                    //     this.references.axisXHover
+                    //         .append('rect')
+                    //         .attr('x', bBox.x)
+                    //         .attr('y', bBox.y)
+                    //         .attr('width', bBox.width)
+                    //         .attr('height', bBox.height)
+                    //         .style('fill', '#eee')
+                    // }
+
+                }
+            } else {
+                [this.axes.xHover, this.axes.yHoverText, this.axes.yHoverLines].forEach(_ => {
+                    _.tickValues([]);
+                });
+                if (this.references.axisXHover && this.references.axisYHoverText && this.references.axisYHoverLines) {
+                    this.axes.xHover(this.references.axisXHover);
+                    this.axes.yHoverText(this.references.axisYHoverText);
+                    this.axes.yHoverLines(this.references.axisYHoverLines);
+                }
+            }
+
+            if (this.references.axisXHover && this.references.axisYHoverText && this.references.axisYHoverLines) {
+                [this.references.axisXHover, this.references.axisYHoverText, this.references.axisYHoverLines].forEach(_ => {
+                    _.select('.domain').remove()
+                });
+            }
+        };
+
         this.references.detectionRects
             ?.on('mouseover', function(d, i) {
-                d3.select(this).style('opacity', 0.3)
+                d3.select(this).style('opacity', 0.3);
+                updateHoverAxes(d, i)
              })
             .on('mouseleave', function(d, i) {
-                d3.select(this).style('opacity', 0)
+                d3.select(this).style('opacity', 0);
+                updateHoverAxes()
             })
     }
 
