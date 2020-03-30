@@ -260,7 +260,7 @@ class StackedLineChartD3 {
         this.references.axisYAreaTitle
             .selectAll('text')
             .style('fill', (d, i) => this.colors.getAreaColor(i))
-            .style('text-transform', 'uppercase')
+            .style('text-transform', 'uppercase');
     }
 
     getShapes() {
@@ -366,6 +366,22 @@ class StackedLineChartD3 {
     appendMouseEventToDetectionRects() {
         const thisClass = this;
 
+        const updateHoverXBg = () => {
+            if (!this.references.axisXHover) return;
+
+            const bBox = this.references.axisXHover.select<SVGTextElement>('text').node()?.getBBox();
+            if (!bBox) return;
+
+            this.references.axisXHover.selectAll('g.tick').insert('rect',
+                ':first-child')
+                .attr('width', bBox.width*1.2)
+                .attr('height', bBox.height)
+                .attr('x', bBox.x-0.1*bBox.width)
+                .attr('y', bBox.y)
+                .style('fill', '#fefefe');
+
+        };
+
         const updateHoverAxes = (percentages?: number[], seriesIndex?: number) => {
             if (percentages !== undefined && seriesIndex !== undefined) {
                 const accumulativeSum = getAccumulativeSum(percentages);
@@ -406,18 +422,8 @@ class StackedLineChartD3 {
                         .style('font-size', '0.875rem')
                         .style('font-weight', '700')
                         .style('fill', this.colors.textColor);
-                    // const bBox = this.references.axisXHover.select<SVGTextElement>('text').node()?.getBBox();
-                    // console.log(bBox);
-                    // if (bBox) {
-                    //     this.references.axisXHover
-                    //         .append('rect')
-                    //         .attr('x', bBox.x)
-                    //         .attr('y', bBox.y)
-                    //         .attr('width', bBox.width)
-                    //         .attr('height', bBox.height)
-                    //         .style('fill', '#eee')
-                    // }
 
+                    updateHoverXBg();
                 }
             } else {
                 [this.axes.xHover, this.axes.yHoverText, this.axes.yHoverLines].forEach(_ => {
