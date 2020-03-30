@@ -55,12 +55,12 @@ class StackedLineChartD3 {
         xPoint: d3.ScalePoint<string>
     };
     axes: {
-        y: d3.Axis<number | {valueOf(): number}>,
+        y: d3.Axis<number>,
         x: d3.Axis<string>,
-        yAreaTitle: d3.Axis<number | {valueOf(): number}>,
+        yAreaTitle: d3.Axis<number>,
         xHover: d3.Axis<string>,
-        yHoverText: d3.Axis<number | {valueOf(): number}>,
-        yHoverLines: d3.Axis<number | {valueOf(): number}>,
+        yHoverText: d3.Axis<number>,
+        yHoverLines: d3.Axis<number>,
     };
     references: {
         axisX: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null,
@@ -145,20 +145,18 @@ class StackedLineChartD3 {
     }
 
     getScales() {
-        const xRange = [this.dimensions.m.l, this.dimensions.m.l + this.dimensions.chartWidth];
+        const xRange: [number, number] = [this.dimensions.m.l, this.dimensions.m.l + this.dimensions.chartWidth];
         const x = d3.scaleLinear()
             .domain([0, this.data.series.length - 1])
             .range(xRange);
         const y = d3.scaleLinear()
             .domain([0, this.data.maxQuantity])
             .range([this.dimensions.chartHeight + this.dimensions.m.t, this.dimensions.m.t]);
-        const xBand = d3.scaleBand()
-            .domain(this.data.quantity.map((_, i) => `${i}`))
-            // @ts-ignore
+        const xBand = d3.scaleBand<string>()
+            .domain(this.data.quantity.map((_, i) => i.toString()))
             .range(xRange);
         const xPoint = d3.scalePoint()
             .domain(this.data.quantity.map((_, i) => `${i}`))
-            // @ts-ignore
             .range(xRange);
         return {
             x,
@@ -179,14 +177,14 @@ class StackedLineChartD3 {
                 const date = new Date(isoString);
                 return `${date.getUTCDate()} ${this.monthStrings[date.getUTCMonth()]}, ${date.getUTCFullYear()}`
             });
-        const y = d3.axisLeft(this.scales.y)
+        const y = d3.axisLeft<number>(this.scales.y)
             .tickValues([0, this.data.maxQuantity])
             .tickFormat((i) => ['0%', '100%'][parseInt(`${i}`)]);
 
         const lastDayQuantities = this.data.quantity[this.data.quantity.length - 1].slice();
         const yAreaTitleTickValues = getAccumulativeSum(lastDayQuantities);
         yAreaTitleTickValues.forEach((num, i , arr) => arr[i] = num + 0.5 * lastDayQuantities[i]);
-        const yAreaTitle = d3.axisRight(this.scales.y)
+        const yAreaTitle = d3.axisRight<number>(this.scales.y)
             .tickValues(yAreaTitleTickValues)
             .tickFormat((d, i) => this.data.order[parseInt(`${i}`)]);
 
@@ -199,15 +197,13 @@ class StackedLineChartD3 {
             });
 
         [x, y, yAreaTitle, xHover].forEach((_)=>{
-            _
-                .tickSize(0)
-                // @ts-ignore
-                .tickPadding(10);
+            _.tickPadding(10);
+            _.tickSize(0);
         });
 
-        const yHoverText = d3.axisLeft(this.scales.y)
+        const yHoverText = d3.axisLeft<number>(this.scales.y)
             .tickValues([]);
-        const yHoverLines = d3.axisLeft(this.scales.y)
+        const yHoverLines = d3.axisLeft<number>(this.scales.y)
             .tickValues([]);
         
         return {
