@@ -320,8 +320,6 @@ class WorldMapD3 {
     }
 
     updateTooltip() {
-        if (!this.references.tooltip) return;
-
         const {
             inputX, // top left x of map path rect, used as primary anchor
             inputXSecondary, // top right x of map path rect, used in case primary anchor causing tooltip overlaps map rect
@@ -329,185 +327,234 @@ class WorldMapD3 {
             inputYSecondary, // bottom right y of map path rect
             data
         } = this.state.tooltipData;
+        if (!this.references.tooltip) return;
 
+        const currentT = this.state.time;
         const getNew = (num: number) => {
             return num >= 0 ? ` (+${num})` : ` (${num})`
         };
 
-        const currentT = this.state.time;
-        const date = new Date(this.data.case.series[currentT]);
-        const dateText = `${date.getDate()} ${this.monthStrings[date.getMonth()]}, ${date.getFullYear()}`;
-        const noData = 'Unknown';
+        const getTooltipsDimensions = () => {
+            if (!this.references.tooltip) return;
 
-        // Update texts
+            const bBox = this.references.tooltip.tooltip.node()?.getBBox();
+            if (!bBox) return;
+            const p = 0.3;
+            const shift = 5;
+            const textWidth = bBox.width;
+            const textHeight = bBox.height;
+            const lineChartHeight = 20;
+            const stackBarChartMarginTop = 10;
+            const stackBarChartHeight = 15;
+            const chartWidth = 150;
+            const tooltipWidth = (1+p)*Math.max(chartWidth, textWidth);
+            const tooltipHeight = (1+p)*(textHeight + lineChartHeight * 3 + stackBarChartHeight + stackBarChartMarginTop);
 
-        this.references.tooltip.tspanCountry.text(data.country);
-        this.references.tooltip.tspanDate.text(dateText);
-        if (!data.case) {
-            // no data
-            this.references.tooltip.tspanCaseAccumulative.text(`Confirmed: ${noData}`);
-            this.references.tooltip.tspanCaseNew.text('');
-            this.references.tooltip.tspanDeathAccumulative.text(`Death: ${noData}`);
-            this.references.tooltip.tspanDeathNew.text('');
-            this.references.tooltip.tspanRecoveredAccumulative.text(`Recovered: ${noData}`);
-            this.references.tooltip.tspanRecoveredNew.text('');
-        } else {
-            this.references.tooltip.tspanCaseAccumulative.text(`Confirmed: ${data.case.cases[currentT]}`);
-            this.references.tooltip.tspanCaseNew.text(currentT === 0 ? getNew(0) : getNew(data.case.cases[currentT] - data.case.cases[currentT - 1]));
-            this.references.tooltip.tspanDeathAccumulative.text(`Death: ${data.case.deaths[currentT]}`);
-            this.references.tooltip.tspanDeathNew.text(currentT === 0 ? getNew(0) : getNew(data.case.deaths[currentT] - data.case.deaths[currentT - 1]));
-            this.references.tooltip.tspanRecoveredAccumulative.text(`Recovered: ${data.case.recovered[currentT]}`);
-            this.references.tooltip.tspanRecoveredNew.text(currentT === 0 ? getNew(0) : getNew(data.case.recovered[currentT] - data.case.recovered[currentT - 1]));
-        }
-
-        // Update dimension and position
-        const bBox = this.references.tooltip.tooltip.node()?.getBBox();
-        if (!bBox) return;
-        const p = 0.3;
-        const shift = 5;
-        const textWidth = bBox.width;
-        const textHeight = bBox.height;
-        const lineChartHeight = 20;
-        const stackBarChartMarginTop = 10;
-        const stackBarChartHeight = 15;
-        const chartWidth = 150;
-        const tooltipWidth = (1+p)*Math.max(chartWidth, textWidth);
-        const tooltipHeight = (1+p)*(textHeight + lineChartHeight * 3 + stackBarChartHeight + stackBarChartMarginTop);
-
-        const xBg = inputX - tooltipWidth - shift;
-        const xBgFloored = Math.max(this.dimension.m.l, xBg);
-        let textX, tooltipX;
-        let y = inputY;
-        if (xBgFloored + tooltipWidth > inputX) {
-            // overlapping with map rect
-            tooltipX = inputXSecondary + shift;
-            if (tooltipX + tooltipWidth > this.dimension.svgWidth) {
-                // tooltip overflows viewport right edge now
-                // fallback to use primary x and use secondary y
-                tooltipX = xBgFloored;
-                textX = tooltipX + 0.5*tooltipWidth;
-                y = inputYSecondary
+            const xBg = inputX - tooltipWidth - shift;
+            const xBgFloored = Math.max(this.dimension.m.l, xBg);
+            let textX, tooltipX;
+            let _inputY = inputY;
+            if (xBgFloored + tooltipWidth > inputX) {
+                // overlapping with map rect
+                tooltipX = inputXSecondary + shift;
+                if (tooltipX + tooltipWidth > this.dimension.svgWidth) {
+                    // tooltip overflows viewport right edge now
+                    // fallback to use primary x and use secondary y
+                    tooltipX = xBgFloored;
+                    textX = tooltipX + 0.5*tooltipWidth;
+                    _inputY = inputYSecondary
+                } else {
+                    textX = tooltipX + 0.5*tooltipWidth
+                }
             } else {
+                tooltipX = xBgFloored;
                 textX = tooltipX + 0.5*tooltipWidth
             }
-        } else {
-            tooltipX = xBgFloored;
-            textX = tooltipX + 0.5*tooltipWidth
-        }
 
-        y = Math.min(y, this.dimension.svgHeight - tooltipHeight);
-        const toolTipStartY = y - p/2*bBox.height;
-        const lineChartStartY = toolTipStartY+0.5*p*tooltipHeight+textHeight;
-        const stackBarChartY = lineChartStartY + 3 * lineChartHeight + stackBarChartMarginTop;
-        this.references.tooltip.tooltip
-            .attr('x', textX)
-            .attr('y', y);
-        this.references.tooltip.tspanCountry
-            .attr('x', textX)
-            .attr('dy', '0.875em');
-        this.references.tooltip.tspanDate
-            .attr('x', textX)
-            .attr('dy', '1em');
-        this.references.tooltip.tspanCaseAccumulative
-            .attr('x', textX)
-            .attr('dy', '1em');
+            let tooltipY = _inputY - p/2*bBox.height;
+            tooltipY = Math.min(tooltipY, this.dimension.svgHeight - tooltipHeight);
+            tooltipY = Math.max(tooltipY, 0);
+            const lineChartStartY = tooltipY+0.5*p*tooltipHeight+textHeight;
+            const stackBarChartY = lineChartStartY + 3 * lineChartHeight + stackBarChartMarginTop;
 
-        this.references.tooltip.tspanDeathAccumulative
-            .attr('x', textX)
-            .attr('dy', '1em');
-
-        this.references.tooltip.tspanRecoveredAccumulative
-            .attr('x', textX)
-            .attr('dy', '1em');
-
-        this.references.tooltip.bg
-            .attr('x', tooltipX)
-            .attr('y', toolTipStartY)
-            .attr('width', tooltipWidth)
-            .attr('height', tooltipHeight);
-
-        //
-        // Update line charts
-        const updateLineCharts = (
-            dataArray: number[],
-            reference: d3.Selection<SVGPathElement, unknown | [number, number][], HTMLElement, any>,
-            yMax: number,
-            x: number,
-            y: number
-        ) => {
-            const data: [number, number][] = dataArray.map((num, i) => [i, num]);
-            const scaleX = d3.scaleLinear()
-                .domain([0, this.data.case.series.length-1])
-                .range([0, chartWidth]);
-            const scaleY = d3.scaleLinear()
-                .domain([0, yMax])
-                .range([20, 0]);
-
-            reference
-                .datum(data)
-                .attr('d', d3.line()
-                    .x((d) => scaleX(d[0]))
-                    .y((d) => scaleY(d[1]))
-                    .defined((d, i) => i <= this.state.time)
-                )
-                .style('transform', `translate(${x}px, ${y}px)`)
+            return {
+                tooltipX,
+                tooltipY,
+                tooltipWidth,
+                tooltipHeight,
+                textX,
+                textY: tooltipY + p/2*bBox.height,
+                chartX: textX - chartWidth/2,
+                chartWidth,
+                lineChartStartY,
+                lineChartHeight,
+                stackBarChartY,
+                stackBarChartHeight
+            }
         };
 
-        const chartX = textX - chartWidth/2;
-        if (this.state.tooltipData.data.case) {
-            // has data
-            const lineChartYMax = Math.max.apply(Math, this.state.tooltipData.data.case.cases);
-            updateLineCharts(this.state.tooltipData.data.case.cases, this.references.tooltip.caseLineChart, lineChartYMax, chartX, lineChartStartY);
-            updateLineCharts(this.state.tooltipData.data.case.deaths, this.references.tooltip.deathLineChart, lineChartYMax, chartX, lineChartStartY + lineChartHeight);
-            updateLineCharts(this.state.tooltipData.data.case.recovered, this.references.tooltip.recoveredLineChart, lineChartYMax, chartX, lineChartStartY + lineChartHeight*2);
-        } else {
-            // either no data or mouse is leaving, need to move line chart out
-            const nullData: number[] = [];
-            updateLineCharts(nullData, this.references.tooltip.caseLineChart, 0, chartX, lineChartStartY);
-            updateLineCharts(nullData, this.references.tooltip.deathLineChart, 0, chartX, lineChartStartY + lineChartHeight);
-            updateLineCharts(nullData, this.references.tooltip.recoveredLineChart, 0, chartX, lineChartStartY + lineChartHeight*2);
-        }
+        const updateTexts = () => {
+            if (!this.references.tooltip) return;
 
-        // update stack bar chart
-        if (this.state.tooltipData.data.case) {
-            // has data
-            const currentCase = this.state.tooltipData.data.case.cases[currentT];
-            const currentDeath = this.state.tooltipData.data.case.deaths[currentT];
-            const currentRecovered = this.state.tooltipData.data.case.recovered[currentT];
-            const deathWidth = currentCase === 0 ? 0 : (currentDeath / currentCase) * chartWidth;
-            const recoveredWidth = currentCase === 0 ? 0 : (currentRecovered / currentCase) * chartWidth;
-            this.references.tooltip.stackBarChartCase
-                .attr('x', chartX)
-                .attr('width', () => currentCase === 0 ? 0 : chartWidth)
-                .attr('height', stackBarChartHeight)
-                .attr('y', stackBarChartY);
-            this.references.tooltip.stackBarChartDeath
-                .attr('x', chartX + chartWidth - deathWidth)
-                .attr('width', deathWidth)
-                .attr('height', stackBarChartHeight)
-                .attr('y', stackBarChartY);
-            this.references.tooltip.stackBarChartRecovered
-                .attr('x', chartX)
-                .attr('width', recoveredWidth)
-                .attr('height', stackBarChartHeight)
-                .attr('y', stackBarChartY)
-        } else {
-            // either no data or mouse is leaving, need to move line chart out
-            this.references.tooltip.stackBarChartCase
-                .attr('x', chartX)
-                .attr('width', 0)
-                .attr('height', 0)
-                .attr('y', stackBarChartY);
-            this.references.tooltip.stackBarChartDeath
-                .attr('x', chartX)
-                .attr('width', 0)
-                .attr('height', 0)
-                .attr('y', stackBarChartY);
-            this.references.tooltip.stackBarChartRecovered
-                .attr('x', chartX)
-                .attr('width', 0)
-                .attr('height', 0)
-                .attr('y', stackBarChartY)
+            const date = new Date(this.data.case.series[currentT]);
+            const dateText = `${date.getDate()} ${this.monthStrings[date.getMonth()]}, ${date.getFullYear()}`;
+            const noData = 'Unknown';
+
+            this.references.tooltip.tspanCountry.text(data.country);
+            this.references.tooltip.tspanDate.text(dateText);
+            if (!data.case) {
+                // no data
+                this.references.tooltip.tspanCaseAccumulative.text(`Confirmed: ${noData}`);
+                this.references.tooltip.tspanCaseNew.text('');
+                this.references.tooltip.tspanDeathAccumulative.text(`Death: ${noData}`);
+                this.references.tooltip.tspanDeathNew.text('');
+                this.references.tooltip.tspanRecoveredAccumulative.text(`Recovered: ${noData}`);
+                this.references.tooltip.tspanRecoveredNew.text('');
+            } else {
+                this.references.tooltip.tspanCaseAccumulative.text(`Confirmed: ${data.case.cases[currentT]}`);
+                this.references.tooltip.tspanCaseNew.text(currentT === 0 ? getNew(0) : getNew(data.case.cases[currentT] - data.case.cases[currentT - 1]));
+                this.references.tooltip.tspanDeathAccumulative.text(`Death: ${data.case.deaths[currentT]}`);
+                this.references.tooltip.tspanDeathNew.text(currentT === 0 ? getNew(0) : getNew(data.case.deaths[currentT] - data.case.deaths[currentT - 1]));
+                this.references.tooltip.tspanRecoveredAccumulative.text(`Recovered: ${data.case.recovered[currentT]}`);
+                this.references.tooltip.tspanRecoveredNew.text(currentT === 0 ? getNew(0) : getNew(data.case.recovered[currentT] - data.case.recovered[currentT - 1]));
+            }
+        };
+
+        const updateDimensionAndPosition = (
+            textX: number,
+            textY: number,
+            tooltipX: number,
+            toolTipY: number,
+            tooltipWidth: number,
+            tooltipHeight: number
+        ) => {
+            if (!this.references.tooltip) return;
+
+            this.references.tooltip.tooltip
+                .attr('x', textX)
+                .attr('y', textY);
+            this.references.tooltip.tspanCountry
+                .attr('x', textX)
+                .attr('dy', '0.875em');
+            this.references.tooltip.tspanDate
+                .attr('x', textX)
+                .attr('dy', '1em');
+            this.references.tooltip.tspanCaseAccumulative
+                .attr('x', textX)
+                .attr('dy', '1em');
+
+            this.references.tooltip.tspanDeathAccumulative
+                .attr('x', textX)
+                .attr('dy', '1em');
+
+            this.references.tooltip.tspanRecoveredAccumulative
+                .attr('x', textX)
+                .attr('dy', '1em');
+
+            this.references.tooltip.bg
+                .attr('x', tooltipX)
+                .attr('y', toolTipY)
+                .attr('width', tooltipWidth)
+                .attr('height', tooltipHeight);
+        };
+
+        const updateLineCharts = (
+            chartX: number,
+            chartWidth: number,
+            lineChartStartY: number,
+            lineChartHeight: number
+        ) => {
+            if (!this.references.tooltip) return;
+
+            const updateLineChartsHelper = (
+                dataArray: number[],
+                reference: d3.Selection<SVGPathElement, unknown | [number, number][], HTMLElement, any>,
+                yMax: number,
+                x: number,
+                y: number
+            ) => {
+                const data: [number, number][] = dataArray.map((num, i) => [i, num]);
+                const scaleX = d3.scaleLinear()
+                    .domain([0, this.data.case.series.length-1])
+                    .range([0, chartWidth]);
+                const scaleY = d3.scaleLinear()
+                    .domain([0, yMax])
+                    .range([20, 0]);
+
+                reference
+                    .datum(data)
+                    .attr('d', d3.line()
+                        .x((d) => scaleX(d[0]))
+                        .y((d) => scaleY(d[1]))
+                        .defined((d, i) => i <= currentT)
+                    )
+                    .style('transform', `translate(${x}px, ${y}px)`)
+            };
+
+            if (this.state.tooltipData.data.case) {
+                // has data
+                const lineChartYMax = Math.max.apply(Math, this.state.tooltipData.data.case.cases);
+                updateLineChartsHelper(this.state.tooltipData.data.case.cases, this.references.tooltip.caseLineChart, lineChartYMax, chartX, lineChartStartY);
+                updateLineChartsHelper(this.state.tooltipData.data.case.deaths, this.references.tooltip.deathLineChart, lineChartYMax, chartX, lineChartStartY + lineChartHeight);
+                updateLineChartsHelper(this.state.tooltipData.data.case.recovered, this.references.tooltip.recoveredLineChart, lineChartYMax, chartX, lineChartStartY + lineChartHeight*2);
+            } else {
+                // either no data or mouse is leaving, need to move line chart out
+                const nullData: number[] = [];
+                updateLineChartsHelper(nullData, this.references.tooltip.caseLineChart, 0, chartX, lineChartStartY);
+                updateLineChartsHelper(nullData, this.references.tooltip.deathLineChart, 0, chartX, lineChartStartY + lineChartHeight);
+                updateLineChartsHelper(nullData, this.references.tooltip.recoveredLineChart, 0, chartX, lineChartStartY + lineChartHeight*2);
+            }
+        };
+
+        const updateStackBarChart = (
+            chartX: number,
+            chartWidth: number,
+            stackBarChartY: number,
+            stackBarChartHeight: number
+        ) => {
+            if (!this.references.tooltip) return;
+
+            if (this.state.tooltipData.data.case) {
+                // has data
+                const currentCase = this.state.tooltipData.data.case.cases[currentT];
+                const currentDeath = this.state.tooltipData.data.case.deaths[currentT];
+                const currentRecovered = this.state.tooltipData.data.case.recovered[currentT];
+                const deathWidth = currentCase === 0 ? 0 : (currentDeath / currentCase) * chartWidth;
+                const recoveredWidth = currentCase === 0 ? 0 : (currentRecovered / currentCase) * chartWidth;
+                this.references.tooltip.stackBarChartCase
+                    .attr('x', chartX)
+                    .attr('width', () => currentCase === 0 ? 0 : chartWidth)
+                    .attr('height', stackBarChartHeight)
+                    .attr('y', stackBarChartY);
+                this.references.tooltip.stackBarChartDeath
+                    .attr('x', chartX + chartWidth - deathWidth)
+                    .attr('width', deathWidth)
+                    .attr('height', stackBarChartHeight)
+                    .attr('y', stackBarChartY);
+                this.references.tooltip.stackBarChartRecovered
+                    .attr('x', chartX)
+                    .attr('width', recoveredWidth)
+                    .attr('height', stackBarChartHeight)
+                    .attr('y', stackBarChartY)
+            } else {
+                // either no data or mouse is leaving, need to move line chart out
+                [this.references.tooltip.stackBarChartCase, this.references.tooltip.stackBarChartDeath, this.references.tooltip.stackBarChartRecovered].forEach(_ => {
+                        _
+                            .attr('x', chartX)
+                            .attr('width', 0)
+                            .attr('height', 0)
+                            .attr('y', stackBarChartY);
+                });
+            }
+        };
+
+        // update texts first so that the dimensions can change base on the max text width
+        updateTexts();
+        const dimensions = getTooltipsDimensions();
+        if (dimensions) {
+            updateDimensionAndPosition(dimensions.textX, dimensions.textY, dimensions.tooltipX, dimensions.tooltipY, dimensions.tooltipWidth, dimensions.tooltipHeight);
+            updateLineCharts(dimensions.chartX, dimensions.chartWidth, dimensions.lineChartStartY, dimensions.lineChartHeight);
+            updateStackBarChart(dimensions.chartX, dimensions.chartWidth, dimensions.stackBarChartY, dimensions.stackBarChartHeight);
         }
     }
 
