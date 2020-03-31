@@ -324,14 +324,14 @@ class StackedLineChartD3 {
         if (!this.references.paths) return;
 
         this.references.paths.transition()
-            .delay((d, i) => i * 200)
-            .duration(1000)
+            .delay((d, i) => i * 100)
+            .duration(1200)
             .attrTween('d', (d) => {
                 return (t: number) => {
                     return this.shapes.getArea(t)(d) || ''
                 }
             })
-            .ease(d3.easeExpIn);
+            .ease(d3.easeCubicIn);
 
         setTimeout(() => {
             // this.appendMouseEventToSvg();
