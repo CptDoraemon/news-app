@@ -469,9 +469,6 @@ class WorldMapD3 {
         }
 
         // update stack bar chart
-        const stackBarScale = d3.scaleLinear()
-            .domain([0, this.data.case.series.length-1])
-            .range([0, 100]);
         if (this.state.tooltipData.data.case) {
             // has data
             const currentCase = this.state.tooltipData.data.case.cases[currentT];
@@ -498,12 +495,18 @@ class WorldMapD3 {
             // either no data or mouse is leaving, need to move line chart out
             this.references.tooltip.stackBarChartCase
                 .attr('x', chartX)
+                .attr('width', 0)
+                .attr('height', 0)
                 .attr('y', stackBarChartY);
             this.references.tooltip.stackBarChartDeath
                 .attr('x', chartX)
+                .attr('width', 0)
+                .attr('height', 0)
                 .attr('y', stackBarChartY);
             this.references.tooltip.stackBarChartRecovered
                 .attr('x', chartX)
+                .attr('width', 0)
+                .attr('height', 0)
                 .attr('y', stackBarChartY)
         }
     }
@@ -692,6 +695,14 @@ class WorldMapD3 {
         country: string,
         newCase: typeof WorldMapD3.prototype.state.tooltipData.data.case
     ) {
+        let _case = null;
+        if (newCase) {
+            _case = {
+                cases: newCase.cases.slice(),
+                deaths: newCase.deaths.slice(),
+                recovered: newCase.recovered.slice()
+            }
+        }
         this.state.tooltipData = Object.assign(
             this.state.tooltipData,
             {
@@ -701,7 +712,7 @@ class WorldMapD3 {
                 inputYSecondary: ySecondary,
                 data: {
                     country: country,
-                    case: newCase
+                    case: _case
                 }
             })
     }
