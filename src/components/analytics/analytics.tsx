@@ -12,6 +12,7 @@ import AnimationSlideIn, {AnimationSlideInDirection} from "./utilitis/animation-
 import WordCloud from "./documents-word-cloud";
 import AnimationFixed from "./utilitis/animation-fixed";
 import DocumentsCountStackedLineChart from "./documents-count-stacked-line-chart";
+import StackedLineChartExpansionPanelNote from "./stacked-line-chart-expansion-panel-note";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -114,11 +115,13 @@ const Analytics: React.FC<AnalyticsProps> = () => {
                                     width={width}/>
                             </SectionWrapper>
                         </Fade>
+
                         <AnimationSlideIn direction={AnimationSlideInDirection.left}>
                             <SectionWrapper>
                                 <DocumentsHeatMap isLoaded={isLoaded} data={summaryStatisticsData.documentsCountByDay} width={width}/>
                             </SectionWrapper>
                         </AnimationSlideIn>
+
                         <AnimationSlideIn direction={AnimationSlideInDirection.right}>
                             <SectionWrapper>
                                 <DocumentsCountStackedLineChart
@@ -133,6 +136,9 @@ const Analytics: React.FC<AnalyticsProps> = () => {
                                 />
                             </SectionWrapper>
                         </AnimationSlideIn>
+
+                        <StackedLineChartExpansionPanelNote />
+
                         <AnimationFixed>
                             <SectionWrapper>
                                 <WordCloud isLoaded={isLoaded} data={summaryStatisticsData.wordCloud} width={width}/>
