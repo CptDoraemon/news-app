@@ -9,11 +9,12 @@ const useStyles = makeStyles(theme => ({
     root: {
         textAlign: 'center',
         width: '100%',
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        color: '#F2F2F2'
+        color: 'inherit'
     },
     section: {
         margin: theme.spacing(5, 0),
@@ -38,7 +39,6 @@ interface DocumentsTextSummaryProps {
 const DocumentsTextSummary = React.forwardRef<HTMLDivElement, DocumentsTextSummaryProps>(({totalDocuments, earliestDocumentDate, latestDocumentDate}, forwardedRef) => {
 
     const classes = useStyles();
-    const [fullHeight, setFullHeight] = useState(window.innerHeight - 100);
     const total = useCountUp({start: totalDocuments*0.9, end: totalDocuments, duration: 5});
 
     const earliestMs = (new Date(earliestDocumentDate)).getTime();
@@ -58,7 +58,7 @@ const DocumentsTextSummary = React.forwardRef<HTMLDivElement, DocumentsTextSumma
 
     return (
         <>
-            <div className={classes.root} style={{minHeight: `${fullHeight}px`}}>
+            <div className={classes.root}>
                 <div className={classes.section}>
                     { title('Total news articles archived') }
                     <p className={classes.number}>{total.countUp}</p>
@@ -71,7 +71,7 @@ const DocumentsTextSummary = React.forwardRef<HTMLDivElement, DocumentsTextSumma
                     { title('Most recent news article archived') }
                     { date(+latest.countUp) }
                 </div>
-                <div ref={forwardedRef}> </div>
+                {/*<div ref={forwardedRef}> </div>*/}
             </div>
         </>
     )
