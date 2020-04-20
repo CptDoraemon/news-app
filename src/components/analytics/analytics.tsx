@@ -13,7 +13,6 @@ import WordCloud from "./documents-word-cloud";
 import AnimationFixed from "./utilitis/animation-fixed";
 import DocumentsCountStackedLineChart from "./documents-count-stacked-line-chart";
 import StackedLineChartExpansionPanelNote from "./stacked-line-chart-expansion-panel-note";
-import AnimationZoomIn from "./utilitis/animation-zoom-in";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -53,32 +52,32 @@ const Analytics: React.FC<AnalyticsProps> = () => {
         summaryStatisticsData
     } = useGetAnalytics();
 
-    // const bgColorChangeRef = useRef<HTMLDivElement>(null);
-    // const [bgBlack, setBgBlack] = useState(false);
-    // const changeBgColor = () => {
-    //     if (!bgColorChangeRef.current) return;
-    //     const target = bgColorChangeRef.current.getBoundingClientRect().top - 100;
-    //     if (target <= 0 && bgBlack) {
-    //         setBgBlack(false);
-    //         document.body.style.backgroundColor = '';
-    //     } else if (target > 0 && !bgBlack) {
-    //         setBgBlack(true);
-    //         document.body.style.backgroundColor = 'black'
-    //     }
-    // };
-    // useEffect(() => {
-    //     changeBgColor();
-    //     document.addEventListener('scroll', changeBgColor);
-    //     return () => {
-    //         document.removeEventListener('scroll', changeBgColor);
-    //     }
-    // }, [status, bgBlack]);
-    //
-    // useEffect(() => {
-    //     return () => {
-    //         document.body.style.backgroundColor = ''
-    //     };
-    // }, []);
+    const bgColorChangeRef = useRef<HTMLDivElement>(null);
+    const [bgBlack, setBgBlack] = useState(false);
+    const changeBgColor = () => {
+        if (!bgColorChangeRef.current) return;
+        const target = bgColorChangeRef.current.getBoundingClientRect().top - 100;
+        if (target <= 0 && bgBlack) {
+            setBgBlack(false);
+            document.body.style.backgroundColor = '';
+        } else if (target > 0 && !bgBlack) {
+            setBgBlack(true);
+            document.body.style.backgroundColor = 'black'
+        }
+    };
+    useEffect(() => {
+        changeBgColor();
+        document.addEventListener('scroll', changeBgColor);
+        return () => {
+            document.removeEventListener('scroll', changeBgColor);
+        }
+    }, [status, bgBlack]);
+
+    useEffect(() => {
+        return () => {
+            document.body.style.backgroundColor = ''
+        };
+    }, []);
 
     const isLoaded = status === AnalyticsPageStatus.loaded;
     const width = wrapperRef?.current?.getBoundingClientRect().width || 100;
@@ -96,33 +95,26 @@ const Analytics: React.FC<AnalyticsProps> = () => {
                     status === AnalyticsPageStatus.loaded &&
                     summaryStatisticsData &&
                     <>
-                        <AnimationZoomIn
-                            sectionOne={() => {
-                                return (
-                                    <SectionWrapper>
-                                        <DocumentsTextSummary
-                                            totalDocuments={summaryStatisticsData.totalDocuments}
-                                            earliestDocumentDate={summaryStatisticsData.earliestDocumentDate}
-                                            latestDocumentDate={summaryStatisticsData.latestDocumentDate}
-                                        />
-                                    </SectionWrapper>
-                                )
-                            }}
-                            sectionTwo={() => {
-                                return (
-                                    <SectionWrapper>
-                                        <DocumentsByCategoryBarChart
-                                            isLoaded={isLoaded}
-                                            data={summaryStatisticsData.documentsCountByCategory.map(obj => ({
-                                                title: obj.category,
-                                                value: obj.count
-                                            }))}
-                                            animate={true}
-                                            width={width}/>
-                                    </SectionWrapper>
-                                )
-                            }}
+
+                        <DocumentsTextSummary
+                            totalDocuments={summaryStatisticsData.totalDocuments}
+                            earliestDocumentDate={summaryStatisticsData.earliestDocumentDate}
+                            latestDocumentDate={summaryStatisticsData.latestDocumentDate}
+                            ref={bgColorChangeRef}
                         />
+
+                        <Fade in={!bgBlack} timeout={2000}>
+                            <SectionWrapper>
+                                <DocumentsByCategoryBarChart
+                                    isLoaded={isLoaded}
+                                    data={summaryStatisticsData.documentsCountByCategory.map(obj => ({
+                                        title: obj.category,
+                                        value: obj.count
+                                    }))}
+                                    animate={!bgBlack}
+                                    width={width}/>
+                            </SectionWrapper>
+                        </Fade>
 
                         <AnimationSlideIn direction={AnimationSlideInDirection.left}>
                             <SectionWrapper>

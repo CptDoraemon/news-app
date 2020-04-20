@@ -71,17 +71,17 @@ const AnimationFixed: React.FC<AnimationFixedProps> = ({children}) => {
             const offset = placeholderRef.current.getBoundingClientRect().top;
             childrenRef.current.style.top = `${offset}px`;
             fixedWrapperRef.current.style.top = `${offset}px`;
-            // if (isFrozen) {
-            //     setIsFrozen(false);
-            // }
+            if (isFrozen) {
+                setIsFrozen(false);
+            }
         } else if (isBefore) {
-            // if (!isFrozen) return;
+            if (!isFrozen) return;
             fixedWrapperRef.current.style.top = `${window.scrollY + placeholderRef.current.getBoundingClientRect().top}px`;
-            // setIsFrozen(true);
+            setIsFrozen(true);
         } else if (isAfter) {
-            // if (!isFrozen) return;
+            if (!isFrozen) return;
             fixedWrapperRef.current.style.top = `${window.scrollY + placeholderRef.current.getBoundingClientRect().bottom}px`;
-            // setIsFrozen(true);
+            setIsFrozen(true);
         }
     };
 
