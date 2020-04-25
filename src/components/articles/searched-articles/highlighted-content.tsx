@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useMemo} from "react";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/core";
 
@@ -14,10 +14,14 @@ interface HighlightedContentProps {
 }
 
 const HighlightedContent: React.FC<HighlightedContentProps> = ({content, keyword}) => {
-    const re= new RegExp('('+keyword+')', 'gi');
-    const contentArray = content.split(re);
 
     const classes = useStyles();
+
+    const contentArray = useMemo(() => {
+        const escapedKeyword = keyword.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+        const re= new RegExp('('+escapedKeyword+')', 'gi');
+        return content.split(re);
+    }, [content, keyword]);
 
     return (
         <>
