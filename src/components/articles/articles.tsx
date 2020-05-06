@@ -206,7 +206,7 @@ function Article(props: ArticleProps) {
             } else {
                 image = <CardMedia
                     className={`${cardClasses.media} ${cardClasses.imageContain}`}
-                    image={process.env.PUBLIC_URL + 'xiaoxihome-news.jpg'}
+                    image={process.env.PUBLIC_URL + '/xiaoxihome-news.jpg'}
                     title={'No image'}
                 />
             }
