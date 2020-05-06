@@ -1,4 +1,4 @@
-import React, {RefObject, useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Box, makeStyles} from "@material-ui/core";
 import Card from "@material-ui/core/Card";
 import CardActionArea from '@material-ui/core/CardActionArea';
@@ -6,7 +6,6 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 import HighlightedContent from "./highlighted-content";
-import {Skeleton} from "@material-ui/lab";
 import {ISearchedArticle} from "./requests/response-types";
 
 const useGetHeight = () => {
@@ -52,6 +51,10 @@ const useStyles = makeStyles((theme) => ({
         width: '20%',
         height: '100%'
     },
+    imageContain: {
+        backgroundSize: 'contain',
+        backgroundColor: theme.palette.primary.main
+    },
     cardContent: {
         width: '80%',
         height: '100%',
@@ -85,7 +88,11 @@ const SearchedArticleCard: React.FC<SearchedArticleCardProps> = ({article, keywo
                                 image={article.urlToImage}
                                 title={article.title}
                             /> :
-                            <Skeleton variant="rect" className={classes.cardMedia}/>
+                            <CardMedia
+                                className={`${classes.cardMedia} ${classes.imageContain}`}
+                                image={process.env.PUBLIC_URL + 'xiaoxihome-news.jpg'}
+                                title={'No image'}
+                            />
                     }
                     <CardContent className={classes.cardContent} ref={heightRef}>
                         <Typography variant="body1" component="h2">

@@ -1,4 +1,4 @@
-import React, {CSSProperties, useEffect, useRef, useState} from "react";
+import React, {CSSProperties, useEffect, useMemo, useRef, useState} from "react";
 import {
     Box,
     Button,
@@ -65,7 +65,18 @@ const overFlowHidden: CSSProperties = {
     position: 'relative'
 };
 
+const cardCommonStyles = (theme: Theme) => ({
+    buttons: {
+        ...overFlowHidden,
+    },
+    imageContain: {
+        backgroundSize: 'contain',
+        backgroundColor: theme.palette.primary.main
+    }
+});
+
 const usePrimaryCardStyles = makeStyles((theme) => createStyles({
+    ...cardCommonStyles(theme),
     media: {
         height: '550px',
         ...overFlowHidden,
@@ -88,9 +99,6 @@ const usePrimaryCardStyles = makeStyles((theme) => createStyles({
         ...ellipsis('body2', theme).root,
         ...overFlowHidden,
     },
-    buttons: {
-        ...overFlowHidden,
-    },
     [theme.breakpoints.down("sm")]: {
         media: {
             height: '200px',
@@ -104,6 +112,7 @@ const usePrimaryCardStyles = makeStyles((theme) => createStyles({
 
 
 const useSecondaryCardStyles = makeStyles((theme) => createStyles({
+    ...cardCommonStyles(theme),
     media: {
         height: '200px',
         ...overFlowHidden,
@@ -128,6 +137,10 @@ const useSecondaryCardStyles = makeStyles((theme) => createStyles({
     },
     buttons: {
         ...overFlowHidden,
+    },
+    imageContain: {
+        backgroundSize: 'contain',
+        backgroundColor: theme.palette.primary.main
     },
     [theme.breakpoints.down("sm")]: {
 
@@ -168,7 +181,6 @@ interface ArticleProps extends ArticleType {
 function Article(props: ArticleProps) {
     const ref = useRef(null);
     const isVisible = useLazyLoad(ref);
-    const [isMounted, setIsMounted] = useState(false);
     const isTransitionAnimationNeeded = !useMediaQuery(useTheme().breakpoints.down('sm'));
 
     const isPrimaryCard = props.id === 0 || props.id === 1;
@@ -176,56 +188,63 @@ function Article(props: ArticleProps) {
     const cardSecondaryClasses = useSecondaryCardStyles();
     const cardClasses = isPrimaryCard ? cardPrimaryClasses : cardSecondaryClasses;
 
-    useEffect(() => {
-        if (isTransitionAnimationNeeded) {
-            setTimeout(() =>setIsMounted(true), 225)
-            // Zoom transition 225ms
-        }
-    }, []);
-
-    const content = (
-        <Grid
-            item
-            xs={12}
-            md={isPrimaryCard ? 6 : 3}
-            ref={ref}
-        >
-            <Card raised>
-                {
-                    isVisible && props.urlToImage?
-                        <CardMedia
-                            component="img"
-                            alt={props.title}
-                            className={cardClasses.media}
-                            image={props.urlToImage}
-                            title={props.title}
-                        /> :
-                        <Skeleton variant={"rect"} className={cardClasses.skeleton} />
+    const content = useMemo(
+        () => {
+            let image;
+            if (props.urlToImage) {
+                if (isVisible) {
+                    image = <CardMedia
+                        component="img"
+                        alt={props.title}
+                        className={cardClasses.media}
+                        image={props.urlToImage}
+                        title={props.title}
+                    />
+                } else {
+                    image = <Skeleton variant={"rect"} className={cardClasses.skeleton} />
                 }
+            } else {
+                image = <CardMedia
+                    className={`${cardClasses.media} ${cardClasses.imageContain}`}
+                    image={process.env.PUBLIC_URL + 'xiaoxihome-news.jpg'}
+                    title={'No image'}
+                />
+            }
 
-                <CardContent>
-                    <Typography gutterBottom variant="body1" component="h2" className={cardClasses.title}>
-                        <Box fontWeight={700}>
-                            { props.title }
-                        </Box>
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary" component="p" className={cardClasses.source}>
-                        <Box component={'span'} fontWeight={700}>
-                            { props.source ? props.source + ' - ' : props.author ? props.author + ' - ' : '' }
-                            { getPublishTime(new Date(props.publishedAt)) }
-                        </Box>
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary" component="p" className={cardClasses.articleContent}>
-                        { props.content && props.content.replace(/\[\+[0-9]+\schars\]/ig, '') }
-                    </Typography>
-                </CardContent>
-                <Buttons url={props.url} className={cardClasses.buttons} openCopyLinkSnackBar={props.openCopyLinkSnackBar} />
-            </Card>
-        </Grid>
+            return (
+                <Grid
+                    item
+                    xs={12}
+                    md={isPrimaryCard ? 6 : 3}
+                    ref={ref}
+                >
+                    <Card raised>
+                        { image }
+
+                        <CardContent>
+                            <Typography gutterBottom variant="body1" component="h2" className={cardClasses.title}>
+                                <Box fontWeight={700}>
+                                    { props.title }
+                                </Box>
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary" component="p" className={cardClasses.source}>
+                                <Box component={'span'} fontWeight={700}>
+                                    { props.source ? props.source + ' - ' : props.author ? props.author + ' - ' : '' }
+                                    { getPublishTime(new Date(props.publishedAt)) }
+                                </Box>
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary" component="p" className={cardClasses.articleContent}>
+                                { props.content && props.content.replace(/\[\+[0-9]+\schars\]/ig, '') }
+                            </Typography>
+                        </CardContent>
+                        <Buttons url={props.url} className={cardClasses.buttons} openCopyLinkSnackBar={props.openCopyLinkSnackBar} />
+                    </Card>
+                </Grid>
+            )}, [props, isVisible]
     );
 
     return isTransitionAnimationNeeded ? (
-        <Zoom in={!isMounted ? true : isVisible}>
+        <Zoom in={isVisible}>
             { content }
         </Zoom>
     ) : content;
