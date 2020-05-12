@@ -6,7 +6,6 @@ import { ThemeProvider } from '@material-ui/core/styles';
 import theme from './theme';
 import InnerAppContainer from "./inner-app";
 
-
 const store = configureStore();
 
 function App() {
@@ -19,7 +18,5 @@ function App() {
         </Provider>
     )
 }
-
-
 
 export default App;
