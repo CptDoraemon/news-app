@@ -75,7 +75,7 @@ const cardCommonStyles = (theme: Theme) => ({
     }
 });
 
-const usePrimaryCardStyles = makeStyles((theme) => createStyles({
+const usePrimaryCardStyles = makeStyles((theme) => ({
     ...cardCommonStyles(theme),
     media: {
         height: '550px',
@@ -111,7 +111,7 @@ const usePrimaryCardStyles = makeStyles((theme) => createStyles({
 
 
 
-const useSecondaryCardStyles = makeStyles((theme) => createStyles({
+const useSecondaryCardStyles = makeStyles((theme) => ({
     ...cardCommonStyles(theme),
     media: {
         height: '200px',
@@ -184,7 +184,9 @@ function Article(props: ArticleProps) {
     const isTransitionAnimationNeeded = !useMediaQuery(useTheme().breakpoints.down('sm'));
 
     const isPrimaryCard = props.id === 0 || props.id === 1;
+    //@ts-ignore
     const cardPrimaryClasses = usePrimaryCardStyles();
+    //@ts-ignore
     const cardSecondaryClasses = useSecondaryCardStyles();
     const cardClasses = isPrimaryCard ? cardPrimaryClasses : cardSecondaryClasses;
 
