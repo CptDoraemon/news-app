@@ -1,7 +1,8 @@
 import SortTypes from "../filters/sort-types";
 import {IResponse} from "./response-types";
 
-const baseUrl = 'https://www.xiaoxihome.com/api/search-news';
+// const baseUrl = 'https://www.xiaoxihome.com/api/search-news';
+const baseUrl = 'http://localhost:5000/api/search-news';
 
 const requestSearchNews = (
     keyword: string,

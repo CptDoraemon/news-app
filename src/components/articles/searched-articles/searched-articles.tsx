@@ -77,12 +77,10 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-interface SearchedArticlesProps {
-    keyword: string
-}
+interface SearchedArticlesProps {}
 
-const SearchedArticles: React.FC<SearchedArticlesProps> = ({keyword}) => {
-
+const SearchedArticles: React.FC<SearchedArticlesProps> = () => {
+    const keyword = '';
     const {
         data,
         frequencyData,

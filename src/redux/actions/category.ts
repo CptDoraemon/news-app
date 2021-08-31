@@ -66,35 +66,35 @@ const setCategoryAndFetchArticles = (category: Category) => {
     };
 };
 
-export function setNextCategory() {
-    return (dispatch: ThunkDispatch<State, null, AnyAction>, getState: () => State) => {
-        const currentCategory = getState().category;
-        const currentIndex = categories.indexOf(currentCategory);
-        const isLast = currentIndex === categories.length - 1;
-        if (isLast) {
-            dispatch(setCategoryAndFetchArticles(Category[categories[0]]));
-        } else {
-            dispatch(setCategoryAndFetchArticles(Category[categories[currentIndex + 1]]));
-        }
-    };
-}
+// export function setNextCategory() {
+//     return (dispatch: ThunkDispatch<State, null, AnyAction>, getState: () => State) => {
+//         const currentCategory = getState().category;
+//         const currentIndex = categories.indexOf(currentCategory);
+//         const isLast = currentIndex === categories.length - 1;
+//         if (isLast) {
+//             dispatch(setCategoryAndFetchArticles(Category[categories[0]]));
+//         } else {
+//             dispatch(setCategoryAndFetchArticles(Category[categories[currentIndex + 1]]));
+//         }
+//     };
+// }
 
-export function setPreviousCategory() {
-    return (dispatch: ThunkDispatch<State, null, AnyAction>, getState: () => State) => {
-        const currentCategory = getState().category;
-        const currentIndex = categories.indexOf(currentCategory);
-        const isFirst = currentIndex === 0;
-        if (isFirst) {
-            dispatch(setCategoryAndFetchArticles(Category[categories[categories.length - 1]]));
-        } else {
-            dispatch(setCategoryAndFetchArticles(Category[categories[currentIndex - 1]]));
-        }
-    };
-}
+// export function setPreviousCategory() {
+//     return (dispatch: ThunkDispatch<State, null, AnyAction>, getState: () => State) => {
+//         const currentCategory = getState().category;
+//         const currentIndex = categories.indexOf(currentCategory);
+//         const isFirst = currentIndex === 0;
+//         if (isFirst) {
+//             dispatch(setCategoryAndFetchArticles(Category[categories[categories.length - 1]]));
+//         } else {
+//             dispatch(setCategoryAndFetchArticles(Category[categories[currentIndex - 1]]));
+//         }
+//     };
+// }
 
-export function setCategoryIfNeeded(category: Category) {
-    return (dispatch: ThunkDispatch<State, null, AnyAction>, getState: () => State) => {
-        if (getState().category === category) return;
-        dispatch(setCategoryAndFetchArticles(category));
-    };
-}
+// export function setCategoryIfNeeded(category: Category) {
+//     return (dispatch: ThunkDispatch<State, null, AnyAction>, getState: () => State) => {
+//         if (getState().category === category) return;
+//         dispatch(setCategoryAndFetchArticles(category));
+//     };
+// }

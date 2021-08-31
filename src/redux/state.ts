@@ -1,8 +1,6 @@
-import {Category} from "./actions/category";
 import {Article} from "./actions/articles";
 
 export interface State {
-    category: Category,
     articles: {
         isError: boolean,
         isFetching: boolean,
@@ -10,12 +8,10 @@ export interface State {
     },
     copyLinkSnackBar: {
         isActive: boolean
-    },
-    searchKeyword: string
+    }
 }
 
 export const initState: State = {
-    category: Category.HEADLINE,
     articles: {
         isError: false,
         isFetching: true,
@@ -23,6 +19,5 @@ export const initState: State = {
     },
     copyLinkSnackBar: {
         isActive: false
-    },
-    searchKeyword: ''
+    }
 };

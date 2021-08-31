@@ -1,4 +1,4 @@
-import React, {CSSProperties, useEffect, useMemo, useRef, useState} from "react";
+import React, {CSSProperties, useEffect, useMemo, useRef} from "react";
 import {
     Box,
     Button,
@@ -271,11 +271,9 @@ function LoadedArticles(props: LoadedArticlesProps) {
     )
 }
 
-interface ArticlesProps extends Pick<State, 'articles'> {
-    openCopyLinkSnackBar: () => void
-}
+interface ArticlesProps {}
 
-function Articles(props: ArticlesProps) {
+function Articles() {
     const classes = useStyles();
 
     // scroll to top after is category changed
@@ -284,38 +282,38 @@ function Articles(props: ArticlesProps) {
     });
 
     let content;
-    if (props.articles.isError) {
-        content = (
-            <div style={{
-                width: '100%'
-            }}>
-                error
-            </div>
-        )
-    } else if (props.articles.isFetching) {
-        content = (
-            <>
-                {
-                    Array.from(Array(10), (_, i) => {
-                        return (
-                            <Grid item key={i}>
-                                <Box width={500} height={300} maxWidth={'100%'}>
-                                    <Skeleton variant={"rect"} width={500} height={200}/>
-                                    <Skeleton width={500}/>
-                                    <Skeleton width={500}/>
-                                </Box>
-                            </Grid>
-                        )
-                    })
-                }
-            </>
-        )
-    } else {
-        content = <LoadedArticles articles={props.articles.articles} openCopyLinkSnackBar={props.openCopyLinkSnackBar}/>
-    }
+    // if (props.articles.isError) {
+    //     content = (
+    //         <div style={{
+    //             width: '100%'
+    //         }}>
+    //             error
+    //         </div>
+    //     )
+    // } else if (props.articles.isFetching) {
+    //     content = (
+    //         <>
+    //             {
+    //                 Array.from(Array(10), (_, i) => {
+    //                     return (
+    //                         <Grid item key={i}>
+    //                             <Box width={500} height={300} maxWidth={'100%'}>
+    //                                 <Skeleton variant={"rect"} width={500} height={200}/>
+    //                                 <Skeleton width={500}/>
+    //                                 <Skeleton width={500}/>
+    //                             </Box>
+    //                         </Grid>
+    //                     )
+    //                 })
+    //             }
+    //         </>
+    //     )
+    // } else {
+    //     content = <LoadedArticles articles={props.articles.articles} openCopyLinkSnackBar={props.openCopyLinkSnackBar}/>
+    // }
 
     return (
-        <Swipeable>
+        <Swipeable goNext={() => false} goPrevious={() => false}>
             <Box className={classes.wrapper}>
                 <Grid container direction={"row"} alignContent={"center"} justify={"center"} spacing={2}>
                     { content }

@@ -34,7 +34,8 @@ const useGetAnalytics = () => {
     const [summaryStatisticsData, setSummaryStatisticsData] = useState<SummaryStatisticsData | null>(null);
 
     useEffect(() => {
-        fetch('https://www.xiaoxihome.com/api/news-analytics')
+        // fetch('https://www.xiaoxihome.com/api/news-analytics')
+        fetch('http://localhost:5000/api/news-analytics')
             .then(res => res.json())
             .then(json => {
                 if (json.status !== 'ok') {

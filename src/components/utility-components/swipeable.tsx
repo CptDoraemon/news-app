@@ -1,7 +1,5 @@
 import React, {useEffect, useRef} from "react";
 import useSwipeable, {UseSwipeableDirections} from "../../tools/use-swipeable";
-import {connect} from "react-redux";
-import {setNextCategory, setPreviousCategory} from "../../redux/actions/category";
 
 interface SwipeableProps {
     goPrevious: () => void,
@@ -25,7 +23,7 @@ const Swipeable: React.FC<SwipeableProps> = (props) => {
         return () => {
             resetSwipeStatus();
         }
-    }, [direction]);
+    }, [direction, props, resetSwipeStatus]);
 
     return (
         <div
@@ -43,16 +41,4 @@ const Swipeable: React.FC<SwipeableProps> = (props) => {
     )
 };
 
-function mapDispatchToProps(dispatch: any) {
-    return {
-        goPrevious: () => dispatch(setPreviousCategory()),
-        goNext: () => dispatch(setNextCategory())
-    }
-}
-
-const SwipeableContainer = connect(
-    null,
-    mapDispatchToProps
-)(Swipeable);
-
-export default SwipeableContainer
+export default Swipeable
