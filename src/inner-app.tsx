@@ -17,14 +17,26 @@ const useStyles = makeStyles((theme) => ({
     root: {
         width: '100vw',
         maxWidth: '100%',
-        // minHeight: '100vh',
         // overflowX: 'hidden',
         // paddingBottom: '10px',
         // overflowX is causing y-axis scroll problem, pb do the hack,
-        position: 'relative'
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'flex-start'
+    },
+    header: {
+        width: '100%',
+        flex: '0 0 auto'
+    },
+    mainArea: {
+        width: '100%',
+        flex: '1 1 auto'
     },
     attribution: {
-        margin: theme.spacing(10, 0, 2, 0)
+        width: '100%',
+        flex: '0 0 auto'
     }
 }));
 
@@ -34,15 +46,19 @@ function InnerApp(props: InnerAppProps) {
     const classes = useStyles();
 
     return (
-        <Router>
+        <Router basename={'/news-app'}>
             <Box className={classes.root} style={{minHeight: `${window.innerHeight}px`}}>
-                <Header/>
+                <div className={classes.header}>
+                    <Header/>
+                </div>
+                <div className={classes.mainArea}>
                     <Switch>
                         <Route path={'/'} exact render={() => <ArticlesContainer/>} />
                         <Route path={'/search'} exact render={() => <SearchedArticles />} />
                         <Route path={'/topic'} exact component={Topic} />
                         <Route path={'/analytics'} exact component={Analytics} />
                     </Switch>
+                </div>
                 <div className={classes.attribution}>
                     <Attribution />
                 </div>

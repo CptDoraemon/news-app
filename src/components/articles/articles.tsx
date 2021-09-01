@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme) => ({
 		width: '100%',
 		display: 'flex',
 		flexDirection: 'row',
-		alignItems: 'flex-start',
+		alignItems: 'stretch',
 		justifyContent: 'center',
 		flexWrap: 'wrap',
 		padding: theme.spacing(2),
@@ -21,9 +21,9 @@ const useStyles = makeStyles((theme) => ({
 			padding: theme.spacing(1),
 		}
 	},
-	cardWrapper: {
+	skeletonCardWrapper: {
 		margin: theme.spacing(2),
-		width: 'fit-content'
+		width: 'fit-content',
 	}
 }));
 
@@ -44,7 +44,7 @@ const Articles = ({category}: ArticlesProps) => {
 					requestState.isLoading &&
 					new Array(10).fill(1).map((_, i) => {
 						return (
-							<Box width={500} height={300} maxWidth={'100%'} className={classes.cardWrapper} key={i}>
+							<Box width={500} height={300} maxWidth={'100%'} className={classes.skeletonCardWrapper} key={i}>
 								<Skeleton variant={"rect"} width={500} height={200}/>
 								<Skeleton width={500}/>
 								<Skeleton width={500}/>

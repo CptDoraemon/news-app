@@ -19,7 +19,9 @@ const useStyles = makeStyles((theme: Theme) => ({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        whiteSpace: 'nowrap'
+        whiteSpace: 'nowrap',
+        lineHeight: 1,
+        fontWeight: 900
     },
     appBarNoBoxShadow: {
         boxShadow: 'none'
@@ -46,7 +48,7 @@ const Header: React.FC<HeaderProps> = () => {
 
                     </Grid>
                     <Grid item xs={5} md={6}>
-                        <Typography align={"center"} className={classes.heading} variant={"h1"} component={'h1'}>
+                        <Typography align={"center"} className={classes.heading} variant={"h4"} component={'h1'}>
                             News Canada
                         </Typography>
                     </Grid>

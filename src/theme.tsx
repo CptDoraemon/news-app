@@ -1,6 +1,41 @@
-import {createMuiTheme, responsiveFontSizes} from "@material-ui/core/styles";
+import {createTheme, responsiveFontSizes} from "@material-ui/core/styles";
+import {Theme} from "@material-ui/core";
 
-let theme = createMuiTheme({
+const mierB = {
+    fontFamily: 'MierB',
+    fontDisplay: 'swap',
+    src: `
+    url('/assets/fonts/MierB-Bold') format('woff2')
+  `,
+};
+
+const inter = {
+    fontFamily: 'Inter',
+    fontDisplay: 'swap',
+    src: `
+    url('/assets/fonts/Inter-Regular') format('woff2')
+  `
+};
+
+const baseFontFamily = [
+    '-apple-system',
+    'BlinkMacSystemFont',
+    '"Segoe UI"',
+    'Roboto',
+    '"Helvetica Neue"',
+    'Arial',
+    'sans-serif',
+    '"Apple Color Emoji"',
+    '"Segoe UI Emoji"',
+    '"Segoe UI Symbol"'
+];
+
+const titleTypography = {
+    fontFamily: ['"MierB"', ...baseFontFamily].join(','),
+    fontWeight: 700
+}
+
+let theme = createTheme({
     palette: {
         primary: {
             main: '#333333',
@@ -11,20 +46,26 @@ let theme = createMuiTheme({
             contrastText: '#fff',
         },
     },
+    typography: {
+        fontFamily: ['"Inter"', ...baseFontFamily].join(','),
+        h1: titleTypography,
+        h2: titleTypography,
+        h3: titleTypography,
+        h4: titleTypography,
+        h5: titleTypography,
+        h6: titleTypography
+    },
+    overrides: {
+        MuiCssBaseline: {
+            '@global': {
+                // @ts-ignore
+                '@font-face': [inter, mierB],
+            },
+        },
+    },
 });
 theme = responsiveFontSizes(theme);
-theme.typography.h1 = {
-    fontFamily: [
-        'Anton',
-        'sans-serif',
-    ].join(','),
-    fontWeight: 400,
-    fontSize: '2rem',
-    [theme.breakpoints.up('md')]: {
-        fontSize: '2.5rem',
-    },
-    fontStyle: "normal",
-    color: "inherit"
-};
+
+export const MOBILE = (theme: Theme) => theme.breakpoints.down('sm');
 
 export default theme;
