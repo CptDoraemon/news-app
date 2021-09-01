@@ -1,8 +1,8 @@
-import React, {useMemo} from "react";
-import {AppBar, makeStyles, Tab, Tabs, Link as MuiLink} from "@material-ui/core";
-import {Link, useLocation, Redirect} from 'react-router-dom';
+import React from "react";
+import {AppBar, makeStyles, Tab, Tabs} from "@material-ui/core";
+import {Link} from 'react-router-dom';
 import {newsCategories} from "./news-categories";
-import * as queryString from "query-string";
+import useGetCategoryFromQuery from "../articles/use-get-category-from-query";
 
 const useStyles = makeStyles((theme) => ({
 	tab: {
@@ -19,15 +19,7 @@ interface HeaderTabsProps {}
 
 const HeaderTabs = () => {
   const classes = useStyles();
-	const location = useLocation();
-	const category = useMemo(() => {
-		const qs = queryString.parse(location.search);
-		return !qs.category ? '' : Array.isArray(qs.category) ? qs.category[0] : qs.category;
-	}, [location.search])
-
-  // if (!category || !(newsCategories as string[]).includes(category)) {
-	// 	return <Redirect to={`/?category=${newsCategories[0]}`} />
-	// }
+	const category = useGetCategoryFromQuery() || '';
 
   return (
 		<AppBar color="primary" position={'static'} className={classes.appBarBottomBoxShadow}>
