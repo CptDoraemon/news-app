@@ -445,7 +445,7 @@ class StackedLineChartD3 {
         this.references.detectionRects
             ?.on('mouseover', function(d, i) {
                 d3.select(this).style('opacity', 0.3);
-                updateHoverAxes(d, i)
+                updateHoverAxes(d, i[0])
              })
             .on('mouseleave', function(d, i) {
                 d3.select(this).style('opacity', 0);

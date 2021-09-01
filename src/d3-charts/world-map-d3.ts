@@ -800,11 +800,11 @@ class WorldMapD3 {
             d3.select(this).style('fill', thisClass.color.timeBarHighlight)
             })
             .on('mouseleave', function(d, i) {
-                d3.select(this).style('fill', i <= thisClass.state.time ? thisClass.color.timeBarNormal : thisClass.color.transparent)
+                d3.select(this).style('fill', parseFloat(i) <= thisClass.state.time ? thisClass.color.timeBarNormal : thisClass.color.transparent)
             })
             .on('click', function(d, i) {
                 thisClass.stopTimeLapse();
-                thisClass.setTimeState(i)
+                thisClass.setTimeState(parseFloat(i))
             })
     }
 
