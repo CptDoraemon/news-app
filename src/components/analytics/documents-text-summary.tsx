@@ -1,7 +1,7 @@
 import React, {useMemo} from "react";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {bigNumber, bigNumberTitle} from "./styles/analytics-styles";
-import { useSpring, animated, config, SpringValue } from 'react-spring';
+import { useSpring, animated, config, SpringValue } from '@react-spring/web';
 
 const monthStrings = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 

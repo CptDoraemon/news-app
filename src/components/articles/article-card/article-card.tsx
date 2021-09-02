@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme) => ({
 	root: {
 		padding: theme.spacing(2),
 		[MOBILE(theme)]: {
-			padding: theme.spacing(1),
+			padding: theme.spacing(0.5),
 		}
 	},
 	rootBig: {

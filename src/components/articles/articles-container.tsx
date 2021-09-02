@@ -1,6 +1,6 @@
 import React, {useCallback, useMemo} from "react";
 import useGetCategoryFromQuery from "./use-get-category-from-query";
-import {newsCategories, NewsCategory} from "../header/news-categories";
+import {newsCategories, NewsCategory} from "../../routers";
 import {Redirect, useHistory} from "react-router-dom";
 import Articles from "./articles";
 

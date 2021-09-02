@@ -5,11 +5,30 @@ import StickyComponent from "../utility-components/sticky-component";
 import IconButton from '@material-ui/core/IconButton';
 import AssessmentIcon from '@material-ui/icons/Assessment';
 import CollectionsBookmarkIcon from '@material-ui/icons/CollectionsBookmark';
+import SearchIcon from "@material-ui/icons/Search";
 import Zoom from "@material-ui/core/Zoom";
-import HeaderSearch from "./header-search";
 import useTheme from "@material-ui/core/styles/useTheme";
 import {Link} from 'react-router-dom';
 import HeaderTabs from "./header-tabs";
+import routers from "../../routers";
+
+const headerLinks = [
+    {
+        title: 'Search',
+        link: routers.search.path,
+        icon: <SearchIcon/>
+    },
+    {
+        title: 'Topic: COVID-19',
+        link: routers.topic.path,
+        icon: <CollectionsBookmarkIcon/>
+    },
+    {
+        title: 'Analytics',
+        link: routers.analytics.path,
+        icon: <AssessmentIcon/>
+    },
+]
 
 const useStyles = makeStyles((theme: Theme) => ({
     heading: {
@@ -54,23 +73,17 @@ const Header: React.FC<HeaderProps> = () => {
                     </Grid>
                     <Grid item xs={6} md={3}>
                         <Grid container alignItems={'center'} justify={"flex-end"}>
-                            <Grid item>
-                                <HeaderSearch/>
-                            </Grid>
-                            <Grid item>
-                                <Tooltip title="Topic: COVID-19" TransitionComponent={Zoom}>
-                                    <IconButton aria-label="Topic: COVID-19" color={"inherit"} component={Link} to={'/topic'}>
-                                        <CollectionsBookmarkIcon/>
-                                    </IconButton>
-                                </Tooltip>
-                            </Grid>
-                            <Grid item>
-                                <Tooltip title="Analytics" TransitionComponent={Zoom}>
-                                    <IconButton aria-label="news trend" color={"inherit"} component={Link} to={'/analytics'}>
-                                        <AssessmentIcon/>
-                                    </IconButton>
-                                </Tooltip>
-                            </Grid>
+                            {
+                                headerLinks.map(data => (
+                                  <Grid item key={data.title}>
+                                      <Tooltip title={data.title} TransitionComponent={Zoom}>
+                                          <IconButton aria-label={data.title} color={"inherit"} component={Link} to={data.link}>
+                                              {data.icon}
+                                          </IconButton>
+                                      </Tooltip>
+                                  </Grid>
+                                ))
+                            }
                         </Grid>
                     </Grid>
                 </Grid>

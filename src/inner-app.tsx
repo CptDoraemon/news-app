@@ -12,6 +12,8 @@ import {
 } from "react-router-dom";
 import Header from "./components/header/header";
 import ArticlesContainer from "./components/articles/articles-container";
+import Search from "./components/search/search";
+import routers from "./routers";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -53,10 +55,10 @@ function InnerApp(props: InnerAppProps) {
                 </div>
                 <div className={classes.mainArea}>
                     <Switch>
-                        <Route path={'/'} exact render={() => <ArticlesContainer/>} />
-                        <Route path={'/search'} exact render={() => <SearchedArticles />} />
-                        <Route path={'/topic'} exact component={Topic} />
-                        <Route path={'/analytics'} exact component={Analytics} />
+                        <Route path={routers.root.path} exact render={() => <ArticlesContainer/>} />
+                        <Route path={routers.search.path} exact render={() => <Search />} />
+                        <Route path={routers.topic.path} exact component={Topic} />
+                        <Route path={routers.analytics.path} exact component={Analytics} />
                     </Switch>
                 </div>
                 <div className={classes.attribution}>

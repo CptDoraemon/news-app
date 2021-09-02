@@ -1,7 +1,7 @@
 import React from "react";
 import {AppBar, makeStyles, Tab, Tabs} from "@material-ui/core";
 import {Link} from 'react-router-dom';
-import {newsCategories} from "./news-categories";
+import {newsCategories} from "../../routers";
 import useGetCategoryFromQuery from "../articles/use-get-category-from-query";
 
 const useStyles = makeStyles((theme) => ({
