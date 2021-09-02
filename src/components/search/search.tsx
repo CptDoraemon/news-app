@@ -2,6 +2,9 @@ import React from "react";
 import {makeStyles} from "@material-ui/core";
 import SearchInput from "./search-input";
 import {MOBILE} from "../../theme";
+import TrendingSearch from "./trending-search";
+import SearchedArticles from "./searched-articles";
+import useSearch from "./useSearch";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -27,11 +30,14 @@ interface SearchProps {}
 
 const Search = () => {
   const classes = useStyles();
+	const search = useSearch();
 
   return (
     <div className={classes.root}>
 			<div className={classes.widthWrapper}>
-				<SearchInput />
+				<SearchInput search={search}/>
+				<TrendingSearch/>
+				<SearchedArticles search={search}/>
 			</div>
     </div>
   )

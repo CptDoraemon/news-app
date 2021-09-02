@@ -76,7 +76,7 @@ const SearchedArticleCard: React.FC<SearchedArticleCardProps> = ({article, keywo
     const {cardHeight, heightRef} = useGetHeight();
     
     return (
-        <Card className={classes.cardRoot} style={{height: cardHeight ? `${cardHeight}px` : 'auto'}}>
+        <Card className={classes.cardRoot} style={{height: cardHeight ? `${cardHeight}px` : 'auto'}} elevation={0}>
             <CardActionArea className={classes.cardActionArea}>
                 <a href={article.url} target='_blank' rel="noopener noreferrer">
                     {
