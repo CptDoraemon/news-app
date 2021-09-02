@@ -12,7 +12,8 @@ function mapDispatchToProps(dispatch: Dispatch) {
 
 function mapStateToProps(state: State) {
     return {
-        isActive: state.copyLinkSnackBar.isActive
+        isActive: state.copyLinkSnackBar.isActive,
+        text: state.copyLinkSnackBar.text
     }
 }
 

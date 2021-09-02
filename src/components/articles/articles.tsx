@@ -24,30 +24,35 @@ const useStyles = makeStyles((theme) => ({
 	skeletonCardWrapper: {
 		margin: theme.spacing(2),
 		width: 'fit-content',
+	},
+	skeleton: {
+		maxWidth: '100%'
 	}
 }));
 
 interface ArticlesProps {
-	category: string
+	category: string,
+	goPreviousCategory: () => void,
+	goNextCategory: () => void
 }
 
-const Articles = ({category}: ArticlesProps) => {
+const Articles = ({category, goNextCategory, goPreviousCategory}: ArticlesProps) => {
   const classes = useStyles();
   const requestState = useLoadArticles(category);
 
 	useMount(() => window.scrollTo(0, 0));
 
 	return (
-		<Swipeable goNext={() => false} goPrevious={() => false}>
+		<Swipeable goNext={goNextCategory} goPrevious={goPreviousCategory}>
 			<div className={classes.root}>
 				{
 					requestState.isLoading &&
 					new Array(10).fill(1).map((_, i) => {
 						return (
-							<Box width={500} height={300} maxWidth={'100%'} className={classes.skeletonCardWrapper} key={i}>
-								<Skeleton variant={"rect"} width={500} height={200}/>
-								<Skeleton width={500}/>
-								<Skeleton width={500}/>
+							<Box width={500} maxWidth={'100%'} className={classes.skeletonCardWrapper} key={i}>
+								<Skeleton variant={"rect"} width={500} height={200} className={classes.skeleton}/>
+								<Skeleton width={500} className={classes.skeleton}/>
+								<Skeleton width={500} className={classes.skeleton}/>
 							</Box>
 						)
 					})

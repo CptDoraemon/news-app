@@ -5,11 +5,13 @@ function copyLinkSnackbar(state = initState.copyLinkSnackBar, actions: CopyLinkS
     switch(actions.type) {
         case CopyLinkSnackbarActionsTypes.CLOSE_SNACKBAR:
             return {
-                isActive: false
+                isActive: false,
+                text: state.text
             };
         case CopyLinkSnackbarActionsTypes.OPEN_SNACKBAR:
             return {
-                isActive: true
+                isActive: true,
+                text: actions.payload.link
             };
         default:
             return state

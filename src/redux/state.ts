@@ -1,23 +1,13 @@
-import {Article} from "./actions/articles";
-
 export interface State {
-    articles: {
-        isError: boolean,
-        isFetching: boolean,
-        articles: Array<Article>
-    },
     copyLinkSnackBar: {
-        isActive: boolean
+        isActive: boolean,
+        text: string
     }
 }
 
 export const initState: State = {
-    articles: {
-        isError: false,
-        isFetching: true,
-        articles: []
-    },
     copyLinkSnackBar: {
-        isActive: false
+        isActive: false,
+        text: ''
     }
 };

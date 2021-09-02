@@ -17,7 +17,8 @@ const useStyles = makeStyles(() => createStyles({
 
 interface CopyLinkSnackbarProps {
     isActive: boolean,
-    closeCopyLinkSnackBar: () => void
+    closeCopyLinkSnackBar: () => void,
+    text: string
 }
 
 function CopyLinkSnackbar(props: CopyLinkSnackbarProps) {
@@ -41,7 +42,7 @@ function CopyLinkSnackbar(props: CopyLinkSnackbarProps) {
                 className={classes.successSnackBar}
                 message={
                     <span id="client-snackbar">
-                        Link copied to clipboard
+                      {`${props.text} copied to clipboard`}
                     </span>
                 }
                 action={[

@@ -4,7 +4,10 @@ export enum CopyLinkSnackbarActionsTypes {
 }
 
 export interface CopyLinkSnackBarActions {
-    type: CopyLinkSnackbarActionsTypes
+    type: CopyLinkSnackbarActionsTypes,
+    payload: {
+        link: string
+    }
 }
 
 export function closeCopyLinkSnackBar() {
@@ -13,8 +16,11 @@ export function closeCopyLinkSnackBar() {
     }
 }
 
-export function openCopyLinkSnackBar() {
+export function openCopyLinkSnackBar(link: string) {
     return {
-        type: CopyLinkSnackbarActionsTypes.OPEN_SNACKBAR
+        type: CopyLinkSnackbarActionsTypes.OPEN_SNACKBAR,
+        payload: {
+            link
+        }
     }
 }

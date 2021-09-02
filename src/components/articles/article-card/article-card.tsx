@@ -1,5 +1,5 @@
 import React, {useRef} from "react";
-import {makeStyles, Paper} from "@material-ui/core";
+import {makeStyles, Paper, useMediaQuery, Zoom} from "@material-ui/core";
 import {ArticleData} from "../use-load-articles";
 import clsx from 'clsx';
 import ArticleCardImage from "./article-card-image";
@@ -7,11 +7,11 @@ import useLazyLoad from "../../../tools/use-lazy-load";
 import ArticleCardContent from "./article-card-content";
 import ArticleCardActions from "./article-card-actions";
 import {MOBILE} from "../../../theme";
+import {useTheme} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
 		padding: theme.spacing(2),
-		height: '100%',
 		[MOBILE(theme)]: {
 			padding: theme.spacing(1),
 		}
@@ -30,10 +30,16 @@ const useStyles = makeStyles((theme) => ({
 	},
 	paper: {
 		overflow: 'hidden',
-		height: '100%'
+		width: '100%',
+		height: '100%',
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center'
 	},
 	image: {
 		width: '100%',
+		flex: '0 0 auto'
 	},
 	imageNormal: {
 		height: 300,
@@ -48,10 +54,14 @@ const useStyles = makeStyles((theme) => ({
 		}
 	},
 	content: {
-		padding: theme.spacing(2)
+		padding: theme.spacing(2),
+		flex: '1 1 auto',
+		width: '100%',
 	},
 	action: {
-		padding: theme.spacing(2)
+		flex: '0 0 auto',
+		padding: theme.spacing(2),
+		width: '100%',
 	}
 }));
 
@@ -64,21 +74,25 @@ const ArticleCard = ({data, variant}: ArticleCardProps) => {
   const classes = useStyles();
   const rootRef = useRef<HTMLDivElement>(null);
 	const isVisible = useLazyLoad(rootRef);
+	const theme = useTheme();
+	const isMobile = useMediaQuery(MOBILE(theme));
 
   return (
-    <div className={clsx(classes.root, variant === 'big' && classes.rootBig, variant === 'normal' && classes.rootNormal)} ref={rootRef}>
-			<Paper className={classes.paper}>
-				<div className={clsx(classes.image, variant === 'big' && classes.imageBig, variant === 'normal' && classes.imageNormal)}>
-					<ArticleCardImage url={data.urlToImage} title={data.title} isVisible={isVisible} />
-				</div>
-				<div className={classes.content}>
-					<ArticleCardContent data={data}/>
-				</div>
-				<div className={classes.action}>
-					<ArticleCardActions />
-				</div>
-			</Paper>
-    </div>
+  	<Zoom in={isMobile || isVisible}>
+			<div className={clsx(classes.root, variant === 'big' && classes.rootBig, variant === 'normal' && classes.rootNormal)} ref={rootRef}>
+				<Paper className={classes.paper}>
+					<div className={clsx(classes.image, variant === 'big' && classes.imageBig, variant === 'normal' && classes.imageNormal)}>
+						<ArticleCardImage url={data.urlToImage} title={data.title} isVisible={isVisible} />
+					</div>
+					<div className={classes.content}>
+						<ArticleCardContent data={data}/>
+					</div>
+					<div className={classes.action}>
+						<ArticleCardActions data={data}/>
+					</div>
+				</Paper>
+			</div>
+		</Zoom>
   )
 };
 
