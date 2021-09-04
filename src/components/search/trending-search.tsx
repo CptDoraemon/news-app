@@ -4,6 +4,7 @@ import WhatshotIcon from '@material-ui/icons/Whatshot';
 import {MOBILE} from "../../theme";
 import {Link} from "react-router-dom";
 import routers from "../../routers";
+import PaperWrapper from "./paper-wrapper";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -11,8 +12,7 @@ const useStyles = makeStyles((theme) => ({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'flex-start',
-		flexWrap: 'wrap',
-		margin: theme.spacing(1, 0)
+		flexWrap: 'wrap'
 	},
 	title: {
 		fontWeight: 700,
@@ -55,25 +55,27 @@ const TrendingSearch = () => {
   const classes = useStyles();
 
   return (
-    <div className={classes.root}>
-      <Typography variant={'body1'} component={'div'} className={classes.title}>
-				<WhatshotIcon style={{color: '#f57c00'}}/>
-				<span>Trending Searches: </span>
-			</Typography>
+  	<PaperWrapper>
+			<div className={classes.root}>
+				<Typography variant={'body1'} component={'div'} className={classes.title}>
+					<WhatshotIcon style={{color: '#f57c00'}}/>
+					<span>Trending Searches: </span>
+				</Typography>
 
-			<div className={classes.buttonWrapper}>
-				{
-					['hot1', 'hot2', 'hot3'].map(_ => (
-						// <Button className={classes.button} component={<MuiLink component={Link} to={`${routers.search.path}?keyword=${_}`} />}>
-						// 	{_}
-						// </Button>
-						<MuiLink className={classes.button} component={Link} to={`${routers.search.path}?keyword=${_}`}>
-							{_}
-						</MuiLink>
-					))
-				}
+				<div className={classes.buttonWrapper}>
+					{
+						['hot1', 'hot2', 'hot3'].map(_ => (
+							// <Button className={classes.button} component={<MuiLink component={Link} to={`${routers.search.path}?keyword=${_}`} />}>
+							// 	{_}
+							// </Button>
+							<MuiLink className={classes.button} component={Link} to={`${routers.search.path}?keyword=${_}`}>
+								{_}
+							</MuiLink>
+						))
+					}
+				</div>
 			</div>
-    </div>
+		</PaperWrapper>
   )
 };
 

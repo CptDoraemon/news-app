@@ -161,7 +161,7 @@ const useSearch = () => {
 	const previousLocationSearch = usePrevious(location.search);
 	const didSearch = location.search.length > 0;
 	useEffect(() => {
-		if (previousLocationSearch !== location.search && didSearch) {
+		if (previousLocationSearch !== undefined && previousLocationSearch !== location.search && didSearch) {
 			pageRef.current = 1;
 			requestState.setData(null)
 			doSearch()

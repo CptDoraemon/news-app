@@ -55,7 +55,12 @@ const SelectFilter = ({label, data}: SelectFilterProps) => {
 			>
 				{
 					data.options.map(option => (
-						<MenuItem value={option.key} key={option.key} classes={{root: classes.menuItem}}>{option.displayName}</MenuItem>
+						React.createElement(isMobile ? 'option' : MenuItem, {
+							value: option.key,
+							key: option.key,
+							classes: {root: classes.menuItem},
+							children: option.displayName
+						})
 					))
 				}
 			</Select>

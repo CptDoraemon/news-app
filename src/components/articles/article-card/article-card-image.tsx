@@ -21,25 +21,18 @@ interface ArticleCardImageProps {
 
 const ArticleCardImage = ({url, title, isVisible}: ArticleCardImageProps) => {
   const classes = useStyles();
+  const _url = url || process.env.PUBLIC_URL + '/xiaoxihome-news.jpg';
 
-	if (url) {
-		if (isVisible) {
-			return <CardMedia
-				component="img"
-				alt={title}
-				className={classes.root}
-				image={url}
-				title={title}
-			/>
-		} else {
-			return <Skeleton variant={"rect"} className={classes.root} />
-		}
-	} else {
+	if (_url && isVisible) {
 		return <CardMedia
+			component="img"
+			alt={title}
 			className={classes.root}
-			image={process.env.PUBLIC_URL + '/xiaoxihome-news.jpg'}
-			title={'No image'}
+			image={_url}
+			title={title}
 		/>
+	} else {
+		return <Skeleton variant={"rect"} className={classes.root} />
 	}
 };
 

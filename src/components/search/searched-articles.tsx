@@ -14,7 +14,11 @@ const useStyles = makeStyles((theme) => ({
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'center',
-		justifyContent: 'flex-start'
+		justifyContent: 'flex-start',
+		margin: theme.spacing(4, 0),
+		[MOBILE(theme)]: {
+			margin: theme.spacing(2, 0),
+		}
 	},
 	centeringWrapper: {
 		width: '100%',
@@ -40,8 +44,13 @@ const useStyles = makeStyles((theme) => ({
 			display: 'block',
 			width: 'fit-content',
 			marginLeft: 'auto',
-			fontWeight: 700
-		}
+			fontWeight: 700,
+			[MOBILE(theme)]: {
+				marginLeft: 0,
+				width: '100%',
+				textAlign: 'center'
+			}
+		},
 	},
 	endOfResult: {
 		'& span': {
@@ -84,7 +93,7 @@ const SearchedArticles = ({search}: SearchedArticlesProps) => {
 			}
 			{
 				!search.requestState.isLoading && !search.requestState.isError && search.requestState.data && !search.requestState.data.docs.length && search.didSearch &&
-				<MessageWithIcon icon={<InfoIcon/>} title={'Ooops'} text={'No news article found'} />
+				<MessageWithIcon icon={<InfoIcon/>} title={'No news article found'} text={'Please try again with different keyword and filters'} />
 			}
 
 			{

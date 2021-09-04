@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useMemo} from "react";
 import {AppBar, makeStyles, Tab, Tabs} from "@material-ui/core";
 import {Link} from 'react-router-dom';
 import {newsCategories} from "../../routers";
@@ -20,11 +20,12 @@ interface HeaderTabsProps {}
 const HeaderTabs = () => {
   const classes = useStyles();
 	const category = useGetCategoryFromQuery() || '';
+	const categoryIndex = useMemo(() => (newsCategories as string[]).indexOf(category), [category]);
 
   return (
 		<AppBar color="primary" position={'static'} className={classes.appBarBottomBoxShadow}>
 			<Tabs
-				value={(newsCategories as string[]).indexOf(category)}
+				value={categoryIndex === -1 ? false : categoryIndex}
 				indicatorColor="secondary"
 				textColor="secondary"
 				variant="scrollable"

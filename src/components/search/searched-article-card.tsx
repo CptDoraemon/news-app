@@ -1,9 +1,11 @@
-import React from "react";
+import React, {useRef} from "react";
 import {makeStyles, Paper} from "@material-ui/core";
 import {SearchedArticle} from "./use-search/use-search";
 import ArticleCardContent from "../articles/article-card/article-card-content";
 import ArticleCardActions from "../articles/article-card/article-card-actions";
 import {MOBILE} from "../../theme";
+import ArticleCardImage from "../articles/article-card/article-card-image";
+import useLazyLoad from "../../tools/use-lazy-load";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -62,12 +64,15 @@ interface SearchedArticleCardProps {
 
 const SearchedArticleCard = ({data}: SearchedArticleCardProps) => {
   const classes = useStyles();
+	const rootRef = useRef<HTMLDivElement>(null);
+	const isVisible = useLazyLoad(rootRef);
 
   return (
-    <Paper elevation={0} className={classes.root}>
+    <Paper elevation={0} className={classes.root} ref={rootRef}>
       <div className={classes.image}>
 				<div className={classes.imageInnerWrapper}>
-					<img src={data.urlToImage} alt={data.title} />
+					<ArticleCardImage url={data.urlToImage} title={data.title} isVisible={isVisible} />
+					{/*<img src={data.urlToImage} alt={data.title} />*/}
 				</div>
 			</div>
 			<div className={classes.contentArea}>
