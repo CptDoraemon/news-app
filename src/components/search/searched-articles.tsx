@@ -1,10 +1,12 @@
 import React from "react";
-import {Button, CircularProgress, makeStyles} from "@material-ui/core";
+import {Button, CircularProgress, makeStyles, Typography} from "@material-ui/core";
 import SearchedArticleCard from "./searched-article-card";
-import useSearch from "./useSearch";
+import useSearch from "./use-search/use-search";
 import {MOBILE} from "../../theme";
 import MessageWithIcon from "../utility-components/message-with-icon";
 import InfoIcon from "@material-ui/icons/Info";
+import ScrollToTopButton from "./scroll-to-top-button";
+import clsx from 'clsx';
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -27,8 +29,28 @@ const useStyles = makeStyles((theme) => ({
 	},
 	loadMoreButton: {
 		maxWidth: '100%',
-		width: 200,
+		width: 400,
+		height: 40,
 		margin: theme.spacing(1, 0)
+	},
+	totalCountRow: {
+		width: '100%',
+		margin: theme.spacing(1, 0),
+		'& span': {
+			display: 'block',
+			width: 'fit-content',
+			marginLeft: 'auto',
+			fontWeight: 700
+		}
+	},
+	endOfResult: {
+		'& span': {
+			borderBottom: '1px solid rgba(0,0,0,0.32)',
+			color: 'rgba(0,0,0,0.32)',
+			fontWeight: 700,
+			width: '100%',
+			textAlign: 'center'
+		}
 	}
 }));
 
@@ -41,17 +63,29 @@ const SearchedArticles = ({search}: SearchedArticlesProps) => {
 
   return (
     <div className={classes.root}>
-      <SearchedArticleCard data={{
-				author: "TASS",
-				content: "MOSCOW, September 2. /TASS/. Russia’s new orbital station will operate autonomously to a large extent and will be kitted with artificial intelligence, Head of the State Space Corporation Roscosmos Dm… [+814 chars]",
-				description: "The new orbital outpost in conjunction with the Zeus nuclear-powered space tug can serve as a prototype for future systems of lengthy inter-planetary flights, Dmitry Rogozin noted",
-				publishedAt: "2021-09-02T15:56:30Z",
-				source: "TASS",
-				title: "Russia’s future orbital station to use artificial intelligence — Roscosmos chief - TASS",
-				url: "https://tass.com/science/1333311",
-				urlToImage: "https://tass.com/img/blocks/common/tass_logo_share_ru.png",
-				category: 'asd'
-			}} keyword={'asdasd'} />
+			{
+				search.requestState.data &&
+				<>
+					<div className={classes.totalCountRow}>
+						<Typography variant={'body2'} component={'span'}>
+							{ `Found ${search.requestState.data.total} news articles, showing ${Math.min(1, search.requestState.data.docs.length)} - ${search.requestState.data.docs.length}` }
+						</Typography>
+					</div>
+					{
+						search.requestState.data.docs.map(doc => (
+							<SearchedArticleCard data={doc} key={doc.id} keyword={search.keyword} />
+						))
+					}
+				</>
+			}
+			{
+				!search.requestState.isLoading && search.requestState.isError &&
+				<MessageWithIcon icon={<InfoIcon/>} title={'Ooops'} text={search.requestState.errorMessage} />
+			}
+			{
+				!search.requestState.isLoading && !search.requestState.isError && search.requestState.data && !search.requestState.data.docs.length && search.searchingParams !== null &&
+				<MessageWithIcon icon={<InfoIcon/>} title={'Ooops'} text={'No news article found'} />
+			}
 
 			{
 				search.requestState.isLoading &&
@@ -60,16 +94,21 @@ const SearchedArticles = ({search}: SearchedArticlesProps) => {
 				</div>
 			}
 			{
-				!search.requestState.isLoading && search.requestState.isError &&
-				<MessageWithIcon icon={<InfoIcon/>} title={'Ooops'} text={search.requestState.errorMessage} />
+				!search.requestState.isLoading && !search.requestState.isError && search.requestState.data?.hasNext &&
+				<Button className={classes.loadMoreButton} variant={'contained'} disableElevation color={'secondary'} onClick={search.doSearch}>
+					Load more
+				</Button>
 			}
 			{
-				!search.requestState.isLoading && !search.requestState.isError && !search.requestState.data &&
-				<MessageWithIcon icon={<InfoIcon/>} title={'Ooops'} text={'No news article found'} />
+				!search.requestState.isLoading && !search.requestState.isError && !search.requestState.data?.hasNext && !!search.requestState.data?.docs.length &&
+				<div className={clsx(classes.centeringWrapper, classes.endOfResult)}>
+					<Typography variant={'body2'} component={'span'}>
+						END OF RESULT
+					</Typography>
+				</div>
 			}
-			<Button className={classes.loadMoreButton} variant={'contained'} disableElevation color={'secondary'}>
-				Load more
-			</Button>
+
+			<ScrollToTopButton />
     </div>
   )
 };

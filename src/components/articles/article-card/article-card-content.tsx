@@ -22,6 +22,9 @@ const useStyles = makeStyles((theme) => ({
   date: {
     borderBottom: 'dotted 1px rgba(0,0,0,0.32)',
     cursor: 'help'
+  },
+  content: {
+    color: theme.palette.primary.light,
   }
 }));
 
@@ -47,7 +50,7 @@ const ArticleCardContent = ({data}: ArticleCardContentProps) => {
           </Typography>
         </Tooltip>
       </div>
-      <Typography variant={'body2'} component={'p'}>
+      <Typography variant={'body2'} component={'p'} className={classes.content}>
         { data.content && data.content.replace(/\[\+[0-9]+\schars\]/ig, '') }
       </Typography>
     </div>

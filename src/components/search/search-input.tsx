@@ -1,9 +1,10 @@
 import React from "react";
-import {alpha, Button, CircularProgress, makeStyles, TextField} from "@material-ui/core";
-import useSearch from "./useSearch";
+import {alpha, Button, CircularProgress, makeStyles, Select, TextField, useMediaQuery} from "@material-ui/core";
+import useSearch from "./use-search/use-search";
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnsUtils from '@date-io/date-fns';
 import {MOBILE} from "../../theme";
+import {useTheme} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -51,10 +52,17 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   submitButton: {
-	  width: '10ch',
-    height: 40,
+	  width: '12ch',
+    fontSize: theme.typography.h6.fontSize,
+    height: 56,
+    fontWeight: 700,
 	  '&:disabled': {
 	    backgroundColor: alpha(theme.palette.secondary.main, 0.3)
+    },
+    [MOBILE(theme)]: {
+      width: '10ch',
+      height: 40,
+      fontSize: theme.typography.body2.fontSize,
     }
   }
 }));
@@ -66,6 +74,8 @@ interface SearchInputProps {
 const SearchInput = ({search}: SearchInputProps) => {
   const classes = useStyles();
   const disabled = search.requestState.isLoading;
+  const theme = useTheme();
+  const isMobile = useMediaQuery(MOBILE(theme));
 
   return (
     <form className={classes.root} onSubmit={search.submitSearch}>
@@ -78,9 +88,10 @@ const SearchInput = ({search}: SearchInputProps) => {
             label={'Keyword'}
             variant={'outlined'}
             InputLabelProps={{ shrink: false, classes: {root: classes.inputLabel} }}
-            size={'small'}
+            size={isMobile ? 'small' : 'medium'}
             fullWidth={true}
             disabled={disabled}
+            type={'search'}
           />
         </div>
         <div>
@@ -135,6 +146,9 @@ const SearchInput = ({search}: SearchInputProps) => {
               }}
               disabled={disabled}
             />
+          </div>
+          <div>
+            <Select />
           </div>
         </MuiPickersUtilsProvider>
       </div>

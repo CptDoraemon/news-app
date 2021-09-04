@@ -4,7 +4,7 @@ import SearchInput from "./search-input";
 import {MOBILE} from "../../theme";
 import TrendingSearch from "./trending-search";
 import SearchedArticles from "./searched-articles";
-import useSearch from "./useSearch";
+import useSearch from "./use-search/use-search";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
 		justifyContent: 'flex-start'
 	},
 	widthWrapper: {
-		maxWidth: theme.breakpoints.values['md'],
+		maxWidth: theme.breakpoints.values['lg'],
 		width: '100%',
 		padding: theme.spacing(2),
 		margin: theme.spacing(2, 0),

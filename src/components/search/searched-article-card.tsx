@@ -1,6 +1,6 @@
 import React from "react";
 import {makeStyles, Paper} from "@material-ui/core";
-import {SearchedArticle} from "./useSearch";
+import {SearchedArticle} from "./use-search/use-search";
 import ArticleCardContent from "../articles/article-card/article-card-content";
 import ArticleCardActions from "../articles/article-card/article-card-actions";
 import {MOBILE} from "../../theme";

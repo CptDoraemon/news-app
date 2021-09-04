@@ -2,18 +2,18 @@ import {createTheme, responsiveFontSizes} from "@material-ui/core/styles";
 import {Theme} from "@material-ui/core";
 
 const mierB = {
-    fontFamily: 'MierB',
+    fontFamily: '"MierB"',
     fontDisplay: 'swap',
     src: `
-    url('/assets/fonts/MierB-Bold') format('woff2')
+    url('${process.env.PUBLIC_URL}/assets/fonts/MierB-Bold.woff2') format('woff2')
   `,
 };
 
 const inter = {
-    fontFamily: 'Inter',
+    fontFamily: '"Inter"',
     fontDisplay: 'swap',
     src: `
-    url('/assets/fonts/Inter-Regular') format('woff2')
+    url('${process.env.PUBLIC_URL}/assets/fonts/Inter-Regular.woff2') format('woff2')
   `
 };
 
@@ -27,7 +27,7 @@ const baseFontFamily = [
     'sans-serif',
     '"Apple Color Emoji"',
     '"Segoe UI Emoji"',
-    '"Segoe UI Symbol"'
+    '"Segoe UI Symbol"',
 ];
 
 const titleTypography = {

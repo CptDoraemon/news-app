@@ -1,9 +1,11 @@
-import {ChangeEvent, useCallback, useState} from "react";
+import {ChangeEvent, useCallback, useEffect, useRef, useState} from "react";
 import {MaterialUiPickersDate} from "@material-ui/pickers/typings/date";
-import useRequestState from "../../tools/use-request-state";
+import useRequestState from "../../../tools/use-request-state";
 import axios from "axios";
+import {usePrevious} from "react-use";
 
 export interface SearchedArticle {
+	id: string,
 	author: string
 	category: string,
 	content: string,
@@ -17,7 +19,8 @@ export interface SearchedArticle {
 
 interface SearchResponse {
 	docs: SearchedArticle[],
-	total: number
+	total: number,
+	hasNext: boolean
 }
 
 const getDateParam = (date: Date) => `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`;
@@ -26,8 +29,13 @@ const useSearch = () => {
 	const [keyword, setKeyword] = useState('');
 	const [startDate, setStartDate] = useState<MaterialUiPickersDate>(new Date('2020-01-04T00:00:00'));
 	const [endDate, setEndDate] = useState<MaterialUiPickersDate>(new Date());
+	const [searchingParams, setSearchingParams] = useState<null | {
+		keyword: string,
+		startDate: MaterialUiPickersDate,
+		endDate: MaterialUiPickersDate
+	}>(null);
 	const requestState = useRequestState<SearchResponse>();
-	const [page, setPage] = useState(1);
+	const pageRef = useRef(1);
 
 	const handleKeywordChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
 		if (e.currentTarget.value.length > 200) {
@@ -45,34 +53,62 @@ const useSearch = () => {
 	}, []);
 
 	const submitSearch = useCallback(async (e: ChangeEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		if (startDate === null || endDate === null || !keyword) {
+			return
+		}
+		setSearchingParams({
+			keyword,
+			startDate,
+			endDate
+		})
+	}, [endDate, keyword, startDate]);
+
+	const doSearch = useCallback(async () => {
 		try {
-			e.preventDefault();
-			if (startDate === null || endDate === null || !keyword || requestState.isLoading) {
+			if (requestState.isLoading || searchingParams === null) {
 				return
 			}
 
 			requestState.resetError();
 			requestState.setIsLoading(true);
-			const res = await axios.get('http://localhost:5000/api/search-news', {
+			const res = await axios.get('http://192.168.0.156:5000/api/search-news', {
 				params: {
-					keyword,
-					startDate: getDateParam(startDate),
-					endDate: getDateParam(endDate),
-					page
+					keyword: searchingParams.keyword,
+					startDate: getDateParam(searchingParams.startDate as Date),
+					endDate: getDateParam(searchingParams.endDate as Date),
+					page: pageRef.current
 				}
 			});
-			if (res.data.status === 'ok') {
-				requestState.setData(res.data)
+			const data = res.data;
+			if (data.status === 'ok') {
+				requestState.setData(prev => {
+					const newDocs = prev === null ? data.docs : [...prev.docs, ...data.docs];
+					return {
+						docs: newDocs,
+						total: data.total,
+						hasNext: data.hasNext
+					}
+				});
 			} else {
 				requestState.setErrorMessage(res.data.message)
 			}
-			setPage(prev => prev + 1);
+			pageRef.current = pageRef.current + 1;
 		} catch (e) {
 			requestState.setGenericErrorMessage()
 		} finally {
 			requestState.setIsLoading(false)
 		}
-	}, [endDate, keyword, page, requestState, startDate])
+	}, [requestState, searchingParams]);
+
+	const previousSearchingParams = usePrevious(searchingParams);
+	useEffect(() => {
+		if (previousSearchingParams !== searchingParams && searchingParams !== null) {
+			pageRef.current = 1;
+			requestState.setData(null)
+			doSearch()
+		}
+	}, [doSearch, previousSearchingParams, requestState, searchingParams])
 
 	return {
 		keyword,
@@ -82,7 +118,9 @@ const useSearch = () => {
 		handleStartDateChange,
 		handleEndDateChange,
 		submitSearch,
-		requestState
+		requestState,
+		doSearch,
+		searchingParams
 	}
 }
 
