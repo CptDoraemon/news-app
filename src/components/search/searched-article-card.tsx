@@ -57,8 +57,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface SearchedArticleCardProps {
-	data: SearchedArticle,
-	keyword: string
+	data: SearchedArticle
 }
 
 const SearchedArticleCard = ({data}: SearchedArticleCardProps) => {
@@ -73,7 +72,7 @@ const SearchedArticleCard = ({data}: SearchedArticleCardProps) => {
 			</div>
 			<div className={classes.contentArea}>
 				<div className={classes.content}>
-					<ArticleCardContent data={data}/>
+					<ArticleCardContent data={data} />
 				</div>
 				<div className={classes.action}>
 					<ArticleCardActions data={data}/>

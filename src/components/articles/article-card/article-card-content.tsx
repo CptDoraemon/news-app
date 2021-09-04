@@ -1,8 +1,9 @@
-import React from "react";
+import React, {useMemo} from "react";
 import {makeStyles, Tooltip, Typography} from "@material-ui/core";
 import {ArticleData} from "../use-load-articles";
 import getPublishTime from "../../../tools/get-publish-time";
 import getDateString from "../../../tools/get-date-string";
+import HighlightedContent from "./highlighted-content";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,16 +30,24 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface ArticleCardContentProps {
-  data: ArticleData
+  data: ArticleData,
+  keyword?: string
 }
 
-const ArticleCardContent = ({data}: ArticleCardContentProps) => {
+const ArticleCardContent = ({data, keyword}: ArticleCardContentProps) => {
   const classes = useStyles();
+  const content = useMemo(() => {
+    return data.content ? data.content.replace(/\[\+[0-9]+\schars\]/ig, '') : ''
+  }, [data.content])
   
   return (
     <div className={classes.root}>
       <Typography variant={'h6'} component={'h2'} className={classes.title}>
-        { data.title }
+        {
+          keyword ?
+            <HighlightedContent content={data.title} keyword={keyword} /> :
+            data.title
+        }
       </Typography>
       <div className={classes.subtitle}>
         <Typography variant={'body2'} component={'span'}>
@@ -51,7 +60,11 @@ const ArticleCardContent = ({data}: ArticleCardContentProps) => {
         </Tooltip>
       </div>
       <Typography variant={'body2'} component={'p'} className={classes.content}>
-        { data.content && data.content.replace(/\[\+[0-9]+\schars\]/ig, '') }
+        {
+          keyword ?
+            <HighlightedContent content={data.content} keyword={keyword} /> :
+            data.content
+        }
       </Typography>
     </div>
   )

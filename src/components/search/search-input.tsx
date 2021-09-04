@@ -1,10 +1,20 @@
 import React from "react";
-import {alpha, Button, CircularProgress, makeStyles, Select, TextField, useMediaQuery} from "@material-ui/core";
+import {
+  alpha,
+  Button,
+  CircularProgress, FormControl, InputLabel,
+  makeStyles,
+  MenuItem,
+  Select,
+  TextField,
+  useMediaQuery
+} from "@material-ui/core";
 import useSearch from "./use-search/use-search";
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnsUtils from '@date-io/date-fns';
 import {MOBILE} from "../../theme";
 import {useTheme} from "@material-ui/core/styles";
+import SelectFilter from "./select-filter";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -148,7 +158,13 @@ const SearchInput = ({search}: SearchInputProps) => {
             />
           </div>
           <div>
-            <Select />
+            <SelectFilter label={'category'} data={search.category}/>
+          </div>
+          <div>
+            <SelectFilter label={'sort by'} data={search.sortBy}/>
+          </div>
+          <div>
+            <SelectFilter label={'sort order'} data={search.sortOrder}/>
           </div>
         </MuiPickersUtilsProvider>
       </div>

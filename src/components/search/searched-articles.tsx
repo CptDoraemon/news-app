@@ -73,7 +73,7 @@ const SearchedArticles = ({search}: SearchedArticlesProps) => {
 					</div>
 					{
 						search.requestState.data.docs.map(doc => (
-							<SearchedArticleCard data={doc} key={doc.id} keyword={search.keyword.value} />
+							<SearchedArticleCard data={doc} key={doc.id} />
 						))
 					}
 				</>

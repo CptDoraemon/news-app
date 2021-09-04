@@ -5,7 +5,7 @@ import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
-import HighlightedContent from "./highlighted-content";
+import HighlightedContent from "../article-card/highlighted-content";
 import {ISearchedArticle} from "./requests/response-types";
 
 const useGetHeight = () => {

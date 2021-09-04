@@ -5,7 +5,8 @@ import {useMount, usePrevious} from "react-use";
 import useInputFilter from "./use-input-filter";
 import useDatePickerFilter from "./use-date-picker-filter";
 import {useHistory, useLocation} from "react-router-dom";
-import routers from "../../../routers";
+import routers, {newsCategories} from "../../../routers";
+import useSelectFilter from "./use-select-filter";
 const queryString = require('query-string');
 
 export interface SearchedArticle {
@@ -27,6 +28,39 @@ interface SearchResponse {
 	hasNext: boolean
 }
 
+const categoryOptions = [
+	{
+		key: 'all',
+		displayName: 'all'
+	},
+	...newsCategories.map(c => ({
+		key: c,
+		displayName: c
+	}))
+];
+
+const sortByOptions = [
+	{
+		key: 'relevance',
+		displayName: 'relevance'
+	},
+	{
+		key: 'date',
+		displayName: 'date'
+	}
+];
+
+const sortOrderOptions = [
+	{
+		key: 'desc',
+		displayName: 'descending'
+	},
+	{
+		key: 'asc',
+		displayName: 'ascending'
+	}
+]
+
 const dateToYyyymmdd = (date: Date) => `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`;
 const yyyymmddToDate = (yyyymmdd: string) => {
 	const array = yyyymmdd.split('-');
@@ -38,27 +72,36 @@ const useSearch = () => {
 	const keyword = useInputFilter('');
 	const startDate = useDatePickerFilter(new Date('2020-01-04T00:00:00'));
 	const endDate = useDatePickerFilter();
+	const category = useSelectFilter(categoryOptions[0].key, categoryOptions);
+	const sortBy = useSelectFilter(sortByOptions[0].key, sortByOptions);
+	const sortOrder = useSelectFilter(sortOrderOptions[0].key, sortOrderOptions);
 
 	const history = useHistory();
 	const location = useLocation();
 	const requestState = useRequestState<SearchResponse>();
 	const pageRef = useRef(1);
 
-	const redirectWithQueryParam = useCallback(() => {
+	const redirectWithQueryParam = () => {
 		const params = {
 			keyword: keyword.value,
 			startDate: dateToYyyymmdd(startDate.value as Date),
 			endDate: dateToYyyymmdd(endDate.value as Date),
+			category: category.value,
+			sortBy: sortBy.value,
+			sortOrder: sortOrder.value
 		};
 		history.push(`${routers.search.path}?${queryString.stringify(params)}`);
-	}, [endDate.value, history, keyword.value, startDate.value]);
+	};
 
-	const parseStateFromQueryParam = useCallback(() => {
+	const parseStateFromQueryParam = () => {
 		const parsed = queryString.parse(location.search);
 		const filters: {[key: string]: any} = {
 			keyword,
 			startDate,
-			endDate
+			endDate,
+			category,
+			sortBy,
+			sortOrder
 		}
 		Object.keys(parsed).forEach(key => {
 			if (key === 'startDate' || key === 'endDate') {
@@ -70,7 +113,7 @@ const useSearch = () => {
 
 		// need search?
 		return location.search.length !== 0;
-	}, [endDate, keyword, location.search, startDate]);
+	}
 
 	const submitSearch = useCallback(async (e: ChangeEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -101,7 +144,7 @@ const useSearch = () => {
 					return {
 						docs: newDocs,
 						total: data.total,
-						hasNext: data.hasNext
+						hasNext: data.hasNext,
 					}
 				});
 			} else {
@@ -134,6 +177,9 @@ const useSearch = () => {
 		keyword,
 		startDate,
 		endDate,
+		category,
+		sortBy,
+		sortOrder,
 		submitSearch,
 		requestState,
 		doSearch,
