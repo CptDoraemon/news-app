@@ -82,8 +82,8 @@ const SearchInput = ({search}: SearchInputProps) => {
       <div className={classes.inputRow}>
         <div>
           <TextField
-            value={search.keyword}
-            onChange={search.handleKeywordChange}
+            value={search.keyword.value}
+            onChange={search.keyword.handleChange}
             id={'news-search-text-field'}
             label={'Keyword'}
             variant={'outlined'}
@@ -120,8 +120,8 @@ const SearchInput = ({search}: SearchInputProps) => {
               margin="normal"
               id="date-picker-start-date"
               label="Start Date"
-              value={search.startDate}
-              onChange={search.handleStartDateChange}
+              value={search.startDate.value}
+              onChange={search.startDate.handleChange}
               disableFuture
               inputVariant={'outlined'}
               KeyboardButtonProps={{
@@ -137,8 +137,8 @@ const SearchInput = ({search}: SearchInputProps) => {
               margin="normal"
               id="date-picker-end-date"
               label="End Date"
-              value={search.endDate}
-              onChange={search.handleEndDateChange}
+              value={search.endDate.value}
+              onChange={search.endDate.handleChange}
               disableFuture
               inputVariant={'outlined'}
               KeyboardButtonProps={{

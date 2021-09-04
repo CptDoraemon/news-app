@@ -1,8 +1,12 @@
 import {ChangeEvent, useCallback, useEffect, useRef, useState} from "react";
-import {MaterialUiPickersDate} from "@material-ui/pickers/typings/date";
 import useRequestState from "../../../tools/use-request-state";
 import axios from "axios";
-import {usePrevious} from "react-use";
+import {useMount, usePrevious} from "react-use";
+import useInputFilter from "./use-input-filter";
+import useDatePickerFilter from "./use-date-picker-filter";
+import {useHistory, useLocation} from "react-router-dom";
+import routers from "../../../routers";
+const queryString = require('query-string');
 
 export interface SearchedArticle {
 	id: string,
@@ -23,50 +27,62 @@ interface SearchResponse {
 	hasNext: boolean
 }
 
-const getDateParam = (date: Date) => `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`;
+const dateToYyyymmdd = (date: Date) => `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`;
+const yyyymmddToDate = (yyyymmdd: string) => {
+	const array = yyyymmdd.split('-');
+	// @ts-ignore
+	return new Date(Date.UTC(...array))
+}
 
 const useSearch = () => {
-	const [keyword, setKeyword] = useState('');
-	const [startDate, setStartDate] = useState<MaterialUiPickersDate>(new Date('2020-01-04T00:00:00'));
-	const [endDate, setEndDate] = useState<MaterialUiPickersDate>(new Date());
-	const [searchingParams, setSearchingParams] = useState<null | {
-		keyword: string,
-		startDate: MaterialUiPickersDate,
-		endDate: MaterialUiPickersDate
-	}>(null);
+	const keyword = useInputFilter('');
+	const startDate = useDatePickerFilter(new Date('2020-01-04T00:00:00'));
+	const endDate = useDatePickerFilter();
+
+	const history = useHistory();
+	const location = useLocation();
 	const requestState = useRequestState<SearchResponse>();
 	const pageRef = useRef(1);
 
-	const handleKeywordChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-		if (e.currentTarget.value.length > 200) {
-			return
+	const redirectWithQueryParam = useCallback(() => {
+		const params = {
+			keyword: keyword.value,
+			startDate: dateToYyyymmdd(startDate.value as Date),
+			endDate: dateToYyyymmdd(endDate.value as Date),
+		};
+		history.push(`${routers.search.path}?${queryString.stringify(params)}`);
+	}, [endDate.value, history, keyword.value, startDate.value]);
+
+	const parseStateFromQueryParam = useCallback(() => {
+		const parsed = queryString.parse(location.search);
+		const filters: {[key: string]: any} = {
+			keyword,
+			startDate,
+			endDate
 		}
-		setKeyword(e.currentTarget.value);
-	}, []);
+		Object.keys(parsed).forEach(key => {
+			if (key === 'startDate' || key === 'endDate') {
+				filters[key]._setValue(yyyymmddToDate(parsed[key]))
+			} else if (filters[key]) {
+				filters[key]._setValue(parsed[key])
+			}
+		});
 
-	const handleStartDateChange = useCallback((date: MaterialUiPickersDate) => {
-		setStartDate(date);
-	}, []);
-
-	const handleEndDateChange = useCallback((date: MaterialUiPickersDate) => {
-		setEndDate(date);
-	}, []);
+		// need search?
+		return location.search.length !== 0;
+	}, [endDate, keyword, location.search, startDate]);
 
 	const submitSearch = useCallback(async (e: ChangeEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		if (startDate === null || endDate === null || !keyword) {
 			return
 		}
-		setSearchingParams({
-			keyword,
-			startDate,
-			endDate
-		})
-	}, [endDate, keyword, startDate]);
+		redirectWithQueryParam()
+	}, [endDate, keyword, redirectWithQueryParam, startDate]);
 
 	const doSearch = useCallback(async () => {
 		try {
-			if (requestState.isLoading || searchingParams === null) {
+			if (requestState.isLoading) {
 				return
 			}
 
@@ -74,9 +90,7 @@ const useSearch = () => {
 			requestState.setIsLoading(true);
 			const res = await axios.get('http://192.168.0.156:5000/api/search-news', {
 				params: {
-					keyword: searchingParams.keyword,
-					startDate: getDateParam(searchingParams.startDate as Date),
-					endDate: getDateParam(searchingParams.endDate as Date),
+					...queryString.parse(location.search),
 					page: pageRef.current
 				}
 			});
@@ -99,28 +113,31 @@ const useSearch = () => {
 		} finally {
 			requestState.setIsLoading(false)
 		}
-	}, [requestState, searchingParams]);
+	}, [location.search, requestState]);
 
-	const previousSearchingParams = usePrevious(searchingParams);
+	const previousLocationSearch = usePrevious(location.search);
+	const didSearch = location.search.length > 0;
 	useEffect(() => {
-		if (previousSearchingParams !== searchingParams && searchingParams !== null) {
+		if (previousLocationSearch !== location.search && didSearch) {
 			pageRef.current = 1;
 			requestState.setData(null)
 			doSearch()
 		}
-	}, [doSearch, previousSearchingParams, requestState, searchingParams])
+	}, [didSearch, doSearch, location.search, previousLocationSearch, requestState]);
+
+	useMount(() => {
+		const needSearch = parseStateFromQueryParam();
+		if (needSearch) doSearch();
+	})
 
 	return {
 		keyword,
-		handleKeywordChange,
 		startDate,
 		endDate,
-		handleStartDateChange,
-		handleEndDateChange,
 		submitSearch,
 		requestState,
 		doSearch,
-		searchingParams
+		didSearch
 	}
 }
 

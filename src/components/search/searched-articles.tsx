@@ -73,7 +73,7 @@ const SearchedArticles = ({search}: SearchedArticlesProps) => {
 					</div>
 					{
 						search.requestState.data.docs.map(doc => (
-							<SearchedArticleCard data={doc} key={doc.id} keyword={search.keyword} />
+							<SearchedArticleCard data={doc} key={doc.id} keyword={search.keyword.value} />
 						))
 					}
 				</>
@@ -83,7 +83,7 @@ const SearchedArticles = ({search}: SearchedArticlesProps) => {
 				<MessageWithIcon icon={<InfoIcon/>} title={'Ooops'} text={search.requestState.errorMessage} />
 			}
 			{
-				!search.requestState.isLoading && !search.requestState.isError && search.requestState.data && !search.requestState.data.docs.length && search.searchingParams !== null &&
+				!search.requestState.isLoading && !search.requestState.isError && search.requestState.data && !search.requestState.data.docs.length && search.didSearch &&
 				<MessageWithIcon icon={<InfoIcon/>} title={'Ooops'} text={'No news article found'} />
 			}
 

@@ -1,7 +1,9 @@
 import React from "react";
-import {Button, makeStyles, Typography} from "@material-ui/core";
+import {Button, makeStyles, Typography, Link as MuiLink} from "@material-ui/core";
 import WhatshotIcon from '@material-ui/icons/Whatshot';
 import {MOBILE} from "../../theme";
+import {Link} from "react-router-dom";
+import routers from "../../routers";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -62,9 +64,12 @@ const TrendingSearch = () => {
 			<div className={classes.buttonWrapper}>
 				{
 					['hot1', 'hot2', 'hot3'].map(_ => (
-						<Button className={classes.button}>
+						// <Button className={classes.button} component={<MuiLink component={Link} to={`${routers.search.path}?keyword=${_}`} />}>
+						// 	{_}
+						// </Button>
+						<MuiLink className={classes.button} component={Link} to={`${routers.search.path}?keyword=${_}`}>
 							{_}
-						</Button>
+						</MuiLink>
 					))
 				}
 			</div>
