@@ -5,21 +5,21 @@ import CopyLinkSnackbar from "../components/copy-link-snackbar";
 import {Dispatch} from "redux";
 
 function mapDispatchToProps(dispatch: Dispatch) {
-    return {
-        closeCopyLinkSnackBar: () => dispatch(closeCopyLinkSnackBar())
-    }
+  return {
+    closeCopyLinkSnackBar: () => dispatch(closeCopyLinkSnackBar())
+  }
 }
 
 function mapStateToProps(state: State) {
-    return {
-        isActive: state.copyLinkSnackBar.isActive,
-        text: state.copyLinkSnackBar.text
-    }
+  return {
+    isActive: state.copyLinkSnackBar.isActive,
+    text: state.copyLinkSnackBar.text
+  }
 }
 
 const CopyLinkSnackBarContainer = connect(
-    mapStateToProps,
-    mapDispatchToProps
+  mapStateToProps,
+  mapDispatchToProps
 )(CopyLinkSnackbar);
 
 export default CopyLinkSnackBarContainer;

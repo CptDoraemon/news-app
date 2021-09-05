@@ -39,30 +39,30 @@ const ArticleCardContent = ({data, keyword}: ArticleCardContentProps) => {
   const content = useMemo(() => {
     return data.content ? data.content.replace(/\[\+[0-9]+\schars\]/ig, '') : ''
   }, [data.content])
-  
+
   return (
     <div className={classes.root}>
       <Typography variant={'h6'} component={'h2'} className={classes.title}>
         {
           keyword ?
-            <HighlightedContent content={data.title} keyword={keyword} /> :
+            <HighlightedContent content={data.title} keyword={keyword}/> :
             data.title
         }
       </Typography>
       <div className={classes.subtitle}>
         <Typography variant={'body2'} component={'span'}>
-          { data.source ? data.source + ' - ' : data.author ? data.author + ' - ' : '' }
+          {data.source ? data.source + ' - ' : data.author ? data.author + ' - ' : ''}
         </Typography>
         <Tooltip title={getDateString(data.publishedAt)}>
           <Typography variant={'body2'} component={'span'} className={classes.date}>
-            { getPublishTime(new Date(data.publishedAt)) }
+            {getPublishTime(new Date(data.publishedAt))}
           </Typography>
         </Tooltip>
       </div>
       <Typography variant={'body2'} component={'p'} className={classes.content}>
         {
           keyword ?
-            <HighlightedContent content={data.content} keyword={keyword} /> :
+            <HighlightedContent content={data.content} keyword={keyword}/> :
             data.content
         }
       </Typography>

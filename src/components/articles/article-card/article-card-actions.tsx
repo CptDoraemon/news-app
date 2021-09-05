@@ -35,10 +35,11 @@ const ArticleCardActions = ({data}: ArticleCardActionsProps) => {
     copyToClipboard(link);
     dispatch(openCopyLinkSnackBar(link));
   }, [dispatch])
-  
+
   return (
     <div className={classes.root}>
-      <Button className={classes.button} startIcon={<OpenInNewIcon/>} component={Link} href={data.url} target={'_blank'} rel={'noopener'}>
+      <Button className={classes.button} startIcon={<OpenInNewIcon/>} component={Link} href={data.url} target={'_blank'}
+              rel={'noopener'}>
         Learn More
       </Button>
       <Button className={classes.button} startIcon={<ShareIcon/>} onClick={handleShare}>

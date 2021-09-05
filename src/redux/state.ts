@@ -1,13 +1,13 @@
 export interface State {
-    copyLinkSnackBar: {
-        isActive: boolean,
-        text: string
-    }
+  copyLinkSnackBar: {
+    isActive: boolean,
+    text: string
+  }
 }
 
 export const initState: State = {
-    copyLinkSnackBar: {
-        isActive: false,
-        text: ''
-    }
+  copyLinkSnackBar: {
+    isActive: false,
+    text: ''
+  }
 };

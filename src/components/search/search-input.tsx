@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   inputLabel: {
-	  display: 'none'
+    display: 'none'
   },
   filterRow: {
     display: 'flex',
@@ -67,12 +67,12 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   submitButton: {
-	  width: '12ch',
+    width: '12ch',
     fontSize: theme.typography.h6.fontSize,
     height: 56,
     fontWeight: 700,
-	  '&:disabled': {
-	    backgroundColor: alpha(theme.palette.secondary.main, 0.3)
+    '&:disabled': {
+      backgroundColor: alpha(theme.palette.secondary.main, 0.3)
     },
     [MOBILE(theme)]: {
       width: '10ch',
@@ -86,7 +86,8 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-interface SearchInputProps {}
+interface SearchInputProps {
+}
 
 const SearchInput = () => {
   const classes = useStyles();
@@ -129,7 +130,7 @@ const SearchInput = () => {
               id={'news-search-text-field'}
               label={'Keyword'}
               variant={'outlined'}
-              InputLabelProps={{ shrink: false, classes: {root: classes.inputLabel} }}
+              InputLabelProps={{shrink: false, classes: {root: classes.inputLabel}}}
               inputRef={keywordRef}
               size={isMobile ? 'small' : 'medium'}
               fullWidth={true}
@@ -148,7 +149,7 @@ const SearchInput = () => {
             >
               {
                 disabled ?
-                  <CircularProgress size={15} /> :
+                  <CircularProgress size={15}/> :
                   'Search'
               }
             </Button>

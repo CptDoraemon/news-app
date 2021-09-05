@@ -4,34 +4,36 @@ import {newsCategories, NewsCategory} from "../../routers";
 import {Redirect, useHistory} from "react-router-dom";
 import Articles from "./articles";
 
-interface ArticlesContainerProps {}
+interface ArticlesContainerProps {
+}
 
 const ArticlesContainer = () => {
-	const category = useGetCategoryFromQuery();
-	const history = useHistory();
-	const willRedirect = useMemo(() => {
-		return !category || !(newsCategories as string[]).includes(category)
-	}, [category])
+  const category = useGetCategoryFromQuery();
+  const history = useHistory();
+  const willRedirect = useMemo(() => {
+    return !category || !(newsCategories as string[]).includes(category)
+  }, [category])
 
-	const goNextCategory = useCallback(() => {
-		if (willRedirect) return;
-		const index = newsCategories.indexOf(category as NewsCategory);
-		const nextIndex = index + 1 >= newsCategories.length ? 0 : index + 1;
-		history.replace(`/?category=${newsCategories[nextIndex]}`)
-	}, [category, history, willRedirect]);
+  const goNextCategory = useCallback(() => {
+    if (willRedirect) return;
+    const index = newsCategories.indexOf(category as NewsCategory);
+    const nextIndex = index + 1 >= newsCategories.length ? 0 : index + 1;
+    history.replace(`/?category=${newsCategories[nextIndex]}`)
+  }, [category, history, willRedirect]);
 
-	const goPreviousCategory = useCallback(() => {
-		if (willRedirect) return;
-		const index = newsCategories.indexOf(category as NewsCategory);
-		const nextIndex = index - 1 < 0 ? newsCategories.length - 1 : index - 1;
-		history.replace(`/?category=${newsCategories[nextIndex]}`)
-	}, [category, history, willRedirect]);
+  const goPreviousCategory = useCallback(() => {
+    if (willRedirect) return;
+    const index = newsCategories.indexOf(category as NewsCategory);
+    const nextIndex = index - 1 < 0 ? newsCategories.length - 1 : index - 1;
+    history.replace(`/?category=${newsCategories[nextIndex]}`)
+  }, [category, history, willRedirect]);
 
-	if (willRedirect) {
-		return <Redirect to={`/?category=${newsCategories[0]}`} />
-	} else return (
-		<Articles category={category as string} key={category} goNextCategory={goNextCategory} goPreviousCategory={goPreviousCategory}/>
-	)
+  if (willRedirect) {
+    return <Redirect to={`/?category=${newsCategories[0]}`}/>
+  } else return (
+    <Articles category={category as string} key={category} goNextCategory={goNextCategory}
+              goPreviousCategory={goPreviousCategory}/>
+  )
 };
 
 export default ArticlesContainer

@@ -1,7 +1,7 @@
 import React, {useMemo} from "react";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {bigNumber, bigNumberTitle} from "./styles/analytics-styles";
-import { useSpring, animated, config, SpringValue } from '@react-spring/web';
+import {useSpring, animated, config, SpringValue} from '@react-spring/web';
 
 const monthStrings = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -37,18 +37,18 @@ const useCountUpAnimation = (totalDocuments: number, earliestDocumentDate: strin
     delay: 200,
     config: config.molasses,
   }
-  const { total } = useSpring({
-    from: { total: 0 },
+  const {total} = useSpring({
+    from: {total: 0},
     total: totalDocuments,
     ...commonProps
   })
-  const { earliest } = useSpring({
-    from: { earliest: 0 },
+  const {earliest} = useSpring({
+    from: {earliest: 0},
     earliest: earliestMs,
     ...commonProps
   })
-  const { latest } = useSpring({
-    from: { latest: 0 },
+  const {latest} = useSpring({
+    from: {latest: 0},
     latest: latestMs,
     ...commonProps
   });
@@ -66,7 +66,11 @@ interface DocumentsTextSummaryProps {
   latestDocumentDate: string
 }
 
-const DocumentsTextSummary = React.forwardRef<HTMLDivElement, DocumentsTextSummaryProps>(({totalDocuments, earliestDocumentDate, latestDocumentDate}, forwardedRef) => {
+const DocumentsTextSummary = React.forwardRef<HTMLDivElement, DocumentsTextSummaryProps>(({
+                                                                                            totalDocuments,
+                                                                                            earliestDocumentDate,
+                                                                                            latestDocumentDate
+                                                                                          }, forwardedRef) => {
   const classes = useStyles();
   const fullHeight = useMemo(() => window.innerHeight - 100, []);
   const {
@@ -91,18 +95,18 @@ const DocumentsTextSummary = React.forwardRef<HTMLDivElement, DocumentsTextSumma
     <>
       <div className={classes.root} style={{minHeight: `${fullHeight}px`}}>
         <div className={classes.section}>
-          { title('Total news articles archived') }
+          {title('Total news articles archived')}
           <animated.p className={classes.number}>{total.to(n => Math.round(n))}</animated.p>
         </div>
         <div className={classes.section}>
-          { title('First news article archived') }
-          { date(earliest) }
+          {title('First news article archived')}
+          {date(earliest)}
         </div>
         <div className={classes.section}>
-          { title('Most recent news article archived') }
-          { date(latest) }
+          {title('Most recent news article archived')}
+          {date(latest)}
         </div>
-        <div ref={forwardedRef}> </div>
+        <div ref={forwardedRef}></div>
       </div>
     </>
   )

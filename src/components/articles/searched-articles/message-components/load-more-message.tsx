@@ -5,24 +5,24 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import Button from "@material-ui/core/Button";
 
 interface LoadMoreMessageProps {
-    onClick: () => void
+  onClick: () => void
 }
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-        margin: theme.spacing(5, 0),
-        width: 300
-    }
+  root: {
+    margin: theme.spacing(5, 0),
+    width: 300
+  }
 }));
 
 const LoadMoreMessage: React.FC<LoadMoreMessageProps> = ({onClick}) => {
-    const classes = useStyles();
+  const classes = useStyles();
 
-    return (
-        <Button variant="contained" disableElevation color="secondary" onClick={onClick} className={classes.root}>
-            Load more
-        </Button>
-    )
+  return (
+    <Button variant="contained" disableElevation color="secondary" onClick={onClick} className={classes.root}>
+      Load more
+    </Button>
+  )
 };
 
 export default LoadMoreMessage

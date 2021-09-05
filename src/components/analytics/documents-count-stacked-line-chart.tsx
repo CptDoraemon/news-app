@@ -5,50 +5,48 @@ import Title from "./utilitis/title";
 import Content from "./utilitis/content";
 import StackedLineChartD3, {StackedLineChartD3Data} from "../../d3-charts/stacked-line-chart-d3";
 
-const useStyles = makeStyles(theme => ({
-
-}));
+const useStyles = makeStyles(theme => ({}));
 
 interface DocumentsHeatMapProps {
-    isLoaded: Boolean,
-    data: StackedLineChartD3Data,
-    width: number,
-    height: number
+  isLoaded: Boolean,
+  data: StackedLineChartD3Data,
+  width: number,
+  height: number
 }
 
 const id = 'analytics-documents-count-stacked-bar-chart';
 
 const DocumentsCountStackedLineChart: React.FC<DocumentsHeatMapProps> = ({isLoaded, data, width, height}) => {
-    const ref = useRef<HTMLDivElement>(null);
-    const isVisible = useLazyLoad(ref, 0.5);
-    const [stackedBarChart, setStackedBarChart] = useState<null | StackedLineChartD3>(null);
+  const ref = useRef<HTMLDivElement>(null);
+  const isVisible = useLazyLoad(ref, 0.5);
+  const [stackedBarChart, setStackedBarChart] = useState<null | StackedLineChartD3>(null);
 
-    useEffect(() => {
-        if (isLoaded && data && stackedBarChart === null) {
-            const stackedBarChart = new StackedLineChartD3(
-                id,
-                data,
-                width,
-                height
-            );
-            stackedBarChart.main();
-            setStackedBarChart(stackedBarChart);
-        }
-    }, [isLoaded, data]);
+  useEffect(() => {
+    if (isLoaded && data && stackedBarChart === null) {
+      const stackedBarChart = new StackedLineChartD3(
+        id,
+        data,
+        width,
+        height
+      );
+      stackedBarChart.main();
+      setStackedBarChart(stackedBarChart);
+    }
+  }, [isLoaded, data]);
 
-    useEffect(() => {
-        if (stackedBarChart && isVisible) {
-            stackedBarChart.animate();
-        }
-    }, [stackedBarChart, isVisible]);
+  useEffect(() => {
+    if (stackedBarChart && isVisible) {
+      stackedBarChart.animate();
+    }
+  }, [stackedBarChart, isVisible]);
 
-    return (
-        <>
-            <Title value={['News', 'archived', 'by', 'day & category']} />
-            <Content value={`Art made of data.`}/>
-            <div id={id} ref={ref}/>
-        </>
-    )
+  return (
+    <>
+      <Title value={['News', 'archived', 'by', 'day & category']}/>
+      <Content value={`Art made of data.`}/>
+      <div id={id} ref={ref}/>
+    </>
+  )
 };
 
 export default DocumentsCountStackedLineChart
