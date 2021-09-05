@@ -7,7 +7,6 @@ import {
   TextField,
   useMediaQuery
 } from "@material-ui/core";
-import useSearch from "./use-search/use-search";
 import {KeyboardDatePicker, KeyboardDatePickerProps, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from '@date-io/date-fns';
 import {MOBILE} from "../../theme";
@@ -20,6 +19,7 @@ import useSearchFilters from "./use-search/use-search-filters";
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
+    position: 'relative'
   },
   inputRow: {
     display: 'flex',
@@ -176,16 +176,16 @@ const SearchInput = () => {
                 {...datePickerProps}
               />
             </div>
-            <div>
-              <SelectFilter label={'category'} data={searchFilter.category}/>
-            </div>
-            <div>
-              <SelectFilter label={'sort by'} data={searchFilter.sortBy}/>
-            </div>
-            <div>
-              <SelectFilter label={'sort order'} data={searchFilter.sortOrder}/>
-            </div>
           </MuiPickersUtilsProvider>
+          <div>
+            <SelectFilter label={'category'} data={searchFilter.category}/>
+          </div>
+          <div>
+            <SelectFilter label={'sort by'} data={searchFilter.sortBy}/>
+          </div>
+          <div>
+            <SelectFilter label={'sort order'} data={searchFilter.sortOrder}/>
+          </div>
         </div>
       </form>
     </PaperWrapper>

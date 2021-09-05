@@ -6,7 +6,8 @@ import {MOBILE} from "../../theme";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
-		minWidth: 150
+		minWidth: 150,
+		position: 'relative'
 	},
 	menuItem: {
 		textTransform: 'capitalize'
@@ -26,47 +27,47 @@ interface SelectFilterProps {
 
 const SelectFilter = ({label, data}: SelectFilterProps) => {
   const classes = useStyles();
+	const anchorRef = useRef<HTMLDivElement>(null);
 	const theme = useTheme();
 	const isMobile = useMediaQuery(MOBILE(theme));
-	const anchorEl = useRef<HTMLDivElement>(null);
 
   return (
   	<>
-			<FormControl variant={'outlined'} className={classes.root} size={'small'}>
-				<InputLabel id={`${label}-select-label`} className={classes.label}>{label}</InputLabel>
-				<Select
-					labelId={`${label}-select-label`}
-					id={`${label}-select`}
-					value={data.value}
-					onChange={data.handleChange}
-					native={isMobile}
-					input={<OutlinedInput notched label={label}/>}
-					MenuProps={{
-						anchorEl: anchorEl.current,
-						getContentAnchorEl: null,
-						anchorOrigin: { vertical: "bottom", horizontal: "left" },
-						transformOrigin: { vertical: "top", horizontal: "left" },
-					}}
-					inputProps={{
-						shrink: true
-					}}
-					classes={{
-						select: classes.select,
-					}}
-				>
-					{
-						data.options.map(option => (
-							React.createElement(isMobile ? 'option' : MenuItem, {
-								value: option.key,
-								key: option.key,
-								classes: {root: classes.menuItem},
-								children: option.displayName
-							})
-						))
-					}
-				</Select>
-			</FormControl>
-			<div ref={anchorEl}/>
+		<div ref={anchorRef}/>
+		<FormControl variant={'outlined'} className={classes.root} size={'small'}>
+			<InputLabel id={`${label}-select-label`} className={classes.label}>{label}</InputLabel>
+			<Select
+				labelId={`${label}-select-label`}
+				id={`${label}-select`}
+				value={data.value}
+				onChange={data.handleChange}
+				native={isMobile}
+				input={<OutlinedInput notched label={label}/>}
+				MenuProps={{
+					anchorEl: anchorRef.current,
+					getContentAnchorEl: null,
+					anchorOrigin: { vertical: "bottom", horizontal: "left" },
+					transformOrigin: { vertical: "top", horizontal: "left" },
+				}}
+				inputProps={{
+					shrink: true
+				}}
+				classes={{
+					select: classes.select,
+				}}
+			>
+				{
+					data.options.map(option => (
+						React.createElement(isMobile ? 'option' : MenuItem, {
+							value: option.key,
+							key: option.key,
+							classes: {root: classes.menuItem},
+							children: option.displayName
+						})
+					))
+				}
+			</Select>
+		</FormControl>
 		</>
   )
 };
