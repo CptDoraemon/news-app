@@ -68,7 +68,7 @@ const TrendingSearch = () => {
 							// <Button className={classes.button} component={<MuiLink component={Link} to={`${routers.search.path}?keyword=${_}`} />}>
 							// 	{_}
 							// </Button>
-							<MuiLink className={classes.button} component={Link} to={`${routers.search.path}?keyword=${_}`}>
+							<MuiLink key={_} className={classes.button} component={Link} to={`${routers.search.path}?keyword=${_}`}>
 								{_}
 							</MuiLink>
 						))
