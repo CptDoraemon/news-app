@@ -4,7 +4,7 @@ import SearchInput from "./search-input";
 import {MOBILE} from "../../theme";
 import TrendingSearch from "./trending-search";
 import SearchedArticles from "./searched-articles";
-import useSearch from "./use-search/use-search";
+import {useLocation} from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -30,14 +30,14 @@ interface SearchProps {}
 
 const Search = () => {
   const classes = useStyles();
-	const search = useSearch();
+  const locationSearch = useLocation().search;
 
   return (
     <div className={classes.root}>
 			<div className={classes.widthWrapper}>
-				<SearchInput search={search}/>
+				<SearchInput/>
 				<TrendingSearch/>
-				<SearchedArticles search={search}/>
+				<SearchedArticles key={locationSearch}/>
 			</div>
     </div>
   )

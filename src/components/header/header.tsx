@@ -1,5 +1,5 @@
 import React, {useRef} from "react";
-import {AppBar, Grid, Theme, Toolbar, Tooltip, Typography} from "@material-ui/core";
+import {AppBar, Theme, Toolbar, Tooltip, Typography} from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
 import StickyComponent from "../utility-components/sticky-component";
 import IconButton from '@material-ui/core/IconButton';
@@ -11,6 +11,7 @@ import useTheme from "@material-ui/core/styles/useTheme";
 import {Link} from 'react-router-dom';
 import HeaderTabs from "./header-tabs";
 import routers from "../../routers";
+import {MOBILE} from "../../theme";
 
 const headerLinks = [
     {
@@ -31,22 +32,35 @@ const headerLinks = [
 ]
 
 const useStyles = makeStyles((theme: Theme) => ({
-    heading: {
+    appBarNoBoxShadow: {
+        boxShadow: 'none'
+    },
+    trendIcon: {
+        color: '#FFF'
+    },
+    toolbar: {
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+    },
+    toolbarTitle: {
+        flex: '1 1 auto',
         textTransform: 'uppercase',
-        height: '100%',
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         whiteSpace: 'nowrap',
         lineHeight: 1,
-        fontWeight: 900
+        fontWeight: 900,
+        [MOBILE(theme)]: {
+            fontSize: theme.typography.h6.fontSize
+        }
     },
-    appBarNoBoxShadow: {
-        boxShadow: 'none'
-    },
-    trendIcon: {
-        color: '#FFF'
+    toolbarButton: {
+        flex: '0 0 auto'
     }
 }));
 
@@ -61,32 +75,21 @@ const Header: React.FC<HeaderProps> = () => {
     return (
         <>
         <AppBar color="primary" position={'static'} ref={appBarRef} className={classes.appBarNoBoxShadow}>
-            <Toolbar>
-                <Grid container>
-                    <Grid item xs={1} md={3}>
-
-                    </Grid>
-                    <Grid item xs={5} md={6}>
-                        <Typography align={"center"} className={classes.heading} variant={"h4"} component={'h1'}>
-                            News Canada
-                        </Typography>
-                    </Grid>
-                    <Grid item xs={6} md={3}>
-                        <Grid container alignItems={'center'} justify={"flex-end"}>
-                            {
-                                headerLinks.map(data => (
-                                  <Grid item key={data.title}>
-                                      <Tooltip title={data.title} TransitionComponent={Zoom}>
-                                          <IconButton aria-label={data.title} color={"inherit"} component={Link} to={data.link}>
-                                              {data.icon}
-                                          </IconButton>
-                                      </Tooltip>
-                                  </Grid>
-                                ))
-                            }
-                        </Grid>
-                    </Grid>
-                </Grid>
+            <Toolbar className={classes.toolbar}>
+                <Typography align={"center"} className={classes.toolbarTitle} variant={"h4"} component={'h1'}>
+                    News Canada
+                </Typography>
+                {
+                    headerLinks.map(data => (
+                      <div key={data.title} className={classes.toolbarButton}>
+                          <Tooltip title={data.title} TransitionComponent={Zoom}>
+                              <IconButton aria-label={data.title} color={"inherit"} component={Link} to={data.link}>
+                                  {data.icon}
+                              </IconButton>
+                          </Tooltip>
+                      </div>
+                    ))
+                }
             </Toolbar>
         </AppBar>
         <StickyComponent

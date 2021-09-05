@@ -1,13 +1,9 @@
-import {ChangeEvent, useCallback, useEffect, useRef, useState} from "react";
+import {useLocation} from "react-router-dom";
 import useRequestState from "../../../tools/use-request-state";
+import {useCallback, useEffect, useRef} from "react";
 import axios from "axios";
-import {useMount, usePrevious} from "react-use";
-import useInputFilter from "./use-input-filter";
-import useDatePickerFilter from "./use-date-picker-filter";
-import {useHistory, useLocation} from "react-router-dom";
-import routers, {newsCategories} from "../../../routers";
-import useSelectFilter from "./use-select-filter";
-const queryString = require('query-string');
+import queryString from "query-string";
+import {usePrevious} from "react-use";
 
 export interface SearchedArticle {
 	id: string,
@@ -28,100 +24,11 @@ interface SearchResponse {
 	hasNext: boolean
 }
 
-const categoryOptions = [
-	{
-		key: 'all',
-		displayName: 'all'
-	},
-	...newsCategories.map(c => ({
-		key: c,
-		displayName: c
-	}))
-];
-
-const sortByOptions = [
-	{
-		key: 'relevance',
-		displayName: 'relevance'
-	},
-	{
-		key: 'date',
-		displayName: 'date'
-	}
-];
-
-const sortOrderOptions = [
-	{
-		key: 'desc',
-		displayName: 'descending'
-	},
-	{
-		key: 'asc',
-		displayName: 'ascending'
-	}
-]
-
-const dateToYyyymmdd = (date: Date) => `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`;
-const yyyymmddToDate = (yyyymmdd: string) => {
-	const array = yyyymmdd.split('-');
-	// @ts-ignore
-	return new Date(Date.UTC(...array))
-}
-
 const useSearch = () => {
-	const keyword = useInputFilter('');
-	const startDate = useDatePickerFilter(new Date('2020-01-04T00:00:00'));
-	const endDate = useDatePickerFilter();
-	const category = useSelectFilter(categoryOptions[0].key, categoryOptions);
-	const sortBy = useSelectFilter(sortByOptions[0].key, sortByOptions);
-	const sortOrder = useSelectFilter(sortOrderOptions[0].key, sortOrderOptions);
-
-	const history = useHistory();
 	const location = useLocation();
+	const previousLocationSearch = usePrevious(location.search);
 	const requestState = useRequestState<SearchResponse>();
 	const pageRef = useRef(1);
-
-	const redirectWithQueryParam = () => {
-		const params = {
-			keyword: keyword.value,
-			startDate: dateToYyyymmdd(startDate.value as Date),
-			endDate: dateToYyyymmdd(endDate.value as Date),
-			category: category.value,
-			sortBy: sortBy.value,
-			sortOrder: sortOrder.value
-		};
-		history.push(`${routers.search.path}?${queryString.stringify(params)}`);
-	};
-
-	const parseStateFromQueryParam = () => {
-		const parsed = queryString.parse(location.search);
-		const filters: {[key: string]: any} = {
-			keyword,
-			startDate,
-			endDate,
-			category,
-			sortBy,
-			sortOrder
-		}
-		Object.keys(parsed).forEach(key => {
-			if (key === 'startDate' || key === 'endDate') {
-				filters[key]._setValue(yyyymmddToDate(parsed[key]))
-			} else if (filters[key]) {
-				filters[key]._setValue(parsed[key])
-			}
-		});
-
-		// need search?
-		return location.search.length !== 0;
-	}
-
-	const submitSearch = useCallback(async (e: ChangeEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		if (startDate === null || endDate === null || !keyword) {
-			return
-		}
-		redirectWithQueryParam()
-	}, [endDate, keyword, redirectWithQueryParam, startDate]);
 
 	const doSearch = useCallback(async () => {
 		try {
@@ -158,32 +65,17 @@ const useSearch = () => {
 		}
 	}, [location.search, requestState]);
 
-	const previousLocationSearch = usePrevious(location.search);
-	const didSearch = location.search.length > 0;
 	useEffect(() => {
-		if (previousLocationSearch !== undefined && previousLocationSearch !== location.search && didSearch) {
+		if (location.search !== previousLocationSearch && location.search.length > 0) {
 			pageRef.current = 1;
 			requestState.setData(null)
 			doSearch()
 		}
-	}, [didSearch, doSearch, location.search, previousLocationSearch, requestState]);
-
-	useMount(() => {
-		const needSearch = parseStateFromQueryParam();
-		if (needSearch) doSearch();
-	})
+	}, [doSearch, location.search, previousLocationSearch, requestState]);
 
 	return {
-		keyword,
-		startDate,
-		endDate,
-		category,
-		sortBy,
-		sortOrder,
-		submitSearch,
 		requestState,
-		doSearch,
-		didSearch
+		doSearch
 	}
 }
 

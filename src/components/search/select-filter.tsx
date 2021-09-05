@@ -31,40 +31,43 @@ const SelectFilter = ({label, data}: SelectFilterProps) => {
 	const anchorEl = useRef<HTMLDivElement>(null);
 
   return (
-		<FormControl variant={'outlined'} ref={anchorEl} className={classes.root} size={'small'}>
-			<InputLabel id={`${label}-select-label`} className={classes.label}>{label}</InputLabel>
-			<Select
-				labelId={`${label}-select-label`}
-				id={`${label}-select`}
-				value={data.value}
-				onChange={data.handleChange}
-				native={isMobile}
-				input={<OutlinedInput notched label={label}/>}
-				MenuProps={{
-					anchorEl: anchorEl.current,
-					getContentAnchorEl: null,
-					anchorOrigin: { vertical: "bottom", horizontal: "left" },
-					transformOrigin: { vertical: "top", horizontal: "left" },
-				}}
-				inputProps={{
-					shrink: true
-				}}
-				classes={{
-					select: classes.select,
-				}}
-			>
-				{
-					data.options.map(option => (
-						React.createElement(isMobile ? 'option' : MenuItem, {
-							value: option.key,
-							key: option.key,
-							classes: {root: classes.menuItem},
-							children: option.displayName
-						})
-					))
-				}
-			</Select>
-		</FormControl>
+  	<>
+			<FormControl variant={'outlined'} className={classes.root} size={'small'}>
+				<InputLabel id={`${label}-select-label`} className={classes.label}>{label}</InputLabel>
+				<Select
+					labelId={`${label}-select-label`}
+					id={`${label}-select`}
+					value={data.value}
+					onChange={data.handleChange}
+					native={isMobile}
+					input={<OutlinedInput notched label={label}/>}
+					MenuProps={{
+						anchorEl: anchorEl.current,
+						getContentAnchorEl: null,
+						anchorOrigin: { vertical: "bottom", horizontal: "left" },
+						transformOrigin: { vertical: "top", horizontal: "left" },
+					}}
+					inputProps={{
+						shrink: true
+					}}
+					classes={{
+						select: classes.select,
+					}}
+				>
+					{
+						data.options.map(option => (
+							React.createElement(isMobile ? 'option' : MenuItem, {
+								value: option.key,
+								key: option.key,
+								classes: {root: classes.menuItem},
+								children: option.displayName
+							})
+						))
+					}
+				</Select>
+			</FormControl>
+			<div ref={anchorEl}/>
+		</>
   )
 };
 

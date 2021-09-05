@@ -1,4 +1,4 @@
-import React, {useMemo, useRef} from "react";
+import React, {ChangeEvent, useCallback, useMemo, useRef} from "react";
 import {
   alpha,
   Button,
@@ -15,6 +15,7 @@ import {useTheme} from "@material-ui/core/styles";
 import SelectFilter from "./select-filter";
 import {useMount} from "react-use";
 import PaperWrapper from "./paper-wrapper";
+import useSearchFilters from "./use-search/use-search-filters";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -85,16 +86,15 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-interface SearchInputProps {
-  search: ReturnType<typeof useSearch>
-}
+interface SearchInputProps {}
 
-const SearchInput = ({search}: SearchInputProps) => {
+const SearchInput = () => {
   const classes = useStyles();
-  const disabled = search.requestState.isLoading;
   const theme = useTheme();
   const isMobile = useMediaQuery(MOBILE(theme));
   const keywordRef = useRef<HTMLInputElement>(null);
+  const searchFilter = useSearchFilters();
+  const disabled = false;
 
   const datePickerProps = useMemo<Partial<KeyboardDatePickerProps>>(() => ({
     minDate: '2020-01-01',
@@ -111,16 +111,21 @@ const SearchInput = ({search}: SearchInputProps) => {
 
   useMount(() => {
     keywordRef.current?.focus();
-  })
+  });
+
+  const handleSubmit = useCallback((e: ChangeEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    searchFilter.submitSearch()
+  }, [searchFilter])
 
   return (
     <PaperWrapper>
-      <form className={classes.root} onSubmit={search.submitSearch}>
+      <form className={classes.root} onSubmit={handleSubmit}>
         <div className={classes.inputRow}>
           <div>
             <TextField
-              value={search.keyword.value}
-              onChange={search.keyword.handleChange}
+              value={searchFilter.keyword.value}
+              onChange={searchFilter.keyword.handleChange}
               id={'news-search-text-field'}
               label={'Keyword'}
               variant={'outlined'}
@@ -155,8 +160,8 @@ const SearchInput = ({search}: SearchInputProps) => {
               <KeyboardDatePicker
                 id="date-picker-start-date"
                 label="Start Date"
-                value={search.startDate.value}
-                onChange={search.startDate.handleChange}
+                value={searchFilter.startDate.value}
+                onChange={searchFilter.startDate.handleChange}
                 disabled={disabled}
                 {...datePickerProps}
               />
@@ -165,20 +170,20 @@ const SearchInput = ({search}: SearchInputProps) => {
               <KeyboardDatePicker
                 id="date-picker-end-date"
                 label="End Date"
-                value={search.endDate.value}
-                onChange={search.endDate.handleChange}
+                value={searchFilter.endDate.value}
+                onChange={searchFilter.endDate.handleChange}
                 disabled={disabled}
                 {...datePickerProps}
               />
             </div>
             <div>
-              <SelectFilter label={'category'} data={search.category}/>
+              <SelectFilter label={'category'} data={searchFilter.category}/>
             </div>
             <div>
-              <SelectFilter label={'sort by'} data={search.sortBy}/>
+              <SelectFilter label={'sort by'} data={searchFilter.sortBy}/>
             </div>
             <div>
-              <SelectFilter label={'sort order'} data={search.sortOrder}/>
+              <SelectFilter label={'sort order'} data={searchFilter.sortOrder}/>
             </div>
           </MuiPickersUtilsProvider>
         </div>

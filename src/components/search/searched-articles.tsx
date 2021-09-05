@@ -63,12 +63,11 @@ const useStyles = makeStyles((theme) => ({
 	}
 }));
 
-interface SearchedArticlesProps {
-	search: ReturnType<typeof useSearch>
-}
+interface SearchedArticlesProps {}
 
-const SearchedArticles = ({search}: SearchedArticlesProps) => {
+const SearchedArticles = () => {
   const classes = useStyles();
+  const search = useSearch();
 
   return (
     <div className={classes.root}>
@@ -92,7 +91,7 @@ const SearchedArticles = ({search}: SearchedArticlesProps) => {
 				<MessageWithIcon icon={<InfoIcon/>} title={'Ooops'} text={search.requestState.errorMessage} />
 			}
 			{
-				!search.requestState.isLoading && !search.requestState.isError && search.requestState.data && !search.requestState.data.docs.length && search.didSearch &&
+				!search.requestState.isLoading && !search.requestState.isError && search.requestState.data && !search.requestState.data.docs.length &&
 				<MessageWithIcon icon={<InfoIcon/>} title={'No news article found'} text={'Please try again with different keyword and filters'} />
 			}
 
