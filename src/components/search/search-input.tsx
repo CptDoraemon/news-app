@@ -2,7 +2,7 @@ import React, {ChangeEvent, useCallback, useMemo, useRef} from "react";
 import {
   alpha,
   Button,
-  CircularProgress,
+  CircularProgress, IconButton, InputAdornment,
   makeStyles,
   TextField,
   useMediaQuery
@@ -15,6 +15,7 @@ import SelectFilter from "./select-filter";
 import {useMount} from "react-use";
 import PaperWrapper from "./paper-wrapper";
 import useSearchFilters from "./use-search/use-search-filters";
+import CancelIcon from '@material-ui/icons/Cancel';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -117,7 +118,11 @@ const SearchInput = () => {
   const handleSubmit = useCallback((e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
     searchFilter.submitSearch()
-  }, [searchFilter])
+  }, [searchFilter]);
+
+  const handleClearKeyword = useCallback(() => {
+    searchFilter.keyword._setValue('')
+  }, [searchFilter.keyword])
 
   return (
     <PaperWrapper>
@@ -135,7 +140,19 @@ const SearchInput = () => {
               size={isMobile ? 'small' : 'medium'}
               fullWidth={true}
               disabled={disabled}
-              type={'search'}
+              InputProps={{
+                endAdornment: searchFilter.keyword.value.length > 0 ?
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="clear keyword"
+                      onClick={handleClearKeyword}
+                      edge="end"
+                    >
+                      <CancelIcon/>
+                    </IconButton>
+                  </InputAdornment> :
+                  <></>
+              }}
             />
           </div>
           <div>

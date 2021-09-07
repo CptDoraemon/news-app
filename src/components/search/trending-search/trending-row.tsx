@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, makeStyles, Typography} from "@material-ui/core";
+import {alpha, Button, makeStyles, Typography} from "@material-ui/core";
 import {TrendingItem} from "./use-trending-search";
 import {Link} from "react-router-dom";
 import routers from "../../../routers";
@@ -25,16 +25,19 @@ const useStyles = makeStyles((theme) => ({
   },
   button: {
     margin: theme.spacing(0.5),
+    padding: theme.spacing(0.25, 1),
     textTransform: 'none',
     fontWeight: 700,
-    backgroundColor: orange[600],
-    color: '#fff',
+    backgroundColor: alpha(orange[600], 0.08),
+    borderLeft: `solid 8px ${alpha(orange[600], 0.64)}`,
+    color: 'rgba(0,0,0,0.7)',
     '&:hover, &:focus': {
-      backgroundColor: orange[100],
-      color: 'rgba(0,0,0,0.7)',
+      backgroundColor: orange[600],
+      color: '#fff',
     },
     '& .MuiButton-endIcon': {
-
+      marginLeft: theme.spacing(2),
+      display: 'block'
     }
   },
   buttonText: {
