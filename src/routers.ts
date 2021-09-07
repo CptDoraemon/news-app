@@ -10,6 +10,10 @@ export enum NewsCategory {
 
 export const newsCategories = Object.values(NewsCategory);
 
+export const getBaseAPI = () => {
+  return process.env.NODE_ENV === 'production' ? '' : 'http://192.168.0.156:5000'
+}
+
 const routers = {
   root: {
     path: '/',
@@ -23,6 +27,10 @@ const routers = {
   },
   topic: {
     path: '/topic'
+  },
+  article: {
+    path: '/article/:id',
+    getPathWithId: (id: string) => `/article/${id}`
   }
 }
 

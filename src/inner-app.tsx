@@ -14,6 +14,7 @@ import Header from "./components/header/header";
 import ArticlesContainer from "./components/articles/articles-container";
 import Search from "./components/search/search";
 import routers from "./routers";
+import ArticleByIdContainer from "./components/article-by-id/article-by-id-container";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -60,6 +61,7 @@ function InnerApp(props: InnerAppProps) {
             <Route path={routers.search.path} exact render={() => <Search/>}/>
             <Route path={routers.topic.path} exact component={Topic}/>
             <Route path={routers.analytics.path} exact component={Analytics}/>
+            <Route path={routers.article.path} exact component={ArticleByIdContainer}/>
           </Switch>
         </div>
         <div className={classes.attribution}>

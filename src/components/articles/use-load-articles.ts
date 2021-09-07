@@ -2,8 +2,10 @@ import useRequestState from "../../tools/use-request-state";
 import {useCallback} from "react";
 import axios from "axios";
 import {useMount} from "react-use";
+import {getBaseAPI} from "../../routers";
 
 export interface ArticleData {
+  id: string,
   source: string,
   author: string,
   title: string,
@@ -24,6 +26,7 @@ const useLoadArticles = (category: string) => {
       const query = `
         {
             getNews(category: ${category.toUpperCase()}) {
+                id,
                 source,
                 author,
                 title,
@@ -35,7 +38,7 @@ const useLoadArticles = (category: string) => {
             }
         }
     `;
-      const res = await axios.get(`https://www.xiaoxihome.com/api/news?query=${encodeURIComponent(query)}`);
+      const res = await axios.get(`${getBaseAPI()}/api/news?query=${encodeURIComponent(query)}`);
       const data = res.data;
       requestState.setData(data.data.getNews);
     } catch (e) {
