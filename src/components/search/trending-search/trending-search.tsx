@@ -1,10 +1,8 @@
 import React from "react";
-import {makeStyles, Typography, Button, CircularProgress} from "@material-ui/core";
+import {makeStyles, Typography, CircularProgress} from "@material-ui/core";
 import WhatshotIcon from '@material-ui/icons/Whatshot';
 import {MOBILE} from "../../../theme";
-import routers from "../../../routers";
 import PaperWrapper from "../paper-wrapper";
-import {Link} from "react-router-dom";
 import useTrendingSearch from "./use-trending-search";
 import TrendingRow from "./trending-row";
 
@@ -23,13 +21,13 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     justifyContent: 'center',
     paddingRight: '1ch',
-    [MOBILE(theme)]: {
-      flex: '1 0 100%',
-      marginBottom: theme.spacing(1)
-    }
   },
-  subTitle: {
-
+  rowWrapper: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    marginBottom: theme.spacing(1)
   },
 }));
 
@@ -45,8 +43,8 @@ const TrendingSearch = () => {
       <div className={classes.root}>
         <div className={classes.rowWrapper}>
           <Typography variant={'body1'} component={'div'} className={classes.title}>
+            <span style={{marginRight: 8}}>Trending Searches</span>
             <WhatshotIcon style={{color: '#f57c00'}}/>
-            <span>Trending Searches: </span>
           </Typography>
 
           {

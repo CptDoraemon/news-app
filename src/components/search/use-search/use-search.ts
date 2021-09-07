@@ -20,6 +20,10 @@ export interface SearchedArticle {
 
 interface SearchResponse {
   docs: SearchedArticle[],
+  histogram: Array<{
+    doc_count: number,
+    key: number,
+  }>,
   total: number,
   hasNext: boolean
 }
@@ -50,6 +54,7 @@ const useSearch = () => {
           const newDocs = prev === null ? data.docs : [...prev.docs, ...data.docs];
           return {
             docs: newDocs,
+            histogram: data.histogram,
             total: data.total,
             hasNext: data.hasNext,
           }

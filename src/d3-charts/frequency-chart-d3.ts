@@ -1,4 +1,4 @@
-import {Theme} from "@material-ui/core";
+import {lighten, Theme} from "@material-ui/core";
 import * as d3 from "d3";
 import getDateString from "../components/articles/searched-articles/utilities/get-date-string";
 
@@ -75,7 +75,7 @@ class FrequencyChartD3 {
       lightColor: theme.palette.secondary.light,
       darkColor: theme.palette.secondary.dark,
       primaryColor: theme.palette.primary.light,
-      backgroundColor: '#EEE',
+      backgroundColor: 'fff',
       TRANSITION_DELAY: 500,
       BAR_TRANSITION_DURATION: 2000,
       maxFrequency: Math.max.apply(Math, this.dataArray.frequency),
@@ -117,6 +117,7 @@ class FrequencyChartD3 {
       yHover: d3.axisLeft(this.scales.y)
     };
     this.setHoverDetectionEventHandlers = this.setHoverDetectionEventHandlers.bind(this);
+    this.getBarColor = this.getBarColor.bind(this);
   }
 
   getBinDateArray(binArray: number[]) {
@@ -139,8 +140,8 @@ class FrequencyChartD3 {
 
   getDimensions(width: number) {
     const svgWidth = width;
-    const svgHeight = Math.min(Math.round(svgWidth / 3), 200);
-    const m = {t: 10, r: 30, b: 30, l: 30}; // margin
+    const svgHeight = Math.min(Math.round(svgWidth / 3), 100);
+    const m = {t: 20, r: 20, b: 20, l: 40}; // margin
     const chartWidth = svgWidth - m.l - m.r;
     const chartHeight = svgHeight - m.t - m.b;
     const chartX = m.l;
@@ -165,6 +166,13 @@ class FrequencyChartD3 {
 
   }
 
+  getBarColor(d: number) {
+    const percentage = parseFloat((d / this.params.maxFrequency).toFixed(2));
+    const scaledMax = 0.5;
+    const scaled = scaledMax - (scaledMax * percentage);
+    return lighten(this.params.lightColor, scaled);
+  }
+
   setBars() {
     const barWidth = this.scales.x.bandwidth();
     const barHeight = (d: number) => this.dimension.chartHeight - this.scales.y(d);
@@ -172,8 +180,7 @@ class FrequencyChartD3 {
     const barY = (d: number) => this.dimension.chartY + this.dimension.chartHeight - barHeight(d);
 
     this.references.bars
-      .style('fill', this.params.lightColor)
-      .style('opacity', 0.8)
+      .style('fill', this.getBarColor)
       .attr('width', barWidth)
       .attr('height', 0)
       .attr('x', barX)
@@ -325,7 +332,7 @@ class FrequencyChartD3 {
         this.references.axisXHoverDate.style('opacity', 0);
 
         this.references.bars.filter((d, index) => index === i)
-          .style('fill', this.params.lightColor);
+          .style('fill', this.getBarColor);
 
       })
   }

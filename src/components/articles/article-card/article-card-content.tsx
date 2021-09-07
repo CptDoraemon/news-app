@@ -63,7 +63,7 @@ const ArticleCardContent = ({data, keyword}: ArticleCardContentProps) => {
         {
           keyword ?
             <HighlightedContent content={data.content} keyword={keyword}/> :
-            data.content
+            data.content && data.content.replace(/\[\+[0-9]+\schars\]/ig, '')
         }
       </Typography>
     </div>
