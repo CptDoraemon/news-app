@@ -5,7 +5,7 @@ import axios from "axios";
 import {getBaseAPI} from "../../routers";
 
 const useGetArticleById = (id: string) => {
-  const request = useRequestState<ArticleData>();
+  const request = useRequestState<ArticleData[]>();
 
   useMount(async () => {
     try {

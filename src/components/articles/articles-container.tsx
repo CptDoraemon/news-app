@@ -2,7 +2,8 @@ import React, {useCallback, useMemo} from "react";
 import useGetCategoryFromQuery from "./use-get-category-from-query";
 import {newsCategories, NewsCategory} from "../../routers";
 import {Redirect, useHistory} from "react-router-dom";
-import Articles from "./articles";
+import Swipeable from "../utility-components/swipeable";
+import ArticlesWithCategoryLoader from "./articles-with-category-loader";
 
 interface ArticlesContainerProps {
 }
@@ -31,8 +32,12 @@ const ArticlesContainer = () => {
   if (willRedirect) {
     return <Redirect to={`/?category=${newsCategories[0]}`}/>
   } else return (
-    <Articles category={category as string} key={category} goNextCategory={goNextCategory}
-              goPreviousCategory={goPreviousCategory}/>
+    <Swipeable goNext={goNextCategory} goPrevious={goPreviousCategory}>
+      <ArticlesWithCategoryLoader
+        category={category as string}
+        key={category}
+      />
+    </Swipeable>
   )
 };
 

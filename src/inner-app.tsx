@@ -4,7 +4,6 @@ import Attribution from "./components/attribution";
 import CopyLinkSnackBarContainer from "./containers/copy-link-snackbar-container";
 import Analytics from "./components/analytics/analytics";
 import Topic from "./components/topic/topic";
-import SearchedArticles from "./components/articles/searched-articles/searched-articles";
 import {
   BrowserRouter as Router,
   Switch,

@@ -6,6 +6,8 @@ import {ArticleData} from "../use-load-articles";
 import copyToClipboard from "../../../tools/copy-to-clipboard";
 import {useDispatch} from "react-redux";
 import {openCopyLinkSnackBar} from "../../../redux/actions/copy-link-snackbar";
+import routers from "../../../routers";
+import {useLocation} from "react-use";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,17 +31,24 @@ interface ArticleCardActionsProps {
 const ArticleCardActions = ({data}: ArticleCardActionsProps) => {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const location = useLocation();
 
   const handleShare = useCallback(() => {
-    const link = '123123';
+    const link = `${location.origin}${process.env.PUBLIC_URL}${routers.article.getPathWithId(data.id)}`
     copyToClipboard(link);
     dispatch(openCopyLinkSnackBar(link));
-  }, [dispatch])
+  }, [data.id, dispatch, location.origin])
 
   return (
     <div className={classes.root}>
-      <Button className={classes.button} startIcon={<OpenInNewIcon/>} component={Link} href={data.url} target={'_blank'}
-              rel={'noopener'}>
+      <Button
+        className={classes.button}
+        startIcon={<OpenInNewIcon/>}
+        component={Link}
+        href={data.url}
+        target={'_blank'}
+        rel={'noopener'}
+      >
         Learn More
       </Button>
       <Button className={classes.button} startIcon={<ShareIcon/>} onClick={handleShare}>
