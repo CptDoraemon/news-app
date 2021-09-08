@@ -3,7 +3,7 @@ import {makeStyles, Paper} from "@material-ui/core";
 import {SearchedArticle} from "./use-search/use-search";
 import ArticleCardContent from "../articles/article-card/article-card-content";
 import ArticleCardActions from "../articles/article-card/article-card-actions";
-import {MOBILE} from "../../theme";
+import {MOBILE} from "../../theme/theme";
 import ArticleCardImage from "../articles/article-card/article-card-image";
 import useLazyLoad from "../../tools/use-lazy-load";
 

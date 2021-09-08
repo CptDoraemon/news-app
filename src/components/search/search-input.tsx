@@ -9,7 +9,7 @@ import {
 } from "@material-ui/core";
 import {KeyboardDatePicker, KeyboardDatePickerProps, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from '@date-io/date-fns';
-import {MOBILE} from "../../theme";
+import {MOBILE} from "../../theme/theme";
 import {useTheme} from "@material-ui/core/styles";
 import SelectFilter from "./select-filter";
 import {useMount} from "react-use";

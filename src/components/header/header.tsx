@@ -11,7 +11,7 @@ import useTheme from "@material-ui/core/styles/useTheme";
 import {Link} from 'react-router-dom';
 import HeaderTabs from "./header-tabs";
 import routers from "../../routers";
-import {MOBILE} from "../../theme";
+import {MOBILE} from "../../theme/theme";
 
 const headerLinks = [
   {

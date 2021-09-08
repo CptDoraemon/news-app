@@ -2,7 +2,7 @@ import React from "react";
 import {Button, CircularProgress, makeStyles, Typography} from "@material-ui/core";
 import SearchedArticleCard from "./searched-article-card";
 import useSearch from "./use-search/use-search";
-import {MOBILE} from "../../theme";
+import {MOBILE} from "../../theme/theme";
 import MessageWithIcon from "../utility-components/message-with-icon";
 import InfoIcon from "@material-ui/icons/Info";
 import ScrollToTopButton from "./scroll-to-top-button";

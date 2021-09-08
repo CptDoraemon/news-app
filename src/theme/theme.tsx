@@ -1,59 +1,6 @@
 import {createTheme, responsiveFontSizes} from "@material-ui/core/styles";
 import {Theme} from "@material-ui/core";
-
-const mierB = [
-  {
-    fontFamily: '"MierB"',
-    fontDisplay: 'swap',
-    src: `
-      url('${process.env.PUBLIC_URL}/assets/fonts/MierB-Bold.woff2') format('woff2')
-    `,
-    fontWeight: '100 200 300 400 500 600'
-  },
-  {
-    fontFamily: '"MierB"',
-    fontDisplay: 'swap',
-    src: `
-      url('${process.env.PUBLIC_URL}/assets/fonts/MierB-ExtraBold.woff2') format('woff2')
-    `,
-    fontWeight: '700 800'
-  },
-  {
-    fontFamily: '"MierB"',
-    fontDisplay: 'swap',
-    src: `
-      url('${process.env.PUBLIC_URL}/assets/fonts/MierB-Heavy.woff2') format('woff2')
-    `,
-    fontWeight: '900'
-  },
-];
-
-const inter = [
-  {
-    fontFamily: '"Inter"',
-    fontDisplay: 'swap',
-    src: `
-      url('${process.env.PUBLIC_URL}/assets/fonts/Inter-Regular.woff2') format('woff2')
-    `,
-    fontWeight: [100, 200, 300, 400, 500]
-  },
-  {
-    fontFamily: '"Inter"',
-    fontDisplay: 'swap',
-    src: `
-      url('${process.env.PUBLIC_URL}/assets/fonts/Inter-SemiBold.woff2') format('woff2')
-    `,
-    fontWeight: [600]
-  },
-  {
-    fontFamily: '"Inter"',
-    fontDisplay: 'swap',
-    src: `
-      url('${process.env.PUBLIC_URL}/assets/fonts/Inter-Bold.woff2') format('woff2')
-    `,
-    fontWeight: [700, 800, 900]
-  }
-];
+import {inter, mierB} from "./fonts";
 
 const baseFontFamily = [
   '-apple-system',

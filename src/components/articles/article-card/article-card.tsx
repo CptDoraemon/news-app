@@ -6,7 +6,7 @@ import ArticleCardImage from "./article-card-image";
 import useLazyLoad from "../../../tools/use-lazy-load";
 import ArticleCardContent from "./article-card-content";
 import ArticleCardActions from "./article-card-actions";
-import {MOBILE} from "../../../theme";
+import {MOBILE} from "../../../theme/theme";
 import {useTheme} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({

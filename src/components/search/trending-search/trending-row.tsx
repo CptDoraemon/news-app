@@ -51,9 +51,10 @@ const useStyles = makeStyles((theme) => ({
   title: {
     fontWeight: 900,
     whiteSpace: 'pre',
-    width: 80,
-    textTransform: 'uppercase',
-    fontSize: theme.typography.caption.fontSize
+    width: '10ch',
+    textTransform: 'capitalize',
+    fontSize: theme.typography.caption.fontSize,
+    color: theme.palette.grey[600]
   }
 }));
 
