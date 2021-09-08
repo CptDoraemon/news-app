@@ -38,7 +38,11 @@ let theme = createTheme({
     h3: titleTypography,
     h4: titleTypography,
     h5: titleTypography,
-    h6: titleTypography
+    h6: titleTypography,
+    button: {
+      fontFamily: ['"MierB"', ...baseFontFamily].join(','),
+      fontWeight: 500
+    }
   },
   overrides: {
     MuiCssBaseline: {

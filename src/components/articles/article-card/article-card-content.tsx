@@ -2,7 +2,7 @@ import React, {useMemo} from "react";
 import {makeStyles, Tooltip, Typography} from "@material-ui/core";
 import {ArticleData} from "../use-load-articles";
 import getPublishTime from "../../../tools/get-publish-time";
-import getDateString from "../../../tools/get-date-string";
+import {getDateStringFromISOString as getDateString} from "../../../tools/get-date-string";
 import HighlightedContent from "./highlighted-content";
 
 const useStyles = makeStyles((theme) => ({

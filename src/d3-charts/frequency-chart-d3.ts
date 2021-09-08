@@ -1,6 +1,6 @@
 import {lighten, Theme} from "@material-ui/core";
 import * as d3 from "d3";
-import getDateString from "../tools/get-date-string";
+import {getDateStringFromMs as getDateString} from "../tools/get-date-string";
 
 class FrequencyChartD3 {
   dataArray: {
@@ -121,7 +121,7 @@ class FrequencyChartD3 {
   }
 
   getBinDateArray(binArray: number[]) {
-    return binArray.map(ms => getDateString(`${ms}`))
+    return binArray.map(getDateString)
   }
 
   getBarTransitionDelayArray(transitionDelay: number, frequencyDataArray: number[]) {
