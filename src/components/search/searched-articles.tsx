@@ -82,13 +82,16 @@ const SearchedArticles = () => {
               {`Found ${search.requestState.data.total} news articles, showing ${Math.min(1, search.requestState.data.docs.length)} - ${search.requestState.data.docs.length}`}
             </Typography>
           </div>
-          <PaperWrapper>
-            <KeywordFrequency
-              bin={search.requestState.data.histogram.map(obj => obj.key)}
-              frequency={search.requestState.data.histogram.map(obj => obj.doc_count)}
-              setDate={() => false}
-            />
-          </PaperWrapper>
+          {
+            !!search.requestState.data.docs.length &&
+            <PaperWrapper>
+              <KeywordFrequency
+                bin={search.requestState.data.histogram.map(obj => obj.key)}
+                frequency={search.requestState.data.histogram.map(obj => obj.doc_count)}
+                setDate={() => false}
+              />
+            </PaperWrapper>
+          }
           {
             search.requestState.data.docs.map(doc => (
               <SearchedArticleCard data={doc} key={doc.id}/>
