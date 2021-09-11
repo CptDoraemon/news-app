@@ -1,6 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
 import PieChartD3, {PieChartData} from "../../d3-charts/pie-chart-d3";
-import useLazyLoad from "../../tools/use-lazy-load";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import Title from "./utilitis/title";
 import Content from "./utilitis/content";

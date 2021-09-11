@@ -1,7 +1,7 @@
 import React, {useMemo} from "react";
 import makeStyles from "@material-ui/core/styles/makeStyles";
-import {bigNumber, bigNumberTitle} from "./styles/analytics-styles";
 import {useSpring, animated, config, SpringValue} from '@react-spring/web';
+import {Typography} from "@material-ui/core";
 
 const monthStrings = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -22,16 +22,23 @@ const useStyles = makeStyles(theme => ({
     }
   },
   title: {
-    ...bigNumberTitle(theme)
+    fontWeight: 700
   },
   number: {
-    ...bigNumber(theme)
+    fontWeight: 900
   }
 }));
 
+const roundAndToMs = (isoString: string) => {
+  const date = new Date(isoString);
+  const rounded = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const dayMsMinusOneS = 1000 * 60 * 60 * 24 - 1;
+  return rounded.getTime() + dayMsMinusOneS;
+}
+
 const useCountUpAnimation = (totalDocuments: number, earliestDocumentDate: string, latestDocumentDate: string) => {
-  const earliestMs = useMemo(() => new Date(earliestDocumentDate).getTime(), [earliestDocumentDate]);
-  const latestMs = useMemo(() => new Date(latestDocumentDate).getTime(), [latestDocumentDate]);
+  const earliestMs = useMemo(() => roundAndToMs(earliestDocumentDate), [earliestDocumentDate]);
+  const latestMs = useMemo(() => roundAndToMs(latestDocumentDate), [latestDocumentDate]);
 
   const commonProps = {
     delay: 200,
@@ -66,11 +73,12 @@ interface DocumentsTextSummaryProps {
   latestDocumentDate: string
 }
 
-const DocumentsTextSummary = React.forwardRef<HTMLDivElement, DocumentsTextSummaryProps>(({
-                                                                                            totalDocuments,
-                                                                                            earliestDocumentDate,
-                                                                                            latestDocumentDate
-                                                                                          }, forwardedRef) => {
+const DocumentsTextSummary = React.forwardRef<HTMLDivElement, DocumentsTextSummaryProps>((
+  {
+    totalDocuments,
+    earliestDocumentDate,
+    latestDocumentDate
+  }, forwardedRef) => {
   const classes = useStyles();
   const fullHeight = useMemo(() => window.innerHeight - 100, []);
   const {
@@ -80,14 +88,26 @@ const DocumentsTextSummary = React.forwardRef<HTMLDivElement, DocumentsTextSumma
   } = useCountUpAnimation(totalDocuments, earliestDocumentDate, latestDocumentDate);
 
   const title = (value: string) => (
-    <h2 className={classes.title}>{value}</h2>
+    <Typography
+      className={classes.title}
+      variant={'body1'}
+      component={'h2'}
+    >
+      {value}
+    </Typography>
   );
   const date = (number: SpringValue<number>) => {
     return (
-      <animated.p className={classes.number}>{number.to(n => {
-        const dateObj = new Date(n);
-        return `${dateObj.getUTCDate()} ${monthStrings[dateObj.getUTCMonth()]}, ${dateObj.getUTCFullYear()}`
-      })}</animated.p>
+      <Typography variant={'h1'} component={'p'} className={classes.number}>
+        <animated.span>
+          {
+            number.to(n => {
+              const dateObj = new Date(n);
+              return `${dateObj.getDate()} ${monthStrings[dateObj.getMonth()]}, ${dateObj.getFullYear()}`
+            })
+          }
+        </animated.span>
+      </Typography>
     )
   };
 
@@ -96,7 +116,13 @@ const DocumentsTextSummary = React.forwardRef<HTMLDivElement, DocumentsTextSumma
       <div className={classes.root} style={{minHeight: `${fullHeight}px`}}>
         <div className={classes.section}>
           {title('Total news articles archived')}
-          <animated.p className={classes.number}>{total.to(n => Math.round(n))}</animated.p>
+          <Typography variant={'h1'} component={'p'} className={classes.number}>
+            <animated.span>
+              {
+                total.to(n => Math.round(n))
+              }
+            </animated.span>
+          </Typography>
         </div>
         <div className={classes.section}>
           {title('First news article archived')}
@@ -106,7 +132,6 @@ const DocumentsTextSummary = React.forwardRef<HTMLDivElement, DocumentsTextSumma
           {title('Most recent news article archived')}
           {date(latest)}
         </div>
-        <div ref={forwardedRef}></div>
       </div>
     </>
   )
