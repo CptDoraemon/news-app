@@ -41,11 +41,11 @@ const sortOrderOptions = [
   }
 ]
 
-const dateToYyyymmdd = (date: Date) => `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`;
+const dateToYyyymmdd = (date: Date) => `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 const yyyymmddToDate = (yyyymmdd: string) => {
   const array = yyyymmdd.split('-');
   // @ts-ignore
-  return new Date(Date.UTC(...array))
+  return new Date(...array)
 }
 
 const useSearchFilters = () => {
