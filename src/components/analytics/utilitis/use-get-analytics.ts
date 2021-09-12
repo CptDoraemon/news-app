@@ -20,7 +20,11 @@ interface AnalyticsData {
     quantity: number[][],
     series: string[],
     order: string[]
-  }
+  },
+  wordCloud: Array<{
+    count: number,
+    word: string
+  }>,
 }
 
 const useGetAnalytics = () => {
@@ -56,7 +60,8 @@ const useGetAnalytics = () => {
           quantity,
           series,
           order
-        }
+        },
+        wordCloud: data.data.wordFrequency
       })
 
     } catch (e) {

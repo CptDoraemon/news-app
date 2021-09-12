@@ -119,6 +119,12 @@ const Analytics: React.FC<AnalyticsProps> = () => {
                 />
               </SectionWrapper>
             </AnimationSlideIn>
+
+            <AnimationFixed>
+              <SectionWrapper>
+                <WordCloud isLoaded={true} data={getAnalytics.data!.wordCloud} width={width}/>
+              </SectionWrapper>
+            </AnimationFixed>
           </>
         }
 
