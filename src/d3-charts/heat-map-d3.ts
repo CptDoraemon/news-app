@@ -1,9 +1,9 @@
 import * as d3 from "d3";
 
-export interface HeatMapData {
-  count: number[],
-  time: number[]
-}
+export type HeatMapData = Array<{
+  count: number,
+  date: number
+}>
 
 class HeatMapD3 {
 
@@ -133,9 +133,9 @@ class HeatMapD3 {
 
   getData(data: HeatMapData) {
     // compensate the data array with empty data first, making the first day of the data array is Sunday.
-    const _data = data.time.map((_, i) => ({
-      count: data.count[i],
-      time: _
+    const _data = data.map((obj, i) => ({
+      count: obj.count,
+      time: obj.date
     }));
     const aDay = 1000 * 60 * 60 * 24;
     const firstActualData = new Date(_data[0].time);

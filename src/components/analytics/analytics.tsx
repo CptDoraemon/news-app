@@ -102,6 +102,23 @@ const Analytics: React.FC<AnalyticsProps> = () => {
                   width={width}/>
               </SectionWrapper>
             </Fade>
+
+            <AnimationSlideIn direction={AnimationSlideInDirection.left}>
+              <SectionWrapper>
+                <DocumentsHeatMap isLoaded={true} data={getAnalytics.data!.docsCountByDay} width={width}/>
+              </SectionWrapper>
+            </AnimationSlideIn>
+
+            <AnimationSlideIn direction={AnimationSlideInDirection.right}>
+              <SectionWrapper>
+                <DocumentsCountStackedLineChart
+                  isLoaded={true}
+                  data={getAnalytics.data!.docCountByDayAndCategory}
+                  width={width}
+                  height={width >= 1000 ? 600 : width / 2}
+                />
+              </SectionWrapper>
+            </AnimationSlideIn>
           </>
         }
 
@@ -131,26 +148,26 @@ const Analytics: React.FC<AnalyticsProps> = () => {
             {/*  </SectionWrapper>*/}
             {/*</Fade>*/}
 
-        {/*    <AnimationSlideIn direction={AnimationSlideInDirection.left}>*/}
-        {/*      <SectionWrapper>*/}
-        {/*        <DocumentsHeatMap isLoaded={isLoaded} data={summaryStatisticsData.documentsCountByDay} width={width}/>*/}
-        {/*      </SectionWrapper>*/}
-        {/*    </AnimationSlideIn>*/}
+            {/*<AnimationSlideIn direction={AnimationSlideInDirection.left}>*/}
+            {/*  <SectionWrapper>*/}
+            {/*    <DocumentsHeatMap isLoaded={isLoaded} data={summaryStatisticsData.documentsCountByDay} width={width}/>*/}
+            {/*  </SectionWrapper>*/}
+            {/*</AnimationSlideIn>*/}
 
-        {/*    <AnimationSlideIn direction={AnimationSlideInDirection.right}>*/}
-        {/*      <SectionWrapper>*/}
-        {/*        <DocumentsCountStackedLineChart*/}
-        {/*          isLoaded={isLoaded}*/}
-        {/*          data={{*/}
-        {/*            quantity: summaryStatisticsData.documentsCountByDayAndCategory.documentCount,*/}
-        {/*            series: summaryStatisticsData.documentsCountByDayAndCategory.series,*/}
-        {/*            order: summaryStatisticsData.documentsCountByDayAndCategory.category*/}
-        {/*          }}*/}
-        {/*          width={width}*/}
-        {/*          height={width >= 1000 ? 600 : width / 2}*/}
-        {/*        />*/}
-        {/*      </SectionWrapper>*/}
-        {/*    </AnimationSlideIn>*/}
+            {/*<AnimationSlideIn direction={AnimationSlideInDirection.right}>*/}
+            {/*  <SectionWrapper>*/}
+            {/*    <DocumentsCountStackedLineChart*/}
+            {/*      isLoaded={isLoaded}*/}
+            {/*      data={{*/}
+            {/*        quantity: summaryStatisticsData.documentsCountByDayAndCategory.documentCount,*/}
+            {/*        series: summaryStatisticsData.documentsCountByDayAndCategory.series,*/}
+            {/*        order: summaryStatisticsData.documentsCountByDayAndCategory.category*/}
+            {/*      }}*/}
+            {/*      width={width}*/}
+            {/*      height={width >= 1000 ? 600 : width / 2}*/}
+            {/*    />*/}
+            {/*  </SectionWrapper>*/}
+            {/*</AnimationSlideIn>*/}
 
         {/*    <StackedLineChartExpansionPanelNote/>*/}
 

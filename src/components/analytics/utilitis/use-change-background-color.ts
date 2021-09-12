@@ -20,7 +20,6 @@ const useChangeBackgroundColor = (isPageReady: boolean) => {
 
   const prevIsPageReady = usePrevious(isPageReady);
   useEffect(() => {
-    console.log(prevIsPageReady, isPageReady);
     if (prevIsPageReady !== isPageReady && prevIsPageReady !== undefined && isPageReady) {
       changeBgColor();
     }

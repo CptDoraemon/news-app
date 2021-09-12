@@ -12,6 +12,15 @@ interface AnalyticsData {
     count: number,
     category: string
   }>,
+  docsCountByDay: Array<{
+    count: number,
+    date: number
+  }>,
+  docCountByDayAndCategory: {
+    quantity: number[][],
+    series: string[],
+    order: string[]
+  }
 }
 
 const useGetAnalytics = () => {
@@ -25,9 +34,29 @@ const useGetAnalytics = () => {
       if (data.status !== 'ok') {
         throw new Error()
       }
+      const _docCountByDayAndCategory = data.data.docCountByDayAndCategory;
+      const docsCountByDay: AnalyticsData['docsCountByDay'] = [];
+      const quantity: number[][] = [];
+      const series: string[] = [];
+      const order = _docCountByDayAndCategory.categories;
+
+      _docCountByDayAndCategory.date.forEach((date: number, index: number) => {
+        docsCountByDay.push({
+          count: _docCountByDayAndCategory.docCountByDay[index],
+          date,
+        });
+        series.push(new Date(date).toISOString());
+        quantity.push(_docCountByDayAndCategory.docCountByDayAndCategory[index])
+      })
       request.setData({
         summary: data.data.summary,
-        countByCategory: data.data.countByCategory
+        countByCategory: data.data.countByCategory,
+        docsCountByDay,
+        docCountByDayAndCategory: {
+          quantity,
+          series,
+          order
+        }
       })
 
     } catch (e) {

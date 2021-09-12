@@ -22,6 +22,10 @@ export interface SummaryStatisticsData {
     count: number,
     word: string
   }>,
+  docsCountByDay: Array<{
+    count: number,
+    date: number
+  }>,
   documentsCountByDayAndCategory: {
     documentCount: number[][],
     series: string[],
