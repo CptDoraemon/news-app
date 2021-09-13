@@ -22,8 +22,11 @@ interface AnalyticsData {
     order: string[]
   },
   wordCloud: Array<{
-    count: number,
-    word: string
+    year: string,
+    data: Array<{
+      count: number,
+      word: string
+    }>
   }>,
 }
 
@@ -38,20 +41,26 @@ const useGetAnalytics = () => {
       if (data.status !== 'ok') {
         throw new Error()
       }
-      const _docCountByDayAndCategory = data.data.docCountByDayAndCategory;
+
+      // docsCountByDay
       const docsCountByDay: AnalyticsData['docsCountByDay'] = [];
+      data.data.docCountByDay.docCountByDay.forEach((count: number, i: number) => {
+        docsCountByDay.push({
+          count,
+          date: data.data.docCountByDay.date[i]
+        })
+      })
+
+      // docCountByDayAndCategory
+      const _docCountByDayAndCategory = data.data.docCountByDayAndCategory;
       const quantity: number[][] = [];
       const series: string[] = [];
       const order = _docCountByDayAndCategory.categories;
-
       _docCountByDayAndCategory.date.forEach((date: number, index: number) => {
-        docsCountByDay.push({
-          count: _docCountByDayAndCategory.docCountByDay[index],
-          date,
-        });
         series.push(new Date(date).toISOString());
         quantity.push(_docCountByDayAndCategory.docCountByDayAndCategory[index])
       })
+
       request.setData({
         summary: data.data.summary,
         countByCategory: data.data.countByCategory,
@@ -65,6 +74,7 @@ const useGetAnalytics = () => {
       })
 
     } catch (e) {
+      console.log(e);
       request.setGenericErrorMessage();
     } finally {
       request.setIsLoading(false);

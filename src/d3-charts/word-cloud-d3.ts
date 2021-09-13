@@ -21,12 +21,13 @@ class WordCloudD3 {
   };
   scale: d3.ScaleLinear<number, number>;
 
-  constructor(data: WordCloudData, width: number, id: string) {
+  constructor(data: WordCloudData, id: string) {
     this.id = id;
     this.data = this.getData(data);
+    const containerEl = document.getElementById(id);
     this.params = {
-      width,
-      height: width * 0.6
+      width: containerEl ? containerEl.getBoundingClientRect().width : 0,
+      height: containerEl ? containerEl.getBoundingClientRect().height : 0,
     };
     this.scale = this.getScale();
     this.styleSvg = this.styleSvg.bind(this);
@@ -45,7 +46,7 @@ class WordCloudD3 {
   getScale() {
     return d3.scaleLinear()
       .domain([0, this.data.maxCount])
-      .range([10, this.params.width >= 1000 ? 100 : this.params.width >= 800 ? 70 : 36]);
+      .range([10, 180]);
   }
 
   draw() {
@@ -59,10 +60,11 @@ class WordCloudD3 {
         size: this.scale(d.count)
       })))
       .fontSize((d: any) => d.size)
-      .rotate(function () {
-        return ~~(Math.random() * 2) * 90;
-      })
-      .font("Anton")
+      .font('MierB')
+      .fontWeight(900)
+      .padding(1)
+      // .rotate(function() { return ~~(Math.random() * 2) * 90; })
+      .rotate(function() { return (~~(Math.random() * 6) - 3) * 30; })
       .on("end", this.styleSvg)
       .start();
   }
@@ -79,7 +81,8 @@ class WordCloudD3 {
       .style("font-size", (d: any) => {
         return d.size + "px"
       })
-      .style("font-family", "Anton")
+      .style("font-family", "MierB")
+      .style("font-weight", "900")
       .style("fill", () => this.colors[Math.floor(Math.random() * this.colors.length)])
       .attr("text-anchor", "middle")
       .attr("transform", function (d: any) {
