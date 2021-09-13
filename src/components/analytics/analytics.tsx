@@ -1,6 +1,6 @@
 import React, {useMemo} from "react";
 import {CircularProgress, makeStyles} from "@material-ui/core";
-import WordCloud from "./word-cloud";
+import WordCloud from "./word-cloud/word-cloud";
 import useGetAnalytics from "./utilitis/use-get-analytics";
 import SectionWrapper from "./utilitis/section-wrapper";
 import Box from "@material-ui/core/Box";
@@ -38,7 +38,7 @@ const Analytics = () => {
       }
       {
         !getAnalytics.isLoading && !getAnalytics.isError && !!getAnalytics.data &&
-        <WordCloud data={getAnalytics.data.wordCloud[0].data}/>
+        <WordCloud data={getAnalytics.data.wordCloud}/>
       }
     </div>
   )

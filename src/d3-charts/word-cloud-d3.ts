@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import d3Cloud from "d3-cloud";
+import seedrandom from "seedrandom";
 
 export type WordCloudData = Array<{
   count: number,
@@ -64,7 +65,9 @@ class WordCloudD3 {
       .fontWeight(900)
       .padding(1)
       // .rotate(function() { return ~~(Math.random() * 2) * 90; })
-      .rotate(function() { return (~~(Math.random() * 6) - 3) * 30; })
+      // .rotate(function() { return (~~(Math.random() * 6) - 3) * 30; })
+      .rotate(function() { return 0 })
+      .random(seedrandom('a'))
       .on("end", this.styleSvg)
       .start();
   }
@@ -83,7 +86,8 @@ class WordCloudD3 {
       })
       .style("font-family", "MierB")
       .style("font-weight", "900")
-      .style("fill", () => this.colors[Math.floor(Math.random() * this.colors.length)])
+      // .style("fill", () => this.colors[Math.floor(Math.random() * this.colors.length)])
+      .style("fill", (d, i) => this.colors[i % this.colors.length])
       .attr("text-anchor", "middle")
       .attr("transform", function (d: any) {
         return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";

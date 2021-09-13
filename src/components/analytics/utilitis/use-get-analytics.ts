@@ -2,7 +2,7 @@ import useRequestState from "../../../tools/use-request-state";
 import {useMount} from "react-use";
 import axios from "axios";
 
-interface AnalyticsData {
+export interface AnalyticsData {
   summary: {
     totalCount: number,
     firstDocDate: string,

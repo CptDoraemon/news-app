@@ -9,7 +9,6 @@ import DocumentsHeatMap from "./documents-heat-map";
 import DocumentsTextSummary from "./documents-text-summary";
 import Fade from "@material-ui/core/Fade";
 import AnimationSlideIn, {AnimationSlideInDirection} from "./utilitis/animation-slide-in";
-import WordCloud from "./word-cloud";
 import AnimationFixed from "./utilitis/animation-fixed";
 import DocumentsCountStackedLineChart from "./documents-count-stacked-line-chart";
 import StackedLineChartExpansionPanelNote from "./stacked-line-chart-expansion-panel-note";
