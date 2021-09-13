@@ -1,8 +1,6 @@
 import React, {useEffect, useMemo, useRef, useState} from "react";
 import {makeStyles, Typography, useMediaQuery, useTheme} from "@material-ui/core";
 import {MOBILE} from "../../theme/theme";
-import Title from "./utilitis/title";
-import Content from "./utilitis/content";
 import {useMount, usePrevious} from "react-use";
 import {grey} from "@material-ui/core/colors";
 
@@ -30,15 +28,16 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-end',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    // fontSize: theme.typography.h2.fontSize,
   },
   content: {
     width: '100%',
     textAlign: 'end',
-    fontSize: theme.typography.h6.fontSize,
     fontWeight: 600,
     color: grey[700],
-    margin: theme.spacing(1, 0)
+    margin: theme.spacing(1, 0),
+    // fontSize: theme.typography.h6.fontSize,
   },
   chartWrapper: {
     flex: '1 0 auto'
@@ -97,14 +96,14 @@ const AnalyticsSection = ({title, content, children, fullHeightOffset, cbOnChart
   return (
     <div className={classes.root} style={{height}}>
       <div className={classes.titleWrapper}>
-        <Typography component={'h2'} variant={'h4'} className={classes.title}>
+        <Typography component={'h2'} variant={'h2'} className={classes.title}>
           {
             words.map((word, i) => (
               <span key={i}>{word}</span>
             ))
           }
         </Typography>
-        <Typography variant={'body1'} component={'p'} className={classes.content}>
+        <Typography variant={'h6'} component={'p'} className={classes.content}>
           {content}
         </Typography>
       </div>
