@@ -9,7 +9,7 @@ const useStyles = makeStyles<Theme, {direction: 'left' | 'right', duration: numb
   },
   inActive: {
     opacity: 0,
-    transform: (props) => `translateX(${props.direction === 'left' ? '200%' : '-200%'})`
+    transform: (props) => `translateX(${props.direction === 'left' ? '200px' : '-200px'})`
   },
   active: {
     opacity: 1,
@@ -20,11 +20,12 @@ const useStyles = makeStyles<Theme, {direction: 'left' | 'right', duration: numb
 interface FadeAndSlideInProps {
   active: boolean,
   direction: 'left' | 'right',
-  children: JSX.Element
+  children: JSX.Element,
+  duration: number
 }
 
-const FadeAndSlideIn = ({active, direction, children}: FadeAndSlideInProps) => {
-  const classes = useStyles({direction, duration: 600});
+const FadeAndSlideIn = ({active, direction, children, duration}: FadeAndSlideInProps) => {
+  const classes = useStyles({direction, duration});
 
   return (
     <div className={clsx(classes.root, active ? classes.active : classes.inActive)}>

@@ -3,7 +3,8 @@ import {makeStyles} from "@material-ui/core";
 import FullscreenSection from "./layouts/fullscreen-section";
 import SectionWithChart from "./layouts/section-with-chart";
 import PieChartD3 from "../../d3-charts/pie-chart-d3";
-import {AnalyticsData} from "./utilitis/use-get-analytics";
+import {AnalyticsData} from "./hooks/use-get-analytics";
+import useIsVisible from "../../tools/use-is-visible";
 
 const useStyles = makeStyles((theme) => ({
   containerWrapper: {
@@ -27,6 +28,10 @@ interface DocsByCategoryProps {
 const DocsByCategory = ({data}: DocsByCategoryProps) => {
   const classes = useStyles();
   const id = 'analytics-docs-by-category';
+  const {
+    isVisible,
+    isVisibleElRef
+  } = useIsVisible<HTMLDivElement>(false);
 
   const initChart = useCallback(() => {
     const pieChart = new PieChartD3(
@@ -41,11 +46,12 @@ const DocsByCategory = ({data}: DocsByCategoryProps) => {
   }, [data])
 
   return (
-    <FullscreenSection>
+    <FullscreenSection ref={isVisibleElRef}>
       <SectionWithChart
         title={'News archived by category'}
         content={`Overall I'd say the news are pretty well balanced.`}
         cbOnChartElReady={initChart}
+        isVisible={isVisible}
       >
         <div className={classes.containerWrapper}>
           <div id={id} className={classes.container}> </div>

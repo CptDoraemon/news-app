@@ -37,8 +37,6 @@ interface ArticlesProps {
 
 const Articles = ({requestState}: ArticlesProps) => {
   const classes = useStyles();
-  console.log(requestState.data)
-
   useMount(() => window.scrollTo(0, 0));
 
   return (

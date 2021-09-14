@@ -2,8 +2,6 @@ import React, {useEffect, useState} from "react";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, withStyles} from "@material-ui/core";
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import Title from "./utilitis/title";
-import Content from "./utilitis/content";
 
 const contentParagraphs = [
   'The band height of each category is the percentage of news count in that category to the total news count in that day. ' +
@@ -113,12 +111,12 @@ const StackedLineChartExpansionPanelNote: React.FC<ExpansionPanelNoteProps> = ()
           <div className={classes.line}></div>
         </div>
       </StyledExpansionPanelSummary>
-      <ExpansionPanelDetails className={classes.detailWrapper}>
-        <Title value={['How to use this graph?']}/>
-        {
-          contentParagraphs.map((str, i) => <Content value={str} key={i}/>)
-        }
-      </ExpansionPanelDetails>
+      {/*<ExpansionPanelDetails className={classes.detailWrapper}>*/}
+      {/*  <p value={['How to use this graph?']}/>*/}
+      {/*  {*/}
+      {/*    contentParagraphs.map((str, i) => <p value={str} key={i}/>)*/}
+      {/*  }*/}
+      {/*</ExpansionPanelDetails>*/}
     </ExpansionPanel>
   )
 };

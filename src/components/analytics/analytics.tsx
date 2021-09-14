@@ -1,19 +1,24 @@
 import React, {useMemo} from "react";
 import {CircularProgress, makeStyles} from "@material-ui/core";
 import WordCloud from "./word-cloud/word-cloud";
-import useGetAnalytics from "./utilitis/use-get-analytics";
-import SectionWrapper from "./utilitis/section-wrapper";
+import useGetAnalytics from "./hooks/use-get-analytics";
 import Box from "@material-ui/core/Box";
 import MessageWithIcon from "../utility-components/message-with-icon";
 import InfoIcon from "@material-ui/icons/Info";
 import TextSummary from "./text-summary";
-import useChangeBackgroundColor from "./utilitis/use-change-background-color";
+import useChangeBackgroundColor from "./hooks/use-change-background-color";
 import DocsByCategory from "./docs-by-category";
 import DocsByDay from "./docs-by-day";
 import DocsByDayAndCategory from "./docs-by-day-and-category";
+import FullscreenSection from "./layouts/fullscreen-section";
 
 const useStyles = makeStyles((theme) => ({
-
+  centering: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center'
+  }
 }));
 
 interface AnalyticsProps {}
@@ -32,9 +37,11 @@ const Analytics = () => {
     <div>
       {
         getAnalytics.isLoading &&
-        <SectionWrapper>
-          <CircularProgress color={"secondary"}/>
-        </SectionWrapper>
+        <FullscreenSection>
+          <div className={classes.centering}>
+            <CircularProgress color={"secondary"}/>
+          </div>
+        </FullscreenSection>
       }
       {
         !getAnalytics.isLoading && getAnalytics.isError &&

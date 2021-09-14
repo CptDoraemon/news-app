@@ -2,8 +2,9 @@ import React, {useCallback} from "react";
 import {makeStyles} from "@material-ui/core";
 import FullscreenSection from "./layouts/fullscreen-section";
 import SectionWithChart from "./layouts/section-with-chart";
-import {AnalyticsData} from "./utilitis/use-get-analytics";
+import {AnalyticsData} from "./hooks/use-get-analytics";
 import StackedLineChartD3 from "../../d3-charts/stacked-line-chart-d3";
+import useIsVisible from "../../tools/use-is-visible";
 
 const useStyles = makeStyles((theme) => ({
   containerWrapper: {
@@ -27,6 +28,10 @@ interface DocsByDayAndCategoryProps {
 const DocsByDayAndCategory = ({data}: DocsByDayAndCategoryProps) => {
   const classes = useStyles();
   const id = 'analytics-docs-by-day-and-category';
+  const {
+    isVisible,
+    isVisibleElRef
+  } = useIsVisible<HTMLDivElement>(false);
 
   const initChart = useCallback(() => {
     const stackedBarChart = new StackedLineChartD3(
@@ -38,11 +43,12 @@ const DocsByDayAndCategory = ({data}: DocsByDayAndCategoryProps) => {
   }, [data])
 
   return (
-    <FullscreenSection>
+    <FullscreenSection ref={isVisibleElRef}>
       <SectionWithChart
         title={['News', 'archived', 'by', 'day & category']}
         content={`Art made of data.`}
         cbOnChartElReady={initChart}
+        isVisible={isVisible}
       >
         <div className={classes.containerWrapper}>
           <div id={id} className={classes.container}> </div>

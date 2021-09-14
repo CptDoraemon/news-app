@@ -13,7 +13,7 @@ interface AnalyticsSectionProps {
   fullHeightOffset?: number
 }
 
-const FullscreenSection = ({fullHeightOffset, children}: AnalyticsSectionProps) => {
+const FullscreenSection = React.forwardRef<HTMLDivElement, AnalyticsSectionProps>(({fullHeightOffset, children}, ref) => {
   const classes = useStyles();
   const theme = useTheme();
   const isMobile = useMediaQuery(MOBILE(theme));
@@ -25,10 +25,10 @@ const FullscreenSection = ({fullHeightOffset, children}: AnalyticsSectionProps) 
   }, [fullHeightOffset]);
 
   return (
-    <div className={classes.root} style={{height}}>
+    <div className={classes.root} style={{height}} ref={ref}>
       {children}
     </div>
   )
-};
+})
 
 export default FullscreenSection

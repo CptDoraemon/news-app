@@ -1,9 +1,10 @@
 import React, {useEffect, useMemo, useRef, useState} from "react";
-import {makeStyles, Typography} from "@material-ui/core";
+import {Fade, makeStyles, Typography} from "@material-ui/core";
 import {useMount, usePrevious} from "react-use";
 import {grey} from "@material-ui/core/colors";
 import useLazyLoad from "../../../tools/use-lazy-load";
 import FadeAndSlideIn from "./fade-and-slide-in";
+import useIsVisible from "../../../tools/use-is-visible";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -22,7 +23,6 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'flex-end'
   },
   title: {
-    textAlign: 'start',
     width: '100%',
     textTransform: 'uppercase',
     fontWeight: 900,
@@ -31,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     alignItems: 'flex-end',
     justifyContent: 'center',
+    textAlign: 'end'
     // fontSize: theme.typography.h2.fontSize,
   },
   content: {
@@ -62,19 +63,13 @@ interface SectionWithChartProps {
   content: string,
   children: JSX.Element,
   cbOnChartElReady: () => void,
-  belowTitle?: JSX.Element
+  belowTitle?: JSX.Element,
+  isVisible: boolean
 }
 
-const SectionWithChart = ({title, content, children, cbOnChartElReady, belowTitle}: SectionWithChartProps) => {
+const SectionWithChart = ({title, content, children, cbOnChartElReady, belowTitle, isVisible}: SectionWithChartProps) => {
   const classes = useStyles();
-
-  const rootRef = useRef<HTMLDivElement>(null);
-  const _isVisible = useLazyLoad(rootRef);
-  const [mounted, setMounted] = useState(false);
-  const isVisible = _isVisible && mounted;
-  useMount(() => {
-    setMounted(true)
-  })
+  const animationDuration = 600;
 
   const chartWrapperRef = useRef<HTMLDivElement>(null);
   const [chartSize, setChartSize] = useState(0);
@@ -96,34 +91,40 @@ const SectionWithChart = ({title, content, children, cbOnChartElReady, belowTitl
   }, [cbOnChartElReady, chartElReady, previousChartElReady])
 
   return (
-    <div className={classes.root} ref={rootRef}>
+    <div className={classes.root}>
       <div className={classes.titleWrapper}>
         <Typography component={'h2'} variant={'h2'} className={classes.title}>
           {
             words.map((word, i) => (
-              <FadeAndSlideIn active={isVisible} direction={i % 2 === 0 ? 'left' : 'right'} key={i}>
+              <FadeAndSlideIn active={isVisible} direction={i % 2 === 0 ? 'left' : 'right'} key={i} duration={animationDuration}>
                 <span>{word}</span>
               </FadeAndSlideIn>
             ))
           }
         </Typography>
         <Typography variant={'h6'} component={'p'} className={classes.content}>
-          {content}
+          <FadeAndSlideIn active={isVisible} direction={words.length % 2 === 0 ? 'left' : 'right'} duration={animationDuration}>
+            <span>{content}</span>
+          </FadeAndSlideIn>
         </Typography>
-        {
-          belowTitle
-        }
+        <Fade timeout={animationDuration * 2} in={isVisible}>
+          <div>
+            { belowTitle }
+          </div>
+        </Fade>
       </div>
-      <div className={classes.chartWrapper}>
-        <div className={classes.chartWrapperInner} ref={chartWrapperRef}>
-          {
-            !!chartSize &&
-            <div className={classes.chartWrapperDimension} style={{width: chartSize, height: chartSize}}>
-              {children}
-            </div>
-          }
+      <Fade in={!!chartSize && isVisible} timeout={animationDuration}>
+        <div className={classes.chartWrapper}>
+          <div className={classes.chartWrapperInner} ref={chartWrapperRef}>
+            {
+              !!chartSize &&
+              <div className={classes.chartWrapperDimension} style={{width: chartSize, height: chartSize}}>
+                {children}
+              </div>
+            }
+          </div>
         </div>
-      </div>
+      </Fade>
     </div>
   )
 };
