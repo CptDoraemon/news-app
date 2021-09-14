@@ -1,6 +1,7 @@
 import React from "react";
-import {makeStyles, Step, StepButton, StepLabel, Stepper, Typography} from "@material-ui/core";
+import {makeStyles, Step, StepButton, StepLabel, Stepper, Typography, useMediaQuery, useTheme} from "@material-ui/core";
 import YearStepperIcon from "./year-stepper-icon";
+import {MOBILE} from "../../../theme/theme";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -25,9 +26,11 @@ interface YearStepperProps {
 
 const YearStepper = ({steps, activeStep, onStepChange}: YearStepperProps) => {
   const classes = useStyles();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(MOBILE(theme));
 
   return (
-    <Stepper activeStep={activeStep} orientation="vertical" className={classes.root}>
+    <Stepper activeStep={activeStep} orientation={isMobile ? "horizontal" : "vertical"} className={classes.root}>
       {steps.map((label, index) => (
         <Step
           key={label}

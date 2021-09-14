@@ -1,10 +1,11 @@
-import React, {useCallback} from "react";
+import React, {useCallback, useRef} from "react";
 import {makeStyles} from "@material-ui/core";
 import FullscreenSection from "./layouts/fullscreen-section";
 import SectionWithChart from "./layouts/section-with-chart";
 import PieChartD3 from "../../d3-charts/pie-chart-d3";
 import {AnalyticsData} from "./hooks/use-get-analytics";
 import useIsVisible from "../../tools/use-is-visible";
+import useCallbackOnValueChange from "../../tools/use-callback-on-value-change";
 
 const useStyles = makeStyles((theme) => ({
   containerWrapper: {
@@ -17,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
   },
   container: {
     width: '100%',
-    height: '70%'
+    height: '50%'
   }
 }));
 
@@ -32,18 +33,24 @@ const DocsByCategory = ({data}: DocsByCategoryProps) => {
     isVisible,
     isVisibleElRef
   } = useIsVisible<HTMLDivElement>(false);
+  const d3Ref = useRef<null | PieChartD3>(null);
 
   const initChart = useCallback(() => {
-    const pieChart = new PieChartD3(
+    d3Ref.current = new PieChartD3(
       id,
       data.map(obj => ({
         value: obj.count,
         title: obj.category
       }))
     );
-    pieChart.main();
-    pieChart.animate();
-  }, [data])
+    d3Ref.current.main();
+  }, [data]);
+
+  useCallbackOnValueChange(isVisible, () => {
+    if (isVisible) {
+      d3Ref.current!.animate();
+    }
+  })
 
   return (
     <FullscreenSection ref={isVisibleElRef}>

@@ -1,10 +1,12 @@
-import React, {useCallback} from "react";
-import {makeStyles} from "@material-ui/core";
+import React, {useCallback, useRef} from "react";
+import {makeStyles, useMediaQuery, useTheme} from "@material-ui/core";
 import FullscreenSection from "./layouts/fullscreen-section";
 import SectionWithChart from "./layouts/section-with-chart";
 import {AnalyticsData} from "./hooks/use-get-analytics";
 import HeatMapD3 from "../../d3-charts/heat-map-d3";
 import useIsVisible from "../../tools/use-is-visible";
+import useCallbackOnValueChange from "../../tools/use-callback-on-value-change";
+import {MOBILE} from "../../theme/theme";
 
 const useStyles = makeStyles((theme) => ({
   containerWrapper: {
@@ -31,15 +33,24 @@ const DocsByDay = ({data}: DocsByDayProps) => {
     isVisible,
     isVisibleElRef
   } = useIsVisible<HTMLDivElement>(false);
+  const d3Ref = useRef<null | HeatMapD3>(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(MOBILE(theme));
 
   const initChart = useCallback(() => {
-    const heatMap = new HeatMapD3(
+    d3Ref.current = new HeatMapD3(
       id,
-      data
+      data,
+      isMobile
     );
-    heatMap.main();
-    heatMap.animate();
-  }, [data])
+    d3Ref.current.main();
+  }, [data, isMobile]);
+
+  useCallbackOnValueChange(isVisible, () => {
+    if (isVisible) {
+      d3Ref.current!.animate();
+    }
+  })
 
   return (
     <FullscreenSection ref={isVisibleElRef}>

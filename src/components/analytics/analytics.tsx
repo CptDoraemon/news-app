@@ -13,7 +13,14 @@ import DocsByDayAndCategory from "./docs-by-day-and-category";
 import FullscreenSection from "./layouts/fullscreen-section";
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    width: '100vw',
+    maxWidth: '100%',
+    overflowX: 'hidden'
+  },
   centering: {
+    width: '100%',
+    height: '100%',
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
@@ -34,7 +41,7 @@ const Analytics = () => {
   } = useChangeBackgroundColor(isDataReady);
 
   return (
-    <div>
+    <div className={classes.root}>
       {
         getAnalytics.isLoading &&
         <FullscreenSection>

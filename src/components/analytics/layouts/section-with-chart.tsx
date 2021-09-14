@@ -1,10 +1,10 @@
-import React, {useEffect, useMemo, useRef, useState} from "react";
+import React, {useMemo, useRef, useState} from "react";
 import {Fade, makeStyles, Typography} from "@material-ui/core";
-import {useMount, usePrevious} from "react-use";
+import {useMount} from "react-use";
 import {grey} from "@material-ui/core/colors";
-import useLazyLoad from "../../../tools/use-lazy-load";
 import FadeAndSlideIn from "./fade-and-slide-in";
-import useIsVisible from "../../../tools/use-is-visible";
+import useCallbackOnValueChange from "../../../tools/use-callback-on-value-change";
+import {MOBILE} from "../../../theme/theme";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -14,13 +14,22 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
+    [MOBILE(theme)]: {
+      padding: theme.spacing(1),
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+    }
   },
   titleWrapper: {
     width: '30%',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-start',
-    alignItems: 'flex-end'
+    alignItems: 'flex-end',
+    [MOBILE(theme)]: {
+      width: '100%'
+    }
   },
   title: {
     width: '100%',
@@ -31,8 +40,11 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     alignItems: 'flex-end',
     justifyContent: 'center',
-    textAlign: 'end'
-    // fontSize: theme.typography.h2.fontSize,
+    textAlign: 'end',
+    [MOBILE(theme)]: {
+      alignItems: 'flex-start',
+      textAlign: 'start',
+    }
   },
   content: {
     width: '100%',
@@ -40,10 +52,16 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 600,
     color: grey[700],
     margin: theme.spacing(1, 0),
-    // fontSize: theme.typography.h6.fontSize,
+    [MOBILE(theme)]: {
+      textAlign: 'start',
+    }
   },
   chartWrapper: {
-    flex: '1 0 auto'
+    flex: '1 0 auto',
+    [MOBILE(theme)]: {
+      width: '100%',
+      height: 400,
+    }
   },
   chartWrapperInner: {
     width: '100%',
@@ -51,7 +69,13 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-start'
+    justifyContent: 'flex-start',
+    [MOBILE(theme)]: {
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }
   },
   chartWrapperDimension: {
 
@@ -83,12 +107,11 @@ const SectionWithChart = ({title, content, children, cbOnChartElReady, belowTitl
 
   const words = useMemo(() => Array.isArray(title) ? title : title.split(' '), [title]);
 
-  const previousChartElReady = usePrevious(chartElReady);
-  useEffect(() => {
-    if (previousChartElReady !== chartElReady && previousChartElReady !== undefined && chartElReady) {
+  useCallbackOnValueChange(chartElReady, () => {
+    if (chartElReady) {
       cbOnChartElReady()
     }
-  }, [cbOnChartElReady, chartElReady, previousChartElReady])
+  })
 
   return (
     <div className={classes.root}>
@@ -102,7 +125,7 @@ const SectionWithChart = ({title, content, children, cbOnChartElReady, belowTitl
             ))
           }
         </Typography>
-        <Typography variant={'h6'} component={'p'} className={classes.content}>
+        <Typography variant={'h6'} component={'div'} className={classes.content}>
           <FadeAndSlideIn active={isVisible} direction={words.length % 2 === 0 ? 'left' : 'right'} duration={animationDuration}>
             <span>{content}</span>
           </FadeAndSlideIn>

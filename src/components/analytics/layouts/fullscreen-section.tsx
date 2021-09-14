@@ -5,6 +5,9 @@ import {MOBILE} from "../../../theme/theme";
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
+    [MOBILE(theme)]: {
+      padding: theme.spacing(4, 0)
+    }
   }
 }));
 
@@ -18,11 +21,15 @@ const FullscreenSection = React.forwardRef<HTMLDivElement, AnalyticsSectionProps
   const theme = useTheme();
   const isMobile = useMediaQuery(MOBILE(theme));
   const height = useMemo(() => {
+    if (isMobile) {
+      return 'auto'
+    }
+
     const max = 1440;
     const min = 900;
     const headerHeight = fullHeightOffset || 50;
     return Math.min(max, Math.max(min, window.innerHeight)) - headerHeight;
-  }, [fullHeightOffset]);
+  }, [fullHeightOffset, isMobile]);
 
   return (
     <div className={classes.root} style={{height}} ref={ref}>

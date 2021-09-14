@@ -16,6 +16,7 @@ class HeatMapD3 {
   readonly targetRectSize = 70;
   readonly rectPadding = 0.1;
   id: string;
+  isMobile: boolean;
   params: {
     width: number,
     height: number,
@@ -59,9 +60,10 @@ class HeatMapD3 {
     y: d3.Axis<string>,
   };
 
-  constructor(id: string, data: HeatMapData) {
+  constructor(id: string, data: HeatMapData, isMobile: boolean) {
     this.id = id;
     this.data = this.getData(data);
+    this.isMobile = isMobile;
     this.params = this.getParams();
     this.svg = d3.select(`#${id}`).append("svg");
     this.references = this.createReferences();
@@ -73,7 +75,7 @@ class HeatMapD3 {
     const container = document.getElementById(this.id);
     const width = container ? container.getBoundingClientRect().width : 0;
 
-    const m = {t: 50, r: 20, b: 10, l: 50};
+    const m = {t: 20, r: 10, b: 10, l: 40};
 
     const xBands = this.data.xScaleDomain.length;
     const maxRectSize = Math.floor((width - m.l - m.r) / xBands);
@@ -116,12 +118,24 @@ class HeatMapD3 {
     return {
       x: d3.axisTop(this.scales.x)
         .tickFormat((d, i) => {
+          const monthOfFirstDate = new Date(this.data.xScaleGuide[0]).getUTCMonth();
           if (i === 0) {
-            return this.monthStrings[(new Date(this.data.xScaleGuide[i]).getUTCMonth())]
+            return this.monthStrings[monthOfFirstDate];
           } else {
-            const thisOne = this.monthStrings[(new Date(this.data.xScaleGuide[i]).getUTCMonth())];
-            const lastOne = this.monthStrings[(new Date(this.data.xScaleGuide[i - 1]).getUTCMonth())];
-            return thisOne === lastOne ? '' : thisOne
+            const monthOfLastDate = new Date(this.data.xScaleGuide[i - 1]).getUTCMonth();
+            const monthOfThisDate = new Date(this.data.xScaleGuide[i]).getUTCMonth();
+
+            if (monthOfLastDate === monthOfThisDate) {
+              return ''
+            } else {
+              if (this.isMobile) {
+                const _diff = monthOfThisDate - monthOfFirstDate;
+                const diff = _diff > 0 ? _diff : _diff + 12;
+                return diff % 3 === 0 ? this.monthStrings[monthOfThisDate] : ''
+              } else {
+                return this.monthStrings[monthOfThisDate]
+              }
+            }
           }
         })
         .tickSize(0)
