@@ -9,11 +9,11 @@ const useStyles = makeStyles((theme) => ({
       borderColor: theme.palette.secondary.light
     }
   },
-  label: {
-    color: theme.palette.secondary.main
+  stepButton: {
+    color: theme.palette.secondary.main,
   },
   labelText: {
-    color: theme.palette.secondary.main
+    color: theme.palette.secondary.main,
   }
 }));
 
@@ -35,11 +35,12 @@ const YearStepper = ({steps, activeStep, onStepChange}: YearStepperProps) => {
         >
           <StepButton
             onClick={() => onStepChange(index)}
-
+            className={classes.stepButton}
+            disabled={false}
+            completed={false}
           >
             <StepLabel
               StepIconComponent={YearStepperIcon}
-              className={classes.label}
             >
               <Typography variant={'h6'} component={'span'} className={classes.labelText}>
                 {label}

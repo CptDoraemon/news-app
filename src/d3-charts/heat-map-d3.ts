@@ -59,17 +59,20 @@ class HeatMapD3 {
     y: d3.Axis<string>,
   };
 
-  constructor(id: string, data: HeatMapData, width: number) {
+  constructor(id: string, data: HeatMapData) {
     this.id = id;
     this.data = this.getData(data);
-    this.params = this.getParams(width);
+    this.params = this.getParams();
     this.svg = d3.select(`#${id}`).append("svg");
     this.references = this.createReferences();
     this.scales = this.getScales();
     this.axis = this.getAxis();
   }
 
-  getParams(width: number) {
+  getParams() {
+    const container = document.getElementById(this.id);
+    const width = container ? container.getBoundingClientRect().width : 0;
+
     const m = {t: 50, r: 20, b: 10, l: 50};
 
     const xBands = this.data.xScaleDomain.length;

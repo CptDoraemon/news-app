@@ -2,6 +2,7 @@ import React, {useMemo} from "react";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {useSpring, animated, config, SpringValue} from '@react-spring/web';
 import {Typography} from "@material-ui/core";
+import FullscreenSection from "./layouts/fullscreen-section";
 
 const monthStrings = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -9,6 +10,7 @@ const useStyles = makeStyles(theme => ({
   root: {
     textAlign: 'center',
     width: '100%',
+    height: '100%',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -67,20 +69,19 @@ const useCountUpAnimation = (totalDocuments: number, earliestDocumentDate: strin
   }
 }
 
-interface DocumentsTextSummaryProps {
+interface TextSummaryProps {
   totalDocuments: number,
   earliestDocumentDate: string,
   latestDocumentDate: string
 }
 
-const DocumentsTextSummary = React.forwardRef<HTMLDivElement, DocumentsTextSummaryProps>((
+const TextSummary = React.forwardRef<HTMLDivElement, TextSummaryProps>((
   {
     totalDocuments,
     earliestDocumentDate,
     latestDocumentDate
   }, forwardedRef) => {
   const classes = useStyles();
-  const fullHeight = useMemo(() => window.innerHeight - 100, []);
   const {
     total,
     earliest,
@@ -112,8 +113,8 @@ const DocumentsTextSummary = React.forwardRef<HTMLDivElement, DocumentsTextSumma
   };
 
   return (
-    <>
-      <div className={classes.root} style={{minHeight: `${fullHeight}px`}}>
+    <FullscreenSection fullHeightOffset={100}>
+      <div className={classes.root}>
         <div className={classes.section}>
           {title('Total news articles archived')}
           <Typography variant={'h1'} component={'p'} className={classes.number}>
@@ -133,8 +134,8 @@ const DocumentsTextSummary = React.forwardRef<HTMLDivElement, DocumentsTextSumma
           {date(latest)}
         </div>
       </div>
-    </>
+    </FullscreenSection>
   )
 });
 
-export default DocumentsTextSummary
+export default TextSummary

@@ -42,9 +42,9 @@ class PieChartD3 {
     totalValue: number
   };
 
-  constructor(id: string, data: PieChartData, width: number) {
+  constructor(id: string, data: PieChartData) {
     this.id = id;
-    this.params = this.getParams(width);
+    this.params = this.getParams();
     this.svg = d3.select(`#${id}`).append("svg");
     this.data = {
       pieZero: this.getPieData(data.map((_, i) => ({
@@ -57,8 +57,10 @@ class PieChartD3 {
     this.references = this.createReferences();
   }
 
-  getParams(width: number) {
-    const height = width * 0.6;
+  getParams() {
+    const container = document.getElementById(this.id);
+    const width = container ? container.getBoundingClientRect().width : 0;
+    const height = container ? container.getBoundingClientRect().height : 0;
     return {
       width,
       height: height,

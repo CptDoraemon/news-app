@@ -31,6 +31,7 @@ export interface StackedLineChartD3Data {
 
 class StackedLineChartD3 {
   readonly monthStrings = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  id: string;
   colors = {
     getAreaColor: (index: number) => {
       const colors = ['#003f5c', '#374c80', '#7a5195', '#bc5090', '#ef5675', '#ff764a', '#ffa600'];
@@ -82,10 +83,11 @@ class StackedLineChartD3 {
   };
 
 
-  constructor(id: string, data: StackedLineChartD3Data, width: number, height: number) {
+  constructor(id: string, data: StackedLineChartD3Data) {
+    this.id = id;
     this.svg = d3.select(`#${id}`).append("svg");
     this.data = this.getData(data, true);
-    this.dimensions = this.getDimension(width, height);
+    this.dimensions = this.getDimension();
     this.scales = this.getScales();
     this.references = {
       axisX: null,
@@ -131,7 +133,11 @@ class StackedLineChartD3 {
     }
   }
 
-  getDimension(width: number, height: number) {
+  getDimension() {
+    const container = document.getElementById(this.id);
+    const width = container ? container.getBoundingClientRect().width : 0;
+    const height = container ? container.getBoundingClientRect().height : 0;
+
     const m = {t: 10, r: 150, b: 50, l: 60};
     const chartWidth = width - m.l - m.r;
     const chartHeight = height - m.t - m.b;

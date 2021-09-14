@@ -2,6 +2,8 @@ import React, {useEffect, useMemo, useRef, useState} from "react";
 import {makeStyles, Typography} from "@material-ui/core";
 import {useMount, usePrevious} from "react-use";
 import {grey} from "@material-ui/core/colors";
+import useLazyLoad from "../../../tools/use-lazy-load";
+import FadeAndSlideIn from "./fade-and-slide-in";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -66,6 +68,14 @@ interface SectionWithChartProps {
 const SectionWithChart = ({title, content, children, cbOnChartElReady, belowTitle}: SectionWithChartProps) => {
   const classes = useStyles();
 
+  const rootRef = useRef<HTMLDivElement>(null);
+  const _isVisible = useLazyLoad(rootRef);
+  const [mounted, setMounted] = useState(false);
+  const isVisible = _isVisible && mounted;
+  useMount(() => {
+    setMounted(true)
+  })
+
   const chartWrapperRef = useRef<HTMLDivElement>(null);
   const [chartSize, setChartSize] = useState(0);
   const [chartElReady, setCharElReady] = useState(false);
@@ -86,12 +96,14 @@ const SectionWithChart = ({title, content, children, cbOnChartElReady, belowTitl
   }, [cbOnChartElReady, chartElReady, previousChartElReady])
 
   return (
-    <div className={classes.root}>
+    <div className={classes.root} ref={rootRef}>
       <div className={classes.titleWrapper}>
         <Typography component={'h2'} variant={'h2'} className={classes.title}>
           {
             words.map((word, i) => (
-              <span key={i}>{word}</span>
+              <FadeAndSlideIn active={isVisible} direction={i % 2 === 0 ? 'left' : 'right'} key={i}>
+                <span>{word}</span>
+              </FadeAndSlideIn>
             ))
           }
         </Typography>

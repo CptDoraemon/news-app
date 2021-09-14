@@ -6,6 +6,11 @@ import SectionWrapper from "./utilitis/section-wrapper";
 import Box from "@material-ui/core/Box";
 import MessageWithIcon from "../utility-components/message-with-icon";
 import InfoIcon from "@material-ui/icons/Info";
+import TextSummary from "./text-summary";
+import useChangeBackgroundColor from "./utilitis/use-change-background-color";
+import DocsByCategory from "./docs-by-category";
+import DocsByDay from "./docs-by-day";
+import DocsByDayAndCategory from "./docs-by-day-and-category";
 
 const useStyles = makeStyles((theme) => ({
 
@@ -17,6 +22,11 @@ const Analytics = () => {
   const classes = useStyles();
   const getAnalytics = useGetAnalytics();
   const isDataReady = useMemo(() => !getAnalytics.isLoading && !getAnalytics.isError && !!getAnalytics.data, [getAnalytics.data, getAnalytics.isError, getAnalytics.isLoading]);
+
+  const {
+    bgColorChangeRef,
+    bgBlack
+  } = useChangeBackgroundColor(isDataReady);
 
   return (
     <div>
@@ -38,7 +48,18 @@ const Analytics = () => {
       }
       {
         !getAnalytics.isLoading && !getAnalytics.isError && !!getAnalytics.data &&
-        <WordCloud data={getAnalytics.data.wordCloud}/>
+        <>
+          <TextSummary
+            totalDocuments={getAnalytics.data.summary.totalCount}
+            earliestDocumentDate={getAnalytics.data.summary.firstDocDate}
+            latestDocumentDate={getAnalytics.data.summary.lastDocDate}
+          />
+          <div ref={bgColorChangeRef} />
+          <DocsByCategory data={getAnalytics.data.countByCategory} />
+          <DocsByDay data={getAnalytics.data.docsCountByDay} />
+          <DocsByDayAndCategory data={getAnalytics.data.docCountByDayAndCategory} />
+          <WordCloud data={getAnalytics.data.wordCloud} />
+        </>
       }
     </div>
   )
