@@ -4,6 +4,7 @@ import {TrendingItem} from "./use-trending-search";
 import {Link} from "react-router-dom";
 import routers from "../../../routers";
 import {orange} from "@material-ui/core/colors";
+import {getPathWithKeyword} from "../use-search/use-search-filters";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -81,7 +82,7 @@ const TrendingRow = ({data, title}: TrendingRowProps) => {
                 key={item.key}
                 className={classes.button}
                 component={Link}
-                to={`${routers.search.path}?keyword=${item.key}`}
+                to={getPathWithKeyword(item.key)}
                 size={'small'}
                 endIcon={<>{item.doc_count}</>}
               >

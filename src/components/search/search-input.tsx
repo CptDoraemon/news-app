@@ -16,6 +16,7 @@ import {useMount} from "react-use";
 import PaperWrapper from "./paper-wrapper";
 import useSearchFilters from "./use-search/use-search-filters";
 import CancelIcon from '@material-ui/icons/Cancel';
+import ErrorMessage from "./error-message";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -46,6 +47,10 @@ const useStyles = makeStyles((theme) => ({
   },
   inputLabel: {
     display: 'none'
+  },
+  errorMessageRow: {
+    width: '100%',
+    margin: theme.spacing(1, 0)
   },
   filterRow: {
     display: 'flex',
@@ -108,8 +113,11 @@ const SearchInput = () => {
     className: classes.datePicker,
     KeyboardButtonProps: {
       'aria-label': 'change date'
-    }
-  }), [classes.datePicker]);
+    },
+    onError: (error) => {
+      !error ? searchFilter.resetDateHasError() : searchFilter.setDateHasError()
+    },
+  }), [classes.datePicker, searchFilter]);
 
   useMount(() => {
     keywordRef.current?.focus();
@@ -172,6 +180,15 @@ const SearchInput = () => {
             </Button>
           </div>
         </div>
+
+
+        {
+          !!searchFilter.globalErrorMessage &&
+          <div className={classes.errorMessageRow}>
+            <ErrorMessage message={searchFilter.globalErrorMessage} />
+          </div>
+        }
+
         <div className={classes.filterRow}>
           <MuiPickersUtilsProvider utils={DateFnsUtils}>
             <div>
@@ -205,6 +222,7 @@ const SearchInput = () => {
             <SelectFilter label={'sort order'} data={searchFilter.sortOrder}/>
           </div>
         </div>
+
       </form>
     </PaperWrapper>
   )
