@@ -1,6 +1,7 @@
 import useRequestState from "../../../tools/use-request-state";
 import {useMount} from "react-use";
 import axios from "axios";
+import {getBaseAPI} from "../../../routers";
 
 export interface AnalyticsData {
   summary: {
@@ -36,7 +37,7 @@ const useGetAnalytics = () => {
   useMount(async () => {
     try {
       request.setIsLoading(true);
-      const res = await axios.get('http://192.168.0.156:5000/api/news-analytics');
+      const res = await axios.get(`${getBaseAPI()}/api/news-analytics`);
       const data = res.data;
       if (data.status !== 'ok') {
         throw new Error()
