@@ -4,6 +4,7 @@ import {useCallback, useEffect, useRef} from "react";
 import axios from "axios";
 import queryString from "query-string";
 import {usePrevious} from "react-use";
+import {getBaseAPI} from "../../../routers";
 
 export interface SearchedArticle {
   id: string,
@@ -42,7 +43,7 @@ const useSearch = () => {
 
       requestState.resetError();
       requestState.setIsLoading(true);
-      const res = await axios.get('http://192.168.0.156:5000/api/search-news', {
+      const res = await axios.get(`${getBaseAPI()}/api/search-news`, {
         params: {
           ...queryString.parse(location.search),
           page: pageRef.current

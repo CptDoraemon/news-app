@@ -1,6 +1,7 @@
 import useRequestState from "../../../tools/use-request-state";
 import {useMount} from "react-use";
 import axios from "axios";
+import {getBaseAPI} from "../../../routers";
 
 export interface TrendingItem {
   "key": string,
@@ -18,7 +19,7 @@ const useTrendingSearch = () => {
   useMount(async () => {
     try {
       request.setIsLoading(true);
-      const res = await axios.get('http://192.168.0.156:5000/api/search-news/trending');
+      const res = await axios.get(`${getBaseAPI()}/api/search-news/trending`);
       const data = res.data;
       if (data.status !== 'ok') {
         throw new Error()
