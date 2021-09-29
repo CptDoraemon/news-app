@@ -1,161 +1,82 @@
-import React, {useEffect, useRef, useState} from "react";
-import useGetAnalytics, {AnalyticsPageStatus} from "./utilitis/use-get-analytics";
-import makeStyles from "@material-ui/core/styles/makeStyles";
-import {CircularProgress, Typography} from "@material-ui/core";
-import SectionWrapper from "./utilitis/section-wrapper";
+import React, {useMemo} from "react";
+import {CircularProgress, makeStyles} from "@material-ui/core";
+import WordCloud from "./word-cloud/word-cloud";
+import useGetAnalytics from "./hooks/use-get-analytics";
 import Box from "@material-ui/core/Box";
-import DocumentsByCategoryBarChart from "./documents-by-category-bar-chart";
-import DocumentsHeatMap from "./documents-heat-map";
-import DocumentsTextSummary from "./documents-text-summary";
-import Fade from "@material-ui/core/Fade";
-import AnimationSlideIn, {AnimationSlideInDirection} from "./utilitis/animation-slide-in";
-import WordCloud from "./documents-word-cloud";
-import AnimationFixed from "./utilitis/animation-fixed";
-import DocumentsCountStackedLineChart from "./documents-count-stacked-line-chart";
-import StackedLineChartExpansionPanelNote from "./stacked-line-chart-expansion-panel-note";
+import MessageWithIcon from "../utility-components/message-with-icon";
+import InfoIcon from "@material-ui/icons/Info";
+import TextSummary from "./text-summary";
+import useChangeBackgroundColor from "./hooks/use-change-background-color";
+import DocsByCategory from "./docs-by-category";
+import DocsByDay from "./docs-by-day";
+import DocsByDayAndCategory from "./docs-by-day-and-category";
+import FullscreenSection from "./layouts/fullscreen-section";
 
-const useStyles = makeStyles(theme => ({
-    root: {
-        overflowX: 'hidden',
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        paddingBottom: '200px',
-        position: 'relative',
-        [theme.breakpoints.down('sm')]: {
-            paddingBottom: '250px',
-        }
-    },
-    widthWrapper: {
-        width: '1000px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        [theme.breakpoints.down('sm')]: {
-            width: '100%'
-        }
-    },
+const useStyles = makeStyles((theme) => ({
+  root: {
+    width: '100vw',
+    maxWidth: '100%',
+    overflowX: 'hidden'
+  },
+  centering: {
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center'
+  }
 }));
 
-interface AnalyticsProps {
+interface AnalyticsProps {}
 
-}
+const Analytics = () => {
+  const classes = useStyles();
+  const getAnalytics = useGetAnalytics();
+  const isDataReady = useMemo(() => !getAnalytics.isLoading && !getAnalytics.isError && !!getAnalytics.data, [getAnalytics.data, getAnalytics.isError, getAnalytics.isLoading]);
 
-const Analytics: React.FC<AnalyticsProps> = () => {
-    const classes = useStyles();
-    const wrapperRef = useRef<HTMLDivElement>(null);
-    const {
-        status,
-        summaryStatisticsData
-    } = useGetAnalytics();
+  const {
+    bgColorChangeRef,
+    bgBlack
+  } = useChangeBackgroundColor(isDataReady);
 
-    const bgColorChangeRef = useRef<HTMLDivElement>(null);
-    const [bgBlack, setBgBlack] = useState(false);
-    const changeBgColor = () => {
-        if (!bgColorChangeRef.current) return;
-        const target = bgColorChangeRef.current.getBoundingClientRect().top - 100;
-        if (target <= 0 && bgBlack) {
-            setBgBlack(false);
-            document.body.style.backgroundColor = '';
-        } else if (target > 0 && !bgBlack) {
-            setBgBlack(true);
-            document.body.style.backgroundColor = 'black'
-        }
-    };
-    useEffect(() => {
-        changeBgColor();
-        document.addEventListener('scroll', changeBgColor);
-        return () => {
-            document.removeEventListener('scroll', changeBgColor);
-        }
-    }, [status, bgBlack]);
-
-    useEffect(() => {
-        return () => {
-            document.body.style.backgroundColor = ''
-        };
-    }, []);
-
-    const isLoaded = status === AnalyticsPageStatus.loaded;
-    const width = wrapperRef?.current?.getBoundingClientRect().width || 100;
-
-    return (
-        <div className={classes.root}>
-            <div className={classes.widthWrapper} ref={wrapperRef}>
-                {
-                    status === AnalyticsPageStatus.loading &&
-                    <SectionWrapper>
-                        <CircularProgress color={"secondary"}/>
-                    </SectionWrapper>
-                }
-                {
-                    status === AnalyticsPageStatus.loaded &&
-                    summaryStatisticsData &&
-                    <>
-
-                        <DocumentsTextSummary
-                            totalDocuments={summaryStatisticsData.totalDocuments}
-                            earliestDocumentDate={summaryStatisticsData.earliestDocumentDate}
-                            latestDocumentDate={summaryStatisticsData.latestDocumentDate}
-                            ref={bgColorChangeRef}
-                        />
-
-                        <Fade in={!bgBlack} timeout={2000}>
-                            <SectionWrapper>
-                                <DocumentsByCategoryBarChart
-                                    isLoaded={isLoaded}
-                                    data={summaryStatisticsData.documentsCountByCategory.map(obj => ({
-                                        title: obj.category,
-                                        value: obj.count
-                                    }))}
-                                    animate={!bgBlack}
-                                    width={width}/>
-                            </SectionWrapper>
-                        </Fade>
-
-                        <AnimationSlideIn direction={AnimationSlideInDirection.left}>
-                            <SectionWrapper>
-                                <DocumentsHeatMap isLoaded={isLoaded} data={summaryStatisticsData.documentsCountByDay} width={width}/>
-                            </SectionWrapper>
-                        </AnimationSlideIn>
-
-                        <AnimationSlideIn direction={AnimationSlideInDirection.right}>
-                            <SectionWrapper>
-                                <DocumentsCountStackedLineChart
-                                    isLoaded={isLoaded}
-                                    data={{
-                                        quantity: summaryStatisticsData.documentsCountByDayAndCategory.documentCount,
-                                        series: summaryStatisticsData.documentsCountByDayAndCategory.series,
-                                        order: summaryStatisticsData.documentsCountByDayAndCategory.category
-                                    }}
-                                    width={width}
-                                    height={width >= 1000 ? 600 : width / 2}
-                                />
-                            </SectionWrapper>
-                        </AnimationSlideIn>
-
-                        <StackedLineChartExpansionPanelNote />
-
-                        <AnimationFixed>
-                            <SectionWrapper>
-                                <WordCloud isLoaded={isLoaded} data={summaryStatisticsData.wordCloud} width={width}/>
-                            </SectionWrapper>
-                        </AnimationFixed>
-                        {/*<div style={{width: 100, height: 3000, backgroundColor: 'rgba(255,0,0,0.5)'}}> </div>*/}
-                    </>
-                }
-                {
-                    status === AnalyticsPageStatus.error &&
-                    <Typography variant={'body2'} component={'h1'}>
-                        <Box fontWeight={700}>Server error, please try again later</Box>
-                    </Typography>
-                }
-            </div>
-        </div>
-    )
+  return (
+    <div className={classes.root}>
+      {
+        getAnalytics.isLoading &&
+        <FullscreenSection>
+          <div className={classes.centering}>
+            <CircularProgress color={"secondary"}/>
+          </div>
+        </FullscreenSection>
+      }
+      {
+        !getAnalytics.isLoading && getAnalytics.isError &&
+        <Box my={2} width={'100%'}>
+          <MessageWithIcon
+            icon={<InfoIcon/>}
+            title={'Server Error'}
+            text={'Please try again later'}
+          />
+        </Box>
+      }
+      {
+        !getAnalytics.isLoading && !getAnalytics.isError && !!getAnalytics.data &&
+        <>
+          <TextSummary
+            totalDocuments={getAnalytics.data.summary.totalCount}
+            earliestDocumentDate={getAnalytics.data.summary.firstDocDate}
+            latestDocumentDate={getAnalytics.data.summary.lastDocDate}
+          />
+          <div ref={bgColorChangeRef} />
+          <DocsByCategory data={getAnalytics.data.countByCategory} />
+          <DocsByDay data={getAnalytics.data.docsCountByDay} />
+          <DocsByDayAndCategory data={getAnalytics.data.docCountByDayAndCategory} />
+          <WordCloud data={getAnalytics.data.wordCloud} />
+        </>
+      }
+    </div>
+  )
 };
 
 export default Analytics

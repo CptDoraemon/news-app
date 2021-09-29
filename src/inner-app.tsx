@@ -1,94 +1,75 @@
-import {State} from "./redux/state";
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {Box, makeStyles} from "@material-ui/core";
-import {categories, Category} from "./redux/actions/category";
-import ArticlesContainer from "./containers/articles-container";
 import Attribution from "./components/attribution";
 import CopyLinkSnackBarContainer from "./containers/copy-link-snackbar-container";
-import {fetchArticles} from "./redux/actions/articles";
-import {connect} from "react-redux";
 import Analytics from "./components/analytics/analytics";
-import HeaderContainer from "./containers/header-container";
 import Topic from "./components/topic/topic";
-import SearchedArticles from "./components/articles/searched-articles/searched-articles";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route
+} from "react-router-dom";
+import Header from "./components/header/header";
+import ArticlesContainer from "./components/articles/articles-container";
+import Search from "./components/search/search";
+import routers from "./routers";
+import ArticleByIdContainer from "./components/article-by-id/article-by-id-container";
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-        width: '100vw',
-        maxWidth: '100%',
-        // minHeight: '100vh',
-        // overflowX: 'hidden',
-        // paddingBottom: '10px',
-        // overflowX is causing y-axis scroll problem, pb do the hack,
-        position: 'relative'
-    },
-    attribution: {
-        position: 'absolute',
-        zIndex: theme.zIndex.appBar,
-        left: 10,
-        bottom: 10
-    }
+  root: {
+    width: '100vw',
+    maxWidth: '100%',
+    // overflowX: 'hidden',
+    // paddingBottom: '10px',
+    // overflowX is causing y-axis scroll problem, pb do the hack,
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start'
+  },
+  header: {
+    width: '100%',
+    flex: '0 0 auto'
+  },
+  mainArea: {
+    width: '100%',
+    flex: '1 1 auto'
+  },
+  attribution: {
+    width: '100%',
+    flex: '0 0 auto'
+  }
 }));
 
-interface InnerAppProps extends Pick<State, 'category' | 'articles'> {
-    fetchArticlesAfterMount: () => void,
-    keyword: string
+interface InnerAppProps {
 }
 
 function InnerApp(props: InnerAppProps) {
-    const classes = useStyles();
-    const [minHeight, setMinHeight] = useState(window.innerHeight);
-    useEffect(() => {
-        props.fetchArticlesAfterMount()
-    }, []);
+  const classes = useStyles();
 
-    const main = () => {
-        let component;
-        switch (props.category) {
-            case Category.ANALYTICS:
-                component = <Analytics />;
-                break;
-            case Category.SEARCH:
-                component = <SearchedArticles keyword={props.keyword} key={props.keyword}/>;
-                break;
-            case Category.TOPIC:
-                component = <Topic/>;
-                break;
-            default:
-                component = <ArticlesContainer articles={props.articles} />;
-        }
-
-        return component
-    };
-
-    return (
-        <Box className={classes.root} style={{minHeight: `${minHeight}px`}}>
-            <HeaderContainer/>
-            {
-                main()
-            }
-            <div className={classes.attribution}>
-                <Attribution />
-            </div>
-            <CopyLinkSnackBarContainer />
-        </Box>
-    )
+  return (
+    <Router basename={'/news-app'}>
+      <Box className={classes.root} style={{minHeight: `${window.innerHeight}px`}}>
+        <div className={classes.header}>
+          <Header/>
+        </div>
+        <div className={classes.mainArea}>
+          <Switch>
+            <Route path={routers.root.path} exact render={() => <ArticlesContainer/>}/>
+            <Route path={routers.search.path} exact render={() => <Search/>}/>
+            <Route path={routers.topic.path} exact component={Topic}/>
+            <Route path={routers.analytics.path} exact component={Analytics}/>
+            <Route path={routers.article.path} exact component={ArticleByIdContainer}/>
+          </Switch>
+        </div>
+        <div className={classes.attribution}>
+          <Attribution/>
+        </div>
+        <CopyLinkSnackBarContainer/>
+      </Box>
+    </Router>
+  )
 }
-function mapStateToProps(state: State) {
-    return {
-        category: state.category,
-        articles: state.articles,
-        keyword: state.searchKeyword
-    }
-}
-function mapDispatchToProps(dispatch: any) {
-    return {
-        fetchArticlesAfterMount: () => dispatch(fetchArticles(Category.HEADLINE))
-    }
-}
-const InnerAppContainer = connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(InnerApp);
 
-export default InnerAppContainer;
+export default InnerApp;

@@ -1,28 +1,13 @@
-import {Category} from "./actions/category";
-import {Article} from "./actions/articles";
-
 export interface State {
-    category: Category,
-    articles: {
-        isError: boolean,
-        isFetching: boolean,
-        articles: Array<Article>
-    },
-    copyLinkSnackBar: {
-        isActive: boolean
-    },
-    searchKeyword: string
+  copyLinkSnackBar: {
+    isActive: boolean,
+    text: string
+  }
 }
 
 export const initState: State = {
-    category: Category.HEADLINE,
-    articles: {
-        isError: false,
-        isFetching: true,
-        articles: []
-    },
-    copyLinkSnackBar: {
-        isActive: false
-    },
-    searchKeyword: ''
+  copyLinkSnackBar: {
+    isActive: false,
+    text: ''
+  }
 };
