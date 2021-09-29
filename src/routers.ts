@@ -11,7 +11,7 @@ export enum NewsCategory {
 export const newsCategories = Object.values(NewsCategory);
 
 export const getBaseAPI = () => {
-  return process.env.NODE_ENV === 'production' ? 'http://localhost' : 'https://api.xiaoxihome.com'
+  return process.env.NODE_ENV === 'production' ? 'https://api.xiaoxihome.com' : 'http://localhost'
 }
 
 const routers = {
