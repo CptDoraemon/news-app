@@ -11,6 +11,7 @@ import DocsByCategory from "./docs-by-category";
 import DocsByDay from "./docs-by-day";
 import DocsByDayAndCategory from "./docs-by-day-and-category";
 import FullscreenSection from "./layouts/fullscreen-section";
+import SlowNotification from "./slow-notification/slow-notification";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -37,11 +38,11 @@ const Analytics = () => {
 
   const {
     bgColorChangeRef,
-    bgBlack
   } = useChangeBackgroundColor(isDataReady);
 
   return (
     <div className={classes.root}>
+      <SlowNotification/>
       {
         getAnalytics.isLoading &&
         <FullscreenSection>
