@@ -4,6 +4,8 @@ import useSlowNotification from "./use-slow-notification";
 
 const useStyles = makeStyles((theme) => ({
   message: {
+    maxHeight: '60vh',
+    overflowY: 'auto',
     padding: theme.spacing(2, 4),
     '& h5': {
       marginBottom: theme.spacing(4),
@@ -31,7 +33,6 @@ const SlowNotification = () => {
       }}
       open={isOpen}
       autoHideDuration={null}
-      onClose={handleClose}
       message={
         <div className={classes.message}>
           <Typography variant={'h6'} component={'h5'}>
