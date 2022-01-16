@@ -1,17 +1,22 @@
 import React from "react";
-import {Button, makeStyles, Snackbar, Typography} from "@material-ui/core";
+import {Button, Dialog, DialogActions, DialogContent, makeStyles, Typography} from "@material-ui/core";
 import useSlowNotification from "./use-slow-notification";
+import DialogTitleWithCloseIcon from "./dialog-with-close-icon";
 
 const useStyles = makeStyles((theme) => ({
-  message: {
-    maxHeight: '60vh',
-    overflowY: 'auto',
-    padding: theme.spacing(2, 4),
+  root: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
     '& h5': {
       marginBottom: theme.spacing(4),
       '& strong': {
         color: theme.palette.warning.main
       }
+    },
+  },
+  message: {
+    '& ol': {
+      margin: 0,
     },
     '& li': {
       margin: theme.spacing(2, 0)
@@ -24,20 +29,17 @@ interface SlowNotificationProps {}
 const SlowNotification = () => {
   const classes = useStyles();
   const {isOpen, handleClose} = useSlowNotification();
-  
+
   return (
-    <Snackbar
-      anchorOrigin={{
-        vertical: 'bottom',
-        horizontal: 'center',
-      }}
-      open={isOpen}
-      autoHideDuration={null}
-      message={
+    <Dialog open={isOpen} onClose={() => false} classes={{paper: classes.root}}>
+      <DialogTitleWithCloseIcon onClose={handleClose}>
+        <Typography variant={'h6'} component={'h5'}>
+          You might ask, why <strong>this page takes very long</strong> to load?
+        </Typography>
+      </DialogTitleWithCloseIcon>
+
+      <DialogContent>
         <div className={classes.message}>
-          <Typography variant={'h6'} component={'h5'}>
-            You might ask, why <strong>this page takes very long</strong> to load?
-          </Typography>
           <ol>
             <Typography variant={'body1'} component={'li'}>
               Initially this report functionality had a in memory cache mechanism built on server.
@@ -50,18 +52,13 @@ const SlowNotification = () => {
             </Typography>
           </ol>
         </div>
-      }
-      action={
-        <Button
-          variant={'contained'}
-          color={'secondary'}
-          disableElevation
-          onClick={handleClose}
-        >
+      </DialogContent>
+      <DialogActions>
+        <Button color="secondary" variant={'contained'} disableElevation onClick={handleClose}>
           Close
         </Button>
-      }
-    />
+      </DialogActions>
+    </Dialog>
   )
 };
 
