@@ -8,7 +8,6 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.primary.contrastText,
     '& h5': {
-      marginBottom: theme.spacing(4),
       '& strong': {
         color: theme.palette.warning.main
       }
