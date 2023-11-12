@@ -20,7 +20,7 @@
     "@types/react-redux": "^7.1.5",
     "@types/redux-logger": "^3.0.7",
     "@types/seedrandom": "^3.0.1",
-    "axios": "^0.21.1",
+    "axios": "^1.6.0",
     "d3": "5.15.0",
     "d3-cloud": "^1.2.5",
     "date-fns": "^2.23.0",
